@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Muhra · Competitor Intel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --paper:#F3F4F1; --surface:#FFFFFF; --ink:#1E2A2C; --muted:#6B7572; --line:#DDE1DC;
+  --brand:#7A2334; --brand-soft:#F4E6E8; --good:#2F6B4F; --good-soft:#E3F0E8; --warn:#8A5A12; --warn-soft:#F7EDDB;
+  --bad:#9B2C2C; --bad-soft:#F8E4E4; --slate:#3E6A7A;
+  --radius-lg:14px; --radius-sm:8px;
+  --font:'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, Arial, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#131A1B; --surface:#1B2426; --ink:#E6EBE8; --muted:#95A09C; --line:#2C3739;
+    --brand:#D9848F; --brand-soft:#3A2227; --good:#7CC39B; --good-soft:#1E3328; --warn:#E0B266; --warn-soft:#3A2E1A;
+    --bad:#EC8C8C; --bad-soft:#3B2020; --slate:#86B3C2;
+  }
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit;color:inherit}
+a{color:var(--slate)}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:4px}
+.num{font-variant-numeric:tabular-nums}
+.hidden{display:none!important}
+
+/* Auth */
+.auth{min-height:100vh;display:grid;place-items:center;padding:24px}
+.auth-card{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:32px}
+.auth-card h1{font-size:22px;margin:0 0 4px}
+.auth-card p{color:var(--muted);margin:0 0 24px}
+.field{display:block;margin-bottom:14px}
+.field span{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+.input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--paper)}
+.input:focus{border-color:var(--brand);outline:none}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:500;white-space:nowrap}
+.btn:hover{border-color:var(--ink)}
+.btn:disabled{opacity:.55;cursor:default}
+.btn-primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn-primary:hover{filter:brightness(1.08);border-color:var(--brand)}
+.btn-danger{color:var(--bad)}
+.btn-sm{padding:5px 12px;font-size:13px}
+.btn-block{width:100%;justify-content:center}
+.linkbtn{background:none;border:none;color:var(--slate);cursor:pointer;padding:0;text-decoration:underline}
+.msg{font-size:14px;padding:10px 12px;border-radius:var(--radius-sm);margin-bottom:14px}
+.msg.err{background:var(--bad-soft);color:var(--bad)}
+.msg.ok{background:var(--good-soft);color:var(--good)}
+
+/* Shell */
+.shell{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+.side{border-right:1px solid var(--line);background:var(--surface);padding:20px 14px;position:sticky;top:env(safe-area-inset-top,0px);height:100vh;overflow-y:auto}
+.brand{display:flex;align-items:baseline;gap:8px;padding:0 8px 18px}
+.brand b{font-size:20px;color:var(--brand);letter-spacing:.5px}
+.brand small{color:var(--muted)}
+.nav{display:flex;flex-direction:column;gap:2px;margin-bottom:22px}
+.nav button{display:flex;justify-content:space-between;align-items:center;text-align:left;border:none;background:none;padding:9px 10px;border-radius:var(--radius-sm);cursor:pointer}
+.nav button:hover{background:var(--paper)}
+.nav button[aria-current="true"]{background:var(--brand-soft);color:var(--brand);font-weight:600}
+.side h3{font-size:12px;color:var(--muted);font-weight:500;margin:0 10px 8px}
+.clist{display:flex;flex-direction:column;gap:2px}
+.citem{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;border:none;background:none;padding:7px 8px;border-radius:var(--radius-sm);cursor:pointer;text-align:left;width:100%}
+.citem:hover{background:var(--paper)}
+.citem[aria-current="true"]{background:var(--brand-soft)}
+.citem .u{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.citem .s{font-size:12px;color:var(--muted)}
+.citem .er{font-size:12px;color:var(--muted)}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--line);object-fit:cover;display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--muted);flex-shrink:0}
+.avatar.lg{width:64px;height:64px;font-size:22px}
+.own-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--brand);margin-left:6px;vertical-align:middle}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot.err{background:var(--bad)} .dot.pause{background:var(--muted)} .dot.wait{background:var(--warn)}
+
+.main{padding:28px 32px 60px;min-width:0}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.topbar h1{font-size:26px;margin:0;font-weight:600;line-height:1.2}
+.topbar .sub{color:var(--muted);font-size:14px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.mobile-nav{display:none}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:20px;margin-bottom:18px}
+.panel h2{font-size:16px;margin:0 0 4px;font-weight:600}
+.panel .hint{color:var(--muted);font-size:13px;margin:0 0 16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid2>.panel{margin-bottom:0}
+.stack{display:flex;flex-direction:column;gap:18px}
+
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:18px}
+.kpi{background:var(--surface);padding:16px 18px}
+.kpi .v{font-size:24px;font-weight:600;line-height:1.2}
+.kpi .l{font-size:13px;color:var(--muted)}
+.kpi .d{font-size:13px;margin-top:2px}
+.up{color:var(--good)} .down{color:var(--bad)} .flat{color:var(--muted)}
+
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-weight:500;color:var(--muted);font-size:13px;text-align:right;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;user-select:none}
+th:first-child,td:first-child{text-align:left}
+th[aria-sort="descending"]::after{content:" ↓"} th[aria-sort="ascending"]::after{content:" ↑"}
+td{padding:10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr.own td{background:var(--brand-soft)}
+tr.clickable{cursor:pointer}
+tr.clickable:hover td{background:var(--paper)}
+tr.own.clickable:hover td{background:var(--brand-soft)}
+.acct{display:flex;align-items:center;gap:10px}
+.acct .avatar{width:28px;height:28px}
+
+.chart-box{position:relative;height:280px}
+.chart-box.sm{height:220px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px}
+.seg button{border:none;background:none;padding:4px 12px;border-radius:999px;cursor:pointer;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.panel-head .hint{margin:0}
+
+/* Profile */
+.profile{display:flex;gap:18px;align-items:flex-start}
+.profile .meta{flex:1;min-width:0}
+.profile h2{font-size:22px;margin:0}
+.profile .bio{color:var(--muted);white-space:pre-line;margin:6px 0;font-size:14px;max-width:70ch}
+.pill{display:inline-block;font-size:12px;padding:2px 10px;border-radius:999px;background:var(--paper);color:var(--muted);border:1px solid var(--line)}
+.pill.brand{background:var(--brand-soft);color:var(--brand);border-color:transparent}
+.banner{padding:12px 14px;border-radius:var(--radius-sm);margin-bottom:18px;font-size:14px}
+.banner.err{background:var(--bad-soft);color:var(--bad)}
+.banner.wait{background:var(--warn-soft);color:var(--warn)}
+
+/* Heatmap */
+.heat{display:grid;grid-template-columns:42px repeat(8,1fr);gap:3px;font-size:12px}
+.heat .hl{color:var(--muted);display:flex;align-items:center}
+.heat .hh{color:var(--muted);text-align:center}
+.heat .cell{aspect-ratio:1.6;border-radius:4px;background:var(--paper);display:grid;place-items:center;font-size:11px;color:var(--ink)}
+
+/* Formats */
+.fmt-row{display:grid;grid-template-columns:90px 1fr 70px 80px;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.fmt-row:last-child{border-bottom:none}
+.bar{height:10px;border-radius:5px;background:var(--paper);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--slate);border-radius:5px}
+
+/* Posts */
+.posts{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
+.post{border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;background:var(--surface);display:flex;flex-direction:column;text-decoration:none;color:inherit}
+.post:hover{border-color:var(--ink)}
+.post .img{aspect-ratio:4/5;background:var(--paper);position:relative;overflow:hidden}
+.post .img img{width:100%;height:100%;object-fit:cover;display:block}
+.post .img .fmt{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;padding:2px 8px;border-radius:999px}
+.post .img .ph{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:13px;text-align:center;padding:10px}
+.post .body{padding:10px;font-size:13px}
+.post .stats{display:flex;justify-content:space-between;color:var(--muted)}
+.post .stats b{color:var(--ink);font-weight:600}
+.post .cap{margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--muted)}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:13px;padding:3px 10px;border-radius:999px;background:var(--paper);border:1px solid var(--line)}
+.chip b{font-weight:600;margin-left:4px;color:var(--muted)}
+
+/* Gaps */
+.gap{display:grid;grid-template-columns:6px 1fr;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:18px 20px 18px 0;margin-bottom:12px;overflow:hidden}
+.gap .rail{background:var(--warn);border-radius:0 4px 4px 0}
+.gap.high .rail{background:var(--bad)}
+.gap.good .rail{background:var(--good)}
+.gap h3{margin:0 0 4px;font-size:16px}
+.gap .ev{color:var(--muted);font-size:14px;margin:0 0 10px}
+.gap .do{font-size:14px;background:var(--paper);border-radius:var(--radius-sm);padding:10px 12px}
+.gap .do b{color:var(--brand)}
+.section-title{font-size:15px;font-weight:600;margin:28px 0 12px}
+
+/* Report */
+.report{direction:rtl;text-align:right;font-size:16px;line-height:1.9;max-width:78ch}
+.report h2{font-size:19px;margin:28px 0 8px;color:var(--brand)}
+.report h3{font-size:16px;margin:18px 0 6px}
+.report ul,.report ol{padding-right:22px;padding-left:0}
+.report li{margin-bottom:6px}
+
+/* Manage */
+.add-form{display:grid;grid-template-columns:2fr 2fr auto;gap:10px;align-items:end}
+.check{display:flex;gap:8px;align-items:center;font-size:14px;margin-top:10px}
+.mrow{display:grid;grid-template-columns:32px 1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.mrow:last-child{border-bottom:none}
+.mrow .info .u{font-weight:600}
+.mrow .info .s{font-size:13px;color:var(--muted)}
+.mrow .info .e{font-size:13px;color:var(--bad)}
+.mrow .btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.notes-input{width:100%;margin-top:6px;padding:6px 10px;font-size:13px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--paper)}
+
+.empty{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty h2{color:var(--ink);font-size:18px;margin:0 0 6px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:10px 18px;border-radius:999px;font-size:14px;z-index:50;max-width:90vw}
+.spinner{width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spinner{animation-duration:2.4s}}
+
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .side{display:none}
+  .mobile-nav{display:flex;gap:8px;overflow-x:auto;margin:-8px -16px 18px;padding:0 16px 4px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--paper);z-index:5}
+  .mobile-nav button,.mobile-nav select{flex-shrink:0}
+  .main{padding:20px 16px 60px}
+  .grid2{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .add-form{grid-template-columns:1fr}
+  .fmt-row{grid-template-columns:70px 1fr 56px 64px;gap:8px}
+  .profile{flex-direction:column}
+  .topbar h1{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<div id="auth" class="auth hidden">
+  <div class="auth-card">
+    <h1>Competitor Intel</h1>
+    <p id="authSub">Sign in to your Muhra dashboard.</p>
+    <div id="authMsg"></div>
+    <label class="field"><span>Email</span><input id="email" class="input" type="email" autocomplete="email"></label>
+    <label class="field"><span>Password</span><input id="password" class="input" type="password" autocomplete="current-password"></label>
+    <button id="authBtn" class="btn btn-primary btn-block">Sign in</button>
+    <p style="margin:16px 0 0;font-size:14px;color:var(--muted)"><span id="authSwitchText">First time here?</span> <button id="authSwitch" class="linkbtn">Create the admin account</button></p>
+  </div>
+</div>
+
+<div id="pending" class="auth hidden">
+  <div class="auth-card">
+    <h1>Access pending</h1>
+    <p>This account can't view the dashboard yet. Ask the dashboard owner to grant access.</p>
+    <button class="btn btn-block" data-signout>Sign out</button>
+  </div>
+</div>
+
+<div id="app" class="shell hidden">
+  <aside class="side">
+    <div class="brand"><b>MUHRA</b><small>Competitor Intel</small></div>
+    <nav class="nav" id="nav"></nav>
+    <h3>Accounts</h3>
+    <div class="clist" id="clist"></div>
+  </aside>
+  <main class="main">
+    <div class="mobile-nav" id="mnav"></div>
+    <div id="view"></div>
+  </main>
+</div>
+
+<div id="toast" class="toast hidden" role="status"></div>
+
+<script>
+const SUPABASE_URL = 'https://ltwzmjqrlvqbndmipufm.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0d3ptanFybHZxYm5kbWlwdWZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMDA3NTEsImV4cCI6MjA5MjY3Njc1MX0.pvp5NFr2tOTw_MJHIxHO9kK7cQ75QjL5N8AcewXIVOM';
+const WEBHOOK_URL = 'https://vmi3437039.contaboserver.net/webhook/ci-fetch';
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+const DAY = 864e5;
+const DAYS = ['Sat','Sun','Mon','Tue','Wed','Thu','Fri'];
+const BLOCKS = ['00','03','06','09','12','15','18','21'];
+const FORMATS = ['Reel','Carousel','Image','Video'];
+const PALETTE = ['#3E6A7A','#A36B4F','#5B7F5E','#6A5C85','#B08D57','#4F5D75','#7E8C3E','#9A5C7A','#3F7F86','#86735F','#5F6F52','#7B6A9E','#C07A5A','#4E6E8E','#8C5E3C'];
+
+const S = { user:null, role:null, comps:[], snaps:[], posts:[], report:null, m:{}, postsBy:{}, snapsBy:{},
+  view:'overview', selected:null, charts:{}, sort:{key:'er',dir:-1}, postSort:'er', trendMode:'index', busy:{} };
+
+/* ---------- utils ---------- */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const isNum = (v) => typeof v === 'number' && isFinite(v);
+const toNum = (v) => v == null || v === '' ? null : Number(v);
+const avg = (a) => { const x = a.filter(isNum); return x.length ? x.reduce((s,v)=>s+v,0)/x.length : null; };
+const median = (a) => { const x = a.filter(isNum).sort((p,q)=>p-q); if(!x.length) return null; const m = Math.floor(x.length/2); return x.length%2 ? x[m] : (x[m-1]+x[m])/2; };
+const fmtInt = (v) => isNum(v) ? Math.round(v).toLocaleString('en-US') : '–';
+const fmtK = (v) => { if(!isNum(v)) return '–'; const a=Math.abs(v); if(a>=1e6) return (v/1e6).toFixed(a>=1e7?0:1)+'M'; if(a>=1e4) return (v/1e3).toFixed(a>=1e5?0:1)+'K'; return Math.round(v).toLocaleString('en-US'); };
+const fmt1 = (v) => isNum(v) ? (Math.round(v*10)/10).toLocaleString('en-US') : '–';
+const fmtPct = (v, d=2) => isNum(v) ? v.toFixed(d)+'%' : '–';
+const pct0 = (v) => isNum(v) ? Math.round(v*100)+'%' : '–';
+const signed = (v, f=fmtK) => !isNum(v) ? '–' : (v>0?'+':v<0?'−':'') + f(Math.abs(v));
+const cls = (v) => !isNum(v) || v===0 ? 'flat' : v>0 ? 'up' : 'down';
+const ageDays = (iso) => (Date.now() - new Date(iso).getTime())/DAY;
+const initials = (u) => (u||'?').replace(/[^a-z0-9]/gi,'').slice(0,2).toUpperCase();
+const relTime = (iso) => { if(!iso) return 'never'; const m=(Date.now()-new Date(iso))/6e4; if(m<1) return 'just now'; if(m<60) return Math.round(m)+' min ago'; const h=m/60; if(h<24) return Math.round(h)+' h ago'; return Math.round(h/24)+' days ago'; };
+const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const cairoFmt = new Intl.DateTimeFormat('en-GB',{timeZone:'Africa/Cairo',weekday:'short',hour:'2-digit',hour12:false});
+function cairoParts(iso){
+  const parts = cairoFmt.formatToParts(new Date(iso));
+  const wd = parts.find(p=>p.type==='weekday').value;
+  let h = Number(parts.find(p=>p.type==='hour').value); if(h===24) h=0;
+  return { day: DAYS.indexOf(wd), block: Math.floor(h/3) };
+}
+function toast(t, ms=3200){ const el=$('toast'); el.textContent=t; el.classList.remove('hidden'); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.add('hidden'), ms); }
+function avatarHtml(c, lg){
+  const k = lg ? 'avatar lg' : 'avatar';
+  if(c.profile_picture_url) return `<img class="${k}" src="${esc(c.profile_picture_url)}" alt="" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=&quot;${k}&quot;>${esc(initials(c.username))}</span>'">`;
+  return `<span class="${k}">${esc(initials(c.username))}</span>`;
+}
+const colorFor = (c) => c.is_own ? cssVar('--brand') : PALETTE[(S.comps.filter(x=>!x.is_own).indexOf(c)) % PALETTE.length];
+
+/* ---------- auth ---------- */
+let signUpMode = false;
+function showAuth(msg, kind){
+  $('app').classList.add('hidden'); $('pending').classList.add('hidden'); $('auth').classList.remove('hidden');
+  $('authMsg').innerHTML = msg ? `<div class="msg ${kind||'err'}">${esc(msg)}</div>` : '';
+}
+$('authSwitch').onclick = () => {
+  signUpMode = !signUpMode;
+  $('authBtn').textContent = signUpMode ? 'Create account' : 'Sign in';
+  $('authSub').textContent = signUpMode ? 'The first account created becomes the admin.' : 'Sign in to your Muhra dashboard.';
+  $('authSwitchText').textContent = signUpMode ? 'Already have an account?' : 'First time here?';
+  $('authSwitch').textContent = signUpMode ? 'Sign in' : 'Create the admin account';
+  $('password').autocomplete = signUpMode ? 'new-password' : 'current-password';
+  $('authMsg').innerHTML = '';
+};
+$('authBtn').onclick = async () => {
+  const email = $('email').value.trim(), password = $('password').value;
+  if(!email || !password) return showAuth('Enter your email and password.');
+  if(signUpMode && password.length < 8) return showAuth('Use a password of at least 8 characters.');
+  $('authBtn').disabled = true;
+  try{
+    if(signUpMode){
+      const { data, error } = await sb.auth.signUp({ email, password });
+      if(error) throw error;
+      if(!data.session){ showAuth('Account created. Confirm the link sent to your email, then sign in.', 'ok'); $('authSwitch').click(); return; }
+    } else {
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if(error) throw error;
+    }
+    await boot();
+  }catch(e){ showAuth(e.message || 'Sign-in failed.'); }
+  finally{ $('authBtn').disabled = false; }
+};
+$('password').addEventListener('keydown', e => { if(e.key==='Enter') $('authBtn').click(); });
+document.addEventListener('click', async e => { if(e.target.closest('[data-signout]')){ await sb.auth.signOut(); location.reload(); } });
+
+/* ---------- data ---------- */
+async function fetchAll(build){
+  const out = []; const size = 1000;
+  for(let from=0;;from+=size){
+    const { data, error } = await build().range(from, from+size-1);
+    if(error) throw error;
+    out.push(...data);
+    if(data.length < size) break;
+  }
+  return out;
+}
+async function loadData(){
+  const since = new Date(Date.now()-120*DAY).toISOString();
+  const [c, s, p, r] = await Promise.all([
+    sb.from('ci_competitors').select('*').order('created_at'),
+    fetchAll(() => sb.from('ci_snapshots').select('*').gte('snap_date', since.slice(0,10)).order('snap_date')),
+    fetchAll(() => sb.from('ci_posts').select('id,competitor_id,caption,format,permalink,media_url,thumbnail_url,posted_at,like_count,comments_count,engagement_rate,hashtags').gte('posted_at', since).order('posted_at',{ascending:false})),
+    sb.from('ci_reports').select('*').order('created_at',{ascending:false}).limit(1)
+  ]);
+  if(c.error) throw c.error; if(r.error) throw r.error;
+  S.comps = c.data.sort((a,b)=> (b.is_own-a.is_own) || ((b.followers||0)-(a.followers||0)));
+  S.snaps = s.map(x=>({...x, followers:toNum(x.followers), engagement_rate:toNum(x.engagement_rate), avg_likes:toNum(x.avg_likes), avg_comments:toNum(x.avg_comments)}));
+  S.posts = p.map(x=>({...x, engagement_rate:toNum(x.engagement_rate)}));
+  S.report = r.data[0] || null;
+  S.postsBy = {}; S.snapsBy = {};
+  for(const x of S.posts) (S.postsBy[x.competitor_id] ||= []).push(x);
+  for(const x of S.snaps) (S.snapsBy[x.competitor_id] ||= []).push(x);
+  S.m = {};
+  for(const comp of S.comps) S.m[comp.id] = metrics(comp);
+}
+
+function metrics(c){
+  const ps = S.postsBy[c.id] || [], ss = S.snapsBy[c.id] || [];
+  const last = ss[ss.length-1] || null;
+  const growth = (days) => {
+    if(ss.length < 2) return null;
+    const target = new Date(Date.now()-days*DAY).toISOString().slice(0,10);
+    const base = ss.find(x=>x.snap_date >= target);
+    if(!base || base === last || !isNum(base.followers) || !isNum(last.followers)) return null;
+    return { abs: last.followers - base.followers, pct: base.followers ? (last.followers-base.followers)/base.followers*100 : null, days: Math.round((new Date(last.snap_date)-new Date(base.snap_date))/DAY) };
+  };
+  const p30 = ps.filter(p=>ageDays(p.posted_at)<=30);
+  const p60 = ps.filter(p=>ageDays(p.posted_at)<=60);
+  const recent = ps.slice(0,12);
+  const er = last && isNum(last.engagement_rate) ? last.engagement_rate : avg(recent.map(p=>p.engagement_rate));
+  const accER = avg(p60.map(p=>p.engagement_rate));
+  const fm = {};
+  for(const f of FORMATS){ const fp = p60.filter(p=>p.format===f); fm[f] = { n: fp.length, share: p60.length ? fp.length/p60.length : 0, er: avg(fp.map(p=>p.engagement_rate)) }; }
+  let best = null; for(const f of FORMATS){ if(fm[f].n>=2 && (!best || fm[f].er > fm[best].er)) best = f; }
+  return {
+    followers: c.followers, er, accER, g7: growth(7), g30: growth(30),
+    perWeek: p30.length/30*7, p30: p30.length, p60,
+    likes: avg(recent.map(p=>p.like_count)), comments: avg(recent.map(p=>p.comments_count)),
+    fm, best, hasData: !!c.last_fetched_at && !c.last_error && ps.length>0,
+    capLen: avg(p60.map(p=>(p.caption||'').length))
+  };
+}
+
+/* ---------- jobs (n8n) ---------- */
+async function triggerJob(job, competitorId){
+  const { data, error } = await sb.rpc('ci_request_job', { p_job: job, p_competitor_id: competitorId ?? null });
+  if(error) throw error;
+  await fetch(WEBHOOK_URL, { method:'POST', mode:'no-cors', body: new URLSearchParams({ job: data.job, job_id: String(data.job_id), token: data.token }) });
+}
+async function waitForFetch(ids, startedAt, timeoutMs=150000){
+  const t0 = Date.now();
+  while(Date.now()-t0 < timeoutMs){
+    await new Promise(r=>setTimeout(r, 4000));
+    const { data } = await sb.from('ci_competitors').select('id,last_fetched_at').in('id', ids);
+    if(data && data.every(x=>x.last_fetched_at && new Date(x.last_fetched_at) >= startedAt)) return true;
+  }
+  return false;
+}
+async function refresh(ids, label){
+  const key = ids ? ids.join(',') : 'all';
+  if(S.busy[key]) return;
+  S.busy[key] = true; render();
+  const startedAt = new Date(Date.now()-2000);
+  try{
+    await triggerJob('track', ids && ids.length===1 ? ids[0] : null);
+    toast(label || 'Fetching fresh data from Instagram…');
+    const target = ids || S.comps.filter(c=>c.status==='active').map(c=>c.id);
+    const ok = target.length ? await waitForFetch(target, startedAt) : true;
+    await loadData();
+    toast(ok ? 'Data updated.' : 'Still working in the background. Reload in a minute.');
+  }catch(e){ toast(e.message || 'Could not start the fetch.'); }
+  finally{ delete S.busy[key]; render(); }
+}
+async function generateReport(){
+  if(S.busy.report) return;
+  S.busy.report = true; render();
+  const prev = S.report ? S.report.id : 0;
+  try{
+    await triggerJob('report', null);
+    toast('Writing the AI report… this takes about a minute.');
+    const t0 = Date.now();
+    while(Date.now()-t0 < 180000){
+      await new Promise(r=>setTimeout(r, 5000));
+      const { data } = await sb.from('ci_reports').select('*').order('created_at',{ascending:false}).limit(1);
+      if(data && data[0] && data[0].id !== prev){ S.report = data[0]; break; }
+    }
+    toast(S.report && S.report.id !== prev ? 'Report ready.' : 'Still writing. Check back shortly.');
+  }catch(e){ toast(e.message || 'Could not start the report.'); }
+  finally{ delete S.busy.report; render(); }
+}
+
+/* ---------- gap engine ---------- */
+function computeGaps(){
+  const own = S.comps.find(c=>c.is_own);
+  const rivals = S.comps.filter(c=>!c.is_own && c.status==='active' && S.m[c.id].hasData);
+  if(!own) return { state:'no-own' };
+  if(!S.m[own.id].hasData) return { state:'own-pending', own };
+  if(!rivals.length) return { state:'no-rivals' };
+  const om = S.m[own.id];
+  const gaps = [], wins = [];
+  const handle = (c) => '@'+c.username;
+
+  // normalised post score: post ER / account's 60-day average ER
+  const norm = (c) => { const m = S.m[c.id]; return m.p60.filter(p=>isNum(p.engagement_rate) && m.accER).map(p=>({...p, rel: p.engagement_rate/m.accER})); };
+  const rivalPosts = rivals.flatMap(norm);
+  const ownPosts = S.m[own.id].p60;
+
+  // 1. posting frequency
+  const medF = median(rivals.map(c=>S.m[c.id].perWeek));
+  const topF = rivals.slice().sort((a,b)=>S.m[b.id].perWeek-S.m[a.id].perWeek)[0];
+  if(isNum(medF) && medF>0){
+    if(om.perWeek < medF*0.8) gaps.push({ sev: om.perWeek < medF*0.5 ? 'high':'med', title:'You post less often than the market',
+      ev:`Muhra posted ${fmt1(om.perWeek)} times a week over the last 30 days. The competitor median is ${fmt1(medF)}, and ${handle(topF)} posts ${fmt1(S.m[topF.id].perWeek)} a week.`,
+      act:`Move to at least ${Math.ceil(medF)} posts a week to stay visible in the feed.` });
+    else if(om.perWeek >= medF*1.2) wins.push({ title:'You out-post the market', ev:`${fmt1(om.perWeek)} posts a week vs a competitor median of ${fmt1(medF)}.` });
+  }
+
+  // 2. format opportunities
+  if(rivalPosts.length >= 10){
+    for(const f of FORMATS){
+      const fp = rivalPosts.filter(p=>p.format===f);
+      if(fp.length < 5) continue;
+      const lift = avg(fp.map(p=>p.rel));
+      const share = fp.length / rivalPosts.length;
+      const ownShare = ownPosts.length ? ownPosts.filter(p=>p.format===f).length/ownPosts.length : 0;
+      if(lift >= 1.15 && ownShare < share - 0.1)
+        gaps.push({ sev: lift>=1.4 ? 'high':'med', title:`${f}s are under-used at Muhra`,
+          ev:`Across competitors, ${f.toLowerCase()}s earn ${fmt1(lift)}× their account's average engagement and make up ${pct0(share)} of posts. They are only ${pct0(ownShare)} of Muhra's last 60 days.`,
+          act:(()=>{ const n = Math.max(1, Math.round((share-ownShare)*Math.max(om.perWeek, medF||3))); return `Shift about ${n} post${n>1?'s':''} a week to ${f.toLowerCase()}s.`; })() });
+      else if(lift <= 0.85 && ownShare > share + 0.15)
+        gaps.push({ sev:'med', title:`Too many ${f.toLowerCase()}s for what they return`,
+          ev:`${f}s get only ${fmt1(lift)}× average engagement across competitors, yet they are ${pct0(ownShare)} of Muhra's posts (market: ${pct0(share)}).`,
+          act:`Replace some ${f.toLowerCase()}s with the format that over-performs above.` });
+      else if(lift >= 1.15 && ownShare >= share)
+        wins.push({ title:`Strong ${f.toLowerCase()} mix`, ev:`${f}s over-perform in the market (${fmt1(lift)}×) and Muhra already uses them for ${pct0(ownShare)} of posts.` });
+    }
+  }
+
+  // 3. timing windows (Cairo)
+  const slot = {};
+  for(const p of rivalPosts){ const t = cairoParts(p.posted_at); const k = t.day+'-'+t.block; (slot[k] ||= []).push(p.rel); }
+  const slots = Object.entries(slot).filter(([,v])=>v.length>=3).map(([k,v])=>({k, n:v.length, lift:avg(v)})).sort((a,b)=>b.lift-a.lift).slice(0,3).filter(s=>s.lift>=1.15);
+  if(slots.length){
+    const keys = new Set(slots.map(s=>s.k));
+    const ownIn = ownPosts.filter(p=>{ const t=cairoParts(p.posted_at); return keys.has(t.day+'-'+t.block); }).length;
+    const label = slots.map(s=>{ const [d,b]=s.k.split('-').map(Number); return `${DAYS[d]} ${BLOCKS[b]}:00–${String((b+1)*3).padStart(2,'0')}:00 (${fmt1(s.lift)}×)`; }).join(', ');
+    const ownShare = ownPosts.length ? ownIn/ownPosts.length : 0;
+    if(ownShare < 0.25) gaps.push({ sev:'med', title:'You miss the best posting windows',
+      ev:`Competitor posts published in these Cairo-time windows get the highest engagement: ${label}. Only ${pct0(ownShare)} of Muhra's posts land there.`,
+      act:'Schedule your strongest content into these windows first.' });
+    else wins.push({ title:'Good timing', ev:`${pct0(ownShare)} of Muhra's posts land in the market's best windows: ${label}.` });
+  }
+
+  // 4. hashtags from top-quartile posts
+  const sorted = rivalPosts.slice().sort((a,b)=>b.rel-a.rel);
+  const topQ = sorted.slice(0, Math.max(5, Math.floor(sorted.length/4)));
+  const ownTags = new Set(ownPosts.flatMap(p=>p.hashtags||[]));
+  const tagCount = {};
+  for(const p of topQ) for(const t of (p.hashtags||[])) tagCount[t] = (tagCount[t]||0)+1;
+  const missing = Object.entries(tagCount).filter(([t,n])=>n>=2 && !ownTags.has(t)).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  if(missing.length) gaps.push({ sev:'low', title:'Hashtags on top competitor posts that Muhra never uses',
+    ev:`These appear repeatedly on the top 25% of competitor posts: ${missing.map(([t,n])=>'#'+t+' ('+n+')').join(', ')}.`,
+    act:'Test the relevant ones on your next posts and keep the ones that lift reach.' });
+
+  // 5. caption length
+  const topCap = avg(topQ.map(p=>(p.caption||'').length));
+  if(isNum(topCap) && isNum(om.capLen) && topCap>0){
+    const ratio = om.capLen/topCap;
+    if(ratio < 0.6) gaps.push({ sev:'low', title:'Your captions are much shorter than winning posts', ev:`Top competitor posts average ${fmtInt(topCap)} characters; Muhra averages ${fmtInt(om.capLen)}.`, act:'Add a hook line, the styling detail, and a clear call to order.' });
+    else if(ratio > 1.8) gaps.push({ sev:'low', title:'Your captions are much longer than winning posts', ev:`Top competitor posts average ${fmtInt(topCap)} characters; Muhra averages ${fmtInt(om.capLen)}.`, act:'Lead with one short hook line and cut the rest.' });
+  }
+
+  // 6. engagement and growth vs market
+  const medER = median(rivals.map(c=>S.m[c.id].er));
+  if(isNum(medER) && isNum(om.er)){
+    if(om.er < medER*0.8) gaps.push({ sev:'high', title:'Your engagement rate trails the market', ev:`Muhra ${fmtPct(om.er)} vs competitor median ${fmtPct(medER)} (average of the last 12 posts, likes + comments ÷ followers).`, act:'Use the format and timing fixes above; they are the fastest levers.' });
+    else if(om.er >= medER*1.2) wins.push({ title:'Engagement above market', ev:`Muhra ${fmtPct(om.er)} vs competitor median ${fmtPct(medER)}.` });
+  }
+  const g = (c) => S.m[c.id].g30 && S.m[c.id].g30.pct;
+  const medG = median(rivals.map(g));
+  if(isNum(medG) && isNum(g(own))){
+    if(g(own) < medG - 0.5) gaps.push({ sev:'med', title:'Your audience grows slower than competitors', ev:`Muhra grew ${fmtPct(g(own),1)} in ${S.m[own.id].g30.days} days vs a competitor median of ${fmtPct(medG,1)}.`, act:'Pair content fixes with a small follower-growth ad or collaboration.' });
+    else if(g(own) > medG + 0.5) wins.push({ title:'Faster follower growth', ev:`Muhra ${fmtPct(g(own),1)} vs competitor median ${fmtPct(medG,1)}.` });
+  }
+
+  const rank = { high:0, med:1, low:2 };
+  gaps.sort((a,b)=>rank[a.sev]-rank[b.sev]);
+  return { state:'ok', gaps, wins, rivals: rivals.length };
+}
+
+/* ---------- rendering ---------- */
+function destroyCharts(){ for(const k in S.charts){ S.charts[k].destroy(); } S.charts = {}; }
+function go(view, id){ S.view = view; S.selected = id ?? null; render(); window.scrollTo(0,0); }
+
+function renderNav(){
+  const admin = S.role === 'admin';
+  const items = [['overview','Overview'],['gaps','Gaps'],['report','AI report']];
+  if(admin) items.push(['manage','Manage accounts']);
+  $('nav').innerHTML = items.map(([k,l])=>`<button data-go="${k}" aria-current="${S.view===k}">${l}</button>`).join('') + `<button data-signout>Sign out</button>`;
+  $('clist').innerHTML = S.comps.length ? S.comps.map(c=>{
+    const m = S.m[c.id];
+    const status = c.last_error ? '<span class="dot err" title="Error"></span>' : c.status==='paused' ? '<span class="dot pause" title="Paused"></span>' : !c.last_fetched_at ? '<span class="dot wait" title="Waiting for first fetch"></span>' : `<span class="er num">${fmtPct(m.er,1)}</span>`;
+    return `<button class="citem" data-comp="${c.id}" aria-current="${S.view==='comp'&&S.selected===c.id}">${avatarHtml(c)}<span><span class="u">@${esc(c.username)}${c.is_own?'<span class="own-dot" title="Muhra"></span>':''}</span><br><span class="s num">${fmtK(c.followers)} followers</span></span>${status}</button>`;
+  }).join('') : `<p style="color:var(--muted);font-size:13px;padding:0 10px">No accounts yet.</p>`;
+  const opts = S.comps.map(c=>`<option value="${c.id}" ${S.view==='comp'&&S.selected===c.id?'selected':''}>@${esc(c.username)}</option>`).join('');
+  $('mnav').innerHTML = items.map(([k,l])=>`<button class="btn btn-sm" data-go="${k}" ${S.view===k?'style="background:var(--ink);color:var(--surface)"':''}>${l}</button>`).join('')
+    + (S.comps.length ? `<select class="btn btn-sm" id="mselect"><option value="">Account…</option>${opts}</select>` : '');
+  const ms = $('mselect'); if(ms) ms.onchange = () => ms.value && go('comp', Number(ms.value));
+}
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-go]'); if(g){ go(g.dataset.go); return; }
+  const c = e.target.closest('[data-comp]'); if(c){ go('comp', Number(c.dataset.comp)); return; }
+});
+
+function render(){
+  destroyCharts();
+  renderNav();
+  const v = $('view');
+  if(S.view==='overview') v.innerHTML = viewOverview();
+  else if(S.view==='comp') v.innerHTML = viewComp();
+  else if(S.view==='gaps') v.innerHTML = viewGaps();
+  else if(S.view==='report') v.innerHTML = viewReport();
+  else if(S.view==='manage') v.innerHTML = S.role==='admin' ? viewManage() : '';
+  bindView();
+}
+
+function emptyAll(){
+  const admin = S.role==='admin';
+  return `<div class="panel empty"><h2>Start by adding accounts</h2><p>Add Muhra's own Instagram as the baseline, then the competitors you want to track.</p>${admin?'<button class="btn btn-primary" data-go="manage">Add accounts</button>':''}</div>`;
+}
+
+function growthCell(g){ if(!g) return '<span class="flat">–</span>'; return `<span class="${cls(g.abs)}">${signed(g.abs)}</span> <span class="flat">${isNum(g.pct)?'('+(g.pct>0?'+':'')+g.pct.toFixed(1)+'%)':''}</span>`; }
+
+function viewOverview(){
+  const busy = S.busy.all;
+  const head = `<div class="topbar"><div><h1>Overview</h1><div class="sub">${S.comps.filter(c=>c.status==='active').length} active accounts · Instagram · updated daily at 05:00 Cairo</div></div>
+    <div class="actions">${S.role==='admin'?`<button class="btn" data-action="refresh-all" ${busy?'disabled':''}>${busy?'<span class="spinner"></span> Fetching…':'Refresh all now'}</button>`:''}</div></div>`;
+  if(!S.comps.length) return head + emptyAll();
+  const rows = S.comps.filter(c=>S.m[c.id].hasData).map(c=>({c, m:S.m[c.id]}));
+  const k = S.sort.key, d = S.sort.dir;
+  const val = (r) => ({ followers:r.m.followers, g30:r.m.g30?r.m.g30.abs:null, pw:r.m.perWeek, er:r.m.er, likes:r.m.likes, comments:r.m.comments })[k];
+  rows.sort((a,b)=> ((val(b)??-Infinity) - (val(a)??-Infinity)) * (d===-1?1:-1));
+  const th = (key,l) => `<th data-sort="${key}" aria-sort="${S.sort.key===key?(S.sort.dir===-1?'descending':'ascending'):'none'}">${l}</th>`;
+  const pending = S.comps.filter(c=>!S.m[c.id].hasData);
+  const pendingNote = pending.length ? `<p class="hint" style="margin-top:12px">${pending.length} account${pending.length>1?'s':''} without data yet: ${pending.map(c=>'@'+esc(c.username)+(c.last_error?' (error)':c.status==='paused'?' (paused)':' (waiting)')).join(', ')}.</p>` : '';
+  return head + `
+  <div class="panel">
+    <div class="panel-head"><div><h2>Leaderboard</h2><p class="hint">Engagement rate = average (likes + comments) ÷ followers on the last 12 posts. Click a row for the full breakdown.</p></div></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Account</th>${th('followers','Followers')}${th('g30','30-day growth')}${th('pw','Posts / week')}${th('er','Eng. rate')}${th('likes','Avg likes')}${th('comments','Avg comments')}<th>Best format</th></tr></thead>
+      <tbody>${rows.map(({c,m})=>`<tr class="clickable ${c.is_own?'own':''}" data-comp="${c.id}">
+        <td><span class="acct">${avatarHtml(c)}<span>@${esc(c.username)}${c.is_own?' <span class="pill brand">Muhra</span>':''}</span></span></td>
+        <td class="num">${fmtInt(m.followers)}</td><td class="num">${growthCell(m.g30)}</td><td class="num">${fmt1(m.perWeek)}</td>
+        <td class="num"><b>${fmtPct(m.er)}</b></td><td class="num">${fmtInt(m.likes)}</td><td class="num">${fmtInt(m.comments)}</td><td>${m.best||'–'}</td></tr>`).join('')}</tbody>
+    </table></div>${pendingNote}
+  </div>
+  <div class="grid2">
+    <div class="panel"><div class="panel-head"><div><h2>Follower trend</h2><p class="hint" id="trendHint">${S.trendMode==='index'?'Growth since tracking started, as % change':'Follower count'}</p></div>
+      <div class="seg"><button data-trend="index" aria-pressed="${S.trendMode==='index'}">Growth %</button><button data-trend="abs" aria-pressed="${S.trendMode==='abs'}">Followers</button></div></div>
+      <div class="chart-box"><canvas id="chTrend"></canvas></div></div>
+    <div class="panel"><h2>Engagement rate ranking</h2><p class="hint">Who earns the most interaction per follower</p><div class="chart-box"><canvas id="chER"></canvas></div></div>
+  </div>`;
+}
+
+function viewComp(){
+  const c = S.comps.find(x=>x.id===S.selected);
+  if(!c) return emptyAll();
+  const m = S.m[c.id];
+  const busy = S.busy[String(c.id)];
+  const admin = S.role==='admin';
+  let banner = '';
+  if(c.last_error) banner = `<div class="banner err"><b>Last fetch failed:</b> ${esc(c.last_error)}</div>`;
+  else if(!c.last_fetched_at) banner = `<div class="banner wait">Waiting for the first fetch. It starts within a minute of adding the account.</div>`;
+  else if(c.status==='paused') banner = `<div class="banner wait">Tracking is paused. History is kept; resume from Manage accounts.</div>`;
+  const head = `<div class="panel"><div class="profile">${avatarHtml(c,true)}<div class="meta">
+      <h2>${esc(c.display_name || c.username)} ${c.is_own?'<span class="pill brand">Muhra</span>':''}</h2>
+      <div><a href="https://instagram.com/${esc(c.username)}" target="_blank" rel="noopener">@${esc(c.username)}</a>${c.website?` · <a href="${esc(c.website)}" target="_blank" rel="noopener">${esc(c.website.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>`:''}</div>
+      ${c.biography?`<p class="bio">${esc(c.biography)}</p>`:''}
+      ${c.notes?`<p style="font-size:14px;margin:6px 0 0"><b>Notes:</b> ${esc(c.notes)}</p>`:''}
+      <p style="font-size:13px;color:var(--muted);margin:8px 0 0">Updated ${relTime(c.last_fetched_at)} · ${fmtInt(c.media_count)} posts total</p>
+    </div>${admin?`<button class="btn" data-action="refresh-one" data-id="${c.id}" ${busy?'disabled':''}>${busy?'<span class="spinner"></span> Fetching…':'Refresh now'}</button>`:''}</div></div>`;
+  if(!m.hasData) return banner + head;
+  const k = (v,l,d) => `<div class="kpi"><div class="v num">${v}</div><div class="l">${l}</div>${d?`<div class="d num">${d}</div>`:''}</div>`;
+  const kpis = `<div class="kpis">
+    ${k(fmtK(m.followers),'Followers', m.g30?`<span class="${cls(m.g30.abs)}">${signed(m.g30.abs)}</span> <span class="flat">in ${m.g30.days} days</span>`:'<span class="flat">growth shows after day 2</span>')}
+    ${k(fmtPct(m.er),'Engagement rate','<span class="flat">last 12 posts</span>')}
+    ${k(fmt1(m.perWeek),'Posts per week','<span class="flat">last 30 days</span>')}
+    ${k(fmtK(m.likes),'Avg likes','')}
+    ${k(fmtK(m.comments),'Avg comments','')}</div>`;
+
+  const maxShare = Math.max(...FORMATS.map(f=>m.fm[f].share), 0.01);
+  const fmts = FORMATS.filter(f=>m.fm[f].n).map(f=>`<div class="fmt-row"><span>${f}</span><span class="bar"><i style="width:${m.fm[f].share/maxShare*100}%"></i></span><span class="num" style="text-align:right">${pct0(m.fm[f].share)}</span><span class="num" style="text-align:right">${fmtPct(m.fm[f].er)}</span></div>`).join('');
+
+  // heatmap
+  const cells = {}; let maxN = 0;
+  for(const p of m.p60){ const t = cairoParts(p.posted_at); const key = t.day+'-'+t.block; (cells[key] ||= []).push(p.engagement_rate); maxN = Math.max(maxN, cells[key].length); }
+  const ers = Object.values(cells).map(a=>avg(a)).filter(isNum); const maxER = Math.max(...ers, 0.0001);
+  let heat = `<div class="heat"><span></span>${BLOCKS.map(b=>`<span class="hh">${b}</span>`).join('')}`;
+  DAYS.forEach((d,di)=>{ heat += `<span class="hl">${d}</span>`; BLOCKS.forEach((b,bi)=>{ const a = cells[di+'-'+bi]; const e = a?avg(a):null; const alpha = a && isNum(e) ? 0.15+0.85*(e/maxER) : 0;
+    heat += `<span class="cell num" title="${d} ${b}:00 Cairo — ${a?a.length:0} posts${isNum(e)?', avg ER '+e.toFixed(2)+'%':''}" style="${a?`background:color-mix(in srgb, var(--brand) ${Math.round(alpha*100)}%, var(--paper))${alpha>0.6?';color:#fff':''}`:''}">${a?a.length:''}</span>`; }); });
+  heat += '</div>';
+
+  // posts
+  const sortFns = { er:(a,b)=>(b.engagement_rate??-1)-(a.engagement_rate??-1), likes:(a,b)=>(b.like_count??-1)-(a.like_count??-1), comments:(a,b)=>(b.comments_count??-1)-(a.comments_count??-1), recent:(a,b)=>new Date(b.posted_at)-new Date(a.posted_at) };
+  const pool = (S.postsBy[c.id]||[]).filter(p=>S.postSort==='recent' || ageDays(p.posted_at)<=90).slice().sort(sortFns[S.postSort]).slice(0,12);
+  const posts = pool.map(p=>{ const img = p.thumbnail_url || p.media_url; const d = new Date(p.posted_at);
+    return `<a class="post" href="${esc(p.permalink||'#')}" target="_blank" rel="noopener"><div class="img">${img?`<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<span class="ph">Preview expired<br>open on Instagram</span><span class="fmt">${esc(p.format)}</span></div>
+      <div class="body"><div class="stats num"><span><b>${fmtK(p.like_count)}</b> likes</span><span><b>${fmtK(p.comments_count)}</b> com.</span></div>
+      <div class="stats num" style="margin-top:2px"><span>${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</span><span><b>${fmtPct(p.engagement_rate)}</b></span></div>
+      <div class="cap" dir="auto">${esc((p.caption||'').slice(0,160))}</div></div></a>`; }).join('');
+
+  const tagStats = {};
+  for(const p of m.p60) for(const t of (p.hashtags||[])){ (tagStats[t] ||= []).push(p.engagement_rate); }
+  const tags = Object.entries(tagStats).map(([t,a])=>({t,n:a.length,er:avg(a)})).sort((a,b)=>b.n-a.n || (b.er||0)-(a.er||0)).slice(0,20);
+
+  return banner + head + kpis + `
+  <div class="grid2">
+    <div class="panel"><h2>Follower growth</h2><p class="hint">Daily snapshot since tracking started</p><div class="chart-box sm"><canvas id="chFollowers"></canvas></div></div>
+    <div class="panel"><h2>Format mix and performance</h2><p class="hint">Last 60 days · share of posts · average engagement rate</p>${fmts || '<p class="hint">No posts in the last 60 days.</p>'}</div>
+  </div>
+  <div class="grid2" style="margin-top:18px">
+    <div class="panel"><h2>When they post</h2><p class="hint">Cairo time, 3-hour blocks, last 60 days. Number = posts; darker = higher engagement.</p>${heat}</div>
+    <div class="panel"><h2>Hashtags they use</h2><p class="hint">Last 60 days · number of posts</p>${tags.length?`<div class="chips">${tags.map(x=>`<span class="chip">#${esc(x.t)}<b class="num">${x.n}</b></span>`).join('')}</div>`:'<p class="hint">No hashtags used.</p>'}</div>
+  </div>
+  <div class="panel" style="margin-top:18px"><div class="panel-head"><div><h2>Best-performing content</h2><p class="hint">${S.postSort==='recent'?'Most recent posts':'Top 12 from the last 90 days'}</p></div>
+    <div class="seg">${[['er','Engagement'],['likes','Likes'],['comments','Comments'],['recent','Recent']].map(([k,l])=>`<button data-psort="${k}" aria-pressed="${S.postSort===k}">${l}</button>`).join('')}</div></div>
+    <div class="posts">${posts || '<p class="hint">No posts yet.</p>'}</div></div>`;
+}
+
+function viewGaps(){
+  const head = `<div class="topbar"><div><h1>Gaps</h1><div class="sub">What competitors do that works, and Muhra doesn't — calculated live from the tracked data</div></div></div>`;
+  const r = computeGaps();
+  const admin = S.role==='admin';
+  if(r.state==='no-own') return head + `<div class="panel empty"><h2>Mark Muhra's own account first</h2><p>Gaps compare Muhra against the market, so the tool needs your account as the baseline.</p>${admin?'<button class="btn btn-primary" data-go="manage">Add Muhra\'s account</button>':''}</div>`;
+  if(r.state==='own-pending') return head + `<div class="panel empty"><h2>Waiting for Muhra's data</h2><p>${r.own.last_error?esc(r.own.last_error):'The first fetch for @'+esc(r.own.username)+' hasn\'t completed yet.'}</p></div>`;
+  if(r.state==='no-rivals') return head + `<div class="panel empty"><h2>Add competitors to compare against</h2><p>At least one competitor with data is needed.</p>${admin?'<button class="btn btn-primary" data-go="manage">Add competitors</button>':''}</div>`;
+  const card = (g) => `<div class="gap ${g.sev==='high'?'high':''}"><span class="rail"></span><div><h3>${esc(g.title)}</h3><p class="ev">${esc(g.ev)}</p><div class="do"><b>Do this:</b> ${esc(g.act)}</div></div></div>`;
+  const win = (g) => `<div class="gap good"><span class="rail"></span><div><h3>${esc(g.title)}</h3><p class="ev" style="margin:0">${esc(g.ev)}</p></div></div>`;
+  return head + `<p class="hint" style="color:var(--muted);margin:-8px 0 18px">Compared against ${r.rivals} competitor${r.rivals>1?'s':''}. Engagement is normalised per account, so big and small accounts are compared fairly.</p>`
+    + (r.gaps.length ? r.gaps.map(card).join('') : `<div class="panel empty"><h2>No major gaps found</h2><p>Muhra matches or beats the market on every measured dimension.</p></div>`)
+    + (r.wins.length ? `<div class="section-title">Where Muhra leads</div>` + r.wins.map(win).join('') : '')
+    + `<p class="hint" style="color:var(--muted);margin-top:18px">For content ideas and the reasoning behind these patterns, open the <button class="linkbtn" data-go="report">AI report</button>.</p>`;
+}
+
+function mdToHtml(md){
+  const lines = md.replace(/\r/g,'').split('\n'); let html = ''; let list = null;
+  const inline = (s) => esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(^|\s)\*(?!\s)(.+?)\*(?=\s|$)/g,'$1<i>$2</i>');
+  const close = () => { if(list){ html += `</${list}>`; list = null; } };
+  for(const raw of lines){
+    const l = raw.trim();
+    if(!l){ close(); continue; }
+    let m;
+    if((m = l.match(/^(#{1,4})\s+(.*)$/))){ close(); const lv = Math.min(3, Math.max(2, m[1].length)); html += `<h${lv}>${inline(m[2])}</h${lv}>`; }
+    else if((m = l.match(/^[-*•]\s+(.*)$/))){ if(list!=='ul'){ close(); html+='<ul>'; list='ul'; } html += `<li>${inline(m[1])}</li>`; }
+    else if((m = l.match(/^\d+[.)]\s+(.*)$/))){ if(list!=='ol'){ close(); html+='<ol>'; list='ol'; } html += `<li>${inline(m[1])}</li>`; }
+    else if(/^-{3,}$/.test(l)){ close(); html += '<hr style="border:none;border-top:1px solid var(--line)">'; }
+    else { close(); html += `<p>${inline(l)}</p>`; }
+  }
+  close(); return html;
+}
+function viewReport(){
+  const admin = S.role==='admin', busy = S.busy.report;
+  const rep = S.report;
+  const head = `<div class="topbar"><div><h1>AI report</h1><div class="sub">${rep && rep.content!=='__NO_KEY__' ? 'Generated '+new Date(rep.created_at).toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'})+' · refreshed every Sunday 07:00' : 'Weekly Arabic strategy report with 10 content ideas'}</div></div>
+    <div class="actions">${admin?`<button class="btn btn-primary" data-action="report" ${busy?'disabled':''}>${busy?'<span class="spinner"></span> Writing…':'Generate now'}</button>`:''}</div></div>`;
+  if(rep && rep.content==='__NO_KEY__') return head + `<div class="panel"><h2>Add a free Gemini key to switch this on</h2><p class="hint">The report is written by Google Gemini on its free tier, so it costs nothing.</p>
+    <ol style="font-size:14px;line-height:1.8;margin:0;padding-left:20px"><li>Open <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> and create an API key.</li><li>In n8n, open <b>Muhra Competitor Intel (Instagram)</b> → <b>Config</b> node and paste it into <code>GEMINI_API_KEY</code>.</li><li>Save, then press <b>Generate now</b> here.</li></ol></div>`;
+  if(!rep) return head + `<div class="panel empty"><h2>No report yet</h2><p>The first report is written on Sunday at 07:00 Cairo, once there is tracked data.${admin?' You can also generate one now.':''}</p></div>`;
+  return head + `<div class="panel"><div class="report">${mdToHtml(rep.content)}</div></div>`;
+}
+
+function viewManage(){
+  const busyAll = S.busy.all;
+  const rows = S.comps.map(c=>{
+    const busy = S.busy[String(c.id)];
+    const state = c.last_error ? `<div class="e">${esc(c.last_error)}</div>` : !c.last_fetched_at ? `<div class="s">Waiting for first fetch…</div>` : `<div class="s">${fmtK(c.followers)} followers · updated ${relTime(c.last_fetched_at)}</div>`;
+    return `<div class="mrow">${avatarHtml(c)}<div class="info"><div class="u">@${esc(c.username)} ${c.is_own?'<span class="pill brand">Muhra</span>':''} ${c.status==='paused'?'<span class="pill">Paused</span>':''}</div>${state}
+      <input class="notes-input" data-notes="${c.id}" value="${esc(c.notes||'')}" placeholder="Notes (price range, why you track them…)" aria-label="Notes for @${esc(c.username)}"></div>
+      <div class="btns">
+        <button class="btn btn-sm" data-action="refresh-one" data-id="${c.id}" ${busy||c.status==='paused'?'disabled':''}>${busy?'<span class="spinner"></span>':'Refresh'}</button>
+        <button class="btn btn-sm" data-action="toggle" data-id="${c.id}">${c.status==='active'?'Pause':'Resume'}</button>
+        ${!c.is_own?`<button class="btn btn-sm" data-action="own" data-id="${c.id}">Set as Muhra</button>`:''}
+        <button class="btn btn-sm btn-danger" data-action="delete" data-id="${c.id}">Remove</button>
+      </div></div>`;
+  }).join('');
+  const hasOwn = S.comps.some(c=>c.is_own);
+  return `<div class="topbar"><div><h1>Manage accounts</h1><div class="sub">Only you can add, pause or remove accounts</div></div>
+    <div class="actions"><button class="btn" data-action="refresh-all" ${busyAll?'disabled':''}>${busyAll?'<span class="spinner"></span> Fetching…':'Refresh all now'}</button></div></div>
+  <div class="panel"><h2>Add an account</h2><p class="hint">Paste an Instagram profile link or @handle. It must be a public Business or Creator account.</p>
+    <div id="addMsg"></div>
+    <div class="add-form">
+      <label class="field" style="margin:0"><span>Instagram link or handle</span><input id="addHandle" class="input" placeholder="https://instagram.com/brandname"></label>
+      <label class="field" style="margin:0"><span>Notes (optional)</span><input id="addNotes" class="input" placeholder="Direct rival, same price range"></label>
+      <button id="addBtn" class="btn btn-primary" style="height:43px">Add and fetch</button>
+    </div>
+    <label class="check"><input type="checkbox" id="addOwn" ${hasOwn?'':'checked'}> This is Muhra's own account (used as the baseline for gaps)</label>
+  </div>
+  <div class="panel"><h2>Tracked accounts (${S.comps.length})</h2>${rows || '<p class="hint">Nothing tracked yet.</p>'}</div>`;
+}
+
+function parseHandle(input){
+  let s = (input||'').trim();
+  if(!s) return null;
+  s = s.replace(/^@/,'');
+  const m = s.match(/instagram\.com\/([^/?#\s]+)/i);
+  if(m) s = m[1];
+  s = s.replace(/[/?#].*$/,'').toLowerCase();
+  if(['p','reel','reels','stories','explore','tv'].includes(s)) return null;
+  return /^[a-z0-9._]{1,30}$/.test(s) ? s : null;
+}
+
+function bindView(){
+  document.querySelectorAll('[data-sort]').forEach(th=>th.onclick=()=>{ const k=th.dataset.sort; S.sort = { key:k, dir: S.sort.key===k ? -S.sort.dir : -1 }; render(); });
+  document.querySelectorAll('[data-trend]').forEach(b=>b.onclick=()=>{ S.trendMode=b.dataset.trend; render(); });
+  document.querySelectorAll('[data-psort]').forEach(b=>b.onclick=()=>{ S.postSort=b.dataset.psort; render(); });
+  document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>onAction(b.dataset.action, Number(b.dataset.id)));
+  document.querySelectorAll('[data-notes]').forEach(inp=>inp.onchange=async()=>{
+    const { error } = await sb.from('ci_competitors').update({ notes: inp.value.trim() || null }).eq('id', Number(inp.dataset.notes));
+    if(error) toast(error.message); else { const c = S.comps.find(x=>x.id===Number(inp.dataset.notes)); if(c) c.notes = inp.value.trim() || null; toast('Notes saved.'); }
+  });
+  const addBtn = $('addBtn');
+  if(addBtn){
+    const submit = async () => {
+      const handle = parseHandle($('addHandle').value);
+      const box = $('addMsg');
+      if(!handle){ box.innerHTML = '<div class="msg err">That doesn\'t look like an Instagram profile link or handle.</div>'; return; }
+      if(S.comps.some(c=>c.username===handle)){ box.innerHTML = `<div class="msg err">@${esc(handle)} is already tracked.</div>`; return; }
+      addBtn.disabled = true;
+      try{
+        const own = $('addOwn').checked;
+        if(own){ const cur = S.comps.find(c=>c.is_own); if(cur){ const { error } = await sb.from('ci_competitors').update({ is_own:false }).eq('id', cur.id); if(error) throw error; } }
+        const { data, error } = await sb.from('ci_competitors').insert({ username: handle, notes: $('addNotes').value.trim() || null, is_own: own }).select().single();
+        if(error) throw error;
+        box.innerHTML = `<div class="msg ok">@${esc(handle)} added. Fetching its data now…</div>`;
+        await loadData(); render();
+        refresh([data.id], `Fetching @${handle}…`);
+      }catch(e){ box.innerHTML = `<div class="msg err">${esc(e.message)}</div>`; }
+      finally{ const b=$('addBtn'); if(b) b.disabled = false; }
+    };
+    addBtn.onclick = submit;
+    $('addHandle').addEventListener('keydown', e=>{ if(e.key==='Enter') submit(); });
+  }
+  drawCharts();
+}
+
+async function onAction(a, id){
+  const c = S.comps.find(x=>x.id===id);
+  try{
+    if(a==='refresh-all') return refresh(null);
+    if(a==='refresh-one') return refresh([id], `Fetching @${c.username}…`);
+    if(a==='report') return generateReport();
+    if(a==='toggle'){
+      const status = c.status==='active' ? 'paused' : 'active';
+      const { error } = await sb.from('ci_competitors').update({ status }).eq('id', id); if(error) throw error;
+      c.status = status; render(); toast(status==='paused' ? `Paused @${c.username}. History is kept.` : `Resumed @${c.username}.`);
+      if(status==='active') refresh([id], `Fetching @${c.username}…`);
+    }
+    if(a==='own'){
+      const cur = S.comps.find(x=>x.is_own);
+      if(cur){ const r1 = await sb.from('ci_competitors').update({ is_own:false }).eq('id', cur.id); if(r1.error) throw r1.error; }
+      const r2 = await sb.from('ci_competitors').update({ is_own:true }).eq('id', id); if(r2.error) throw r2.error;
+      await loadData(); render(); toast(`@${c.username} is now the Muhra baseline.`);
+    }
+    if(a==='delete'){
+      if(!confirm(`Remove @${c.username} and delete all of its tracked history? This can't be undone.`)) return;
+      const { error } = await sb.from('ci_competitors').delete().eq('id', id); if(error) throw error;
+      await loadData(); if(S.selected===id) S.view='manage'; render(); toast(`Removed @${c.username}.`);
+    }
+  }catch(e){ toast(e.message || 'Action failed.'); }
+}
+
+function chartDefaults(){
+  Chart.defaults.font.family = cssVar('--font') || 'sans-serif';
+  Chart.defaults.color = cssVar('--muted');
+  Chart.defaults.borderColor = cssVar('--line');
+}
+function drawCharts(){
+  if(!window.Chart) return;
+  chartDefaults();
+  const trend = $('chTrend');
+  if(trend){
+    const comps = S.comps.filter(c=>(S.snapsBy[c.id]||[]).length);
+    const dates = [...new Set(S.snaps.map(s=>s.snap_date))].sort();
+    const ds = comps.map(c=>{
+      const ss = S.snapsBy[c.id]; const base = ss.find(s=>isNum(s.followers));
+      const map = Object.fromEntries(ss.map(s=>[s.snap_date, s.followers]));
+      return { label:'@'+c.username, data: dates.map(d=> map[d]==null ? null : S.trendMode==='index' ? (base&&base.followers? (map[d]-base.followers)/base.followers*100 : null) : map[d]),
+        borderColor: colorFor(c), backgroundColor: colorFor(c), borderWidth: c.is_own?3:1.6, pointRadius: dates.length<15?3:0, spanGaps:true, tension:.25 };
+    });
+    S.charts.trend = new Chart(trend, { type:'line', data:{ labels: dates.map(d=>new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short'})), datasets: ds },
+      options:{ maintainAspectRatio:false, interaction:{mode:'index',intersect:false}, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, usePointStyle:true } },
+        tooltip:{ callbacks:{ label:(x)=> x.dataset.label+': '+(S.trendMode==='index'? (x.parsed.y>0?'+':'')+x.parsed.y.toFixed(2)+'%' : fmtInt(x.parsed.y)) } } },
+        scales:{ y:{ ticks:{ callback:(v)=> S.trendMode==='index' ? v+'%' : fmtK(v) } }, x:{ grid:{ display:false } } } } });
+  }
+  const erc = $('chER');
+  if(erc){
+    const rows = S.comps.filter(c=>isNum(S.m[c.id].er) && S.m[c.id].hasData).sort((a,b)=>S.m[b.id].er-S.m[a.id].er);
+    S.charts.er = new Chart(erc, { type:'bar', data:{ labels: rows.map(c=>'@'+c.username), datasets:[{ data: rows.map(c=>S.m[c.id].er), backgroundColor: rows.map(c=> c.is_own ? cssVar('--brand') : cssVar('--slate')), borderRadius:4 }] },
+      options:{ indexAxis:'y', maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(x)=>x.parsed.x.toFixed(2)+'%' } } }, scales:{ x:{ ticks:{ callback:(v)=>v+'%' } }, y:{ grid:{display:false} } } } });
+  }
+  const fc = $('chFollowers');
+  if(fc){
+    const c = S.comps.find(x=>x.id===S.selected); const ss = (S.snapsBy[c.id]||[]).filter(s=>isNum(s.followers));
+    S.charts.f = new Chart(fc, { type:'line', data:{ labels: ss.map(s=>new Date(s.snap_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'})),
+      datasets:[{ data: ss.map(s=>s.followers), borderColor: colorFor(c), backgroundColor: 'transparent', borderWidth:2.5, pointRadius: ss.length<15?3:0, tension:.25 }] },
+      options:{ maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(x)=>fmtInt(x.parsed.y)+' followers' } } }, scales:{ y:{ ticks:{ callback:(v)=>fmtK(v) } }, x:{ grid:{display:false} } } } });
+  }
+}
+
+/* ---------- boot ---------- */
+async function boot(){
+  const { data:{ session } } = await sb.auth.getSession();
+  if(!session){ showAuth(); return; }
+  S.user = session.user;
+  const { data: mem, error } = await sb.from('ci_members').select('role').eq('user_id', S.user.id).maybeSingle();
+  if(error){ showAuth(error.message); return; }
+  if(!mem){ $('auth').classList.add('hidden'); $('pending').classList.remove('hidden'); return; }
+  S.role = mem.role;
+  $('auth').classList.add('hidden'); $('pending').classList.add('hidden'); $('app').classList.remove('hidden');
+  $('view').innerHTML = '<div class="empty"><span class="spinner"></span></div>';
+  try{ await loadData(); }catch(e){ $('view').innerHTML = `<div class="banner err">Could not load data: ${esc(e.message)}</div>`; return; }
+  if(!S.comps.length && S.role==='admin') S.view = 'manage';
+  render();
+}
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ()=>{ if(!$('app').classList.contains('hidden')) render(); });
+boot();
+</script>
+</body>
+</html>
