@@ -530,11 +530,10 @@ $('password').addEventListener('keydown', e => { if(e.key==='Enter') $('authBtn'
 document.addEventListener('click', async e => { if(e.target.closest('[data-signout]')){ await sb.auth.signOut(); location.reload(); } });
 
 /* ---------- engagement rate ----------
-   ER          = (likes + comments + saves + shares + reposts) ÷ views × 100
-                 Saves, shares and reposts are private Instagram Insights, so they exist for Muhra only;
-                 for competitors ER falls back to (likes + comments) ÷ views.
-   Public ER   = (likes + comments) ÷ views × 100 — identical inputs for every account, so it is
-                 the one used whenever accounts are compared (leaderboard, ranking, gaps).
+   ER          = (likes + comments) ÷ views × 100 — the one engagement rate shown for every account,
+                 so any two ERs on screen are computed from identical inputs.
+   Full ER     = (likes + comments + saves + shares + reposts) ÷ views × 100 — Muhra only (saves, shares
+                 and reposts are private Instagram Insights); always labelled, never compared with rivals.
    Account ER  = Σ interactions ÷ Σ views × 100 over posts that have both (totals, not an average of %).
    Follower ER = (likes + comments) ÷ followers × 100 — secondary; covers posts without public views.
    Hidden likes (like_count null) make a post's ER unknown, never 0. */
@@ -549,8 +548,8 @@ function pooled(posts, interactionsOf){
   for(const p of posts){ const i = interactionsOf(p); if(isNum(i) && isNum(p.view_count) && p.view_count > 0){ num += i; den += p.view_count; } }
   return den > 0 ? num / den * 100 : null;
 }
-const pooledER = (posts) => pooled(posts, fullInteractions);
-const pooledPublicER = (posts) => pooled(posts, publicInteractions);
+const pooledER = (posts) => pooled(posts, publicInteractions);
+const pooledFullER = (posts) => pooled(posts.filter(hasInsights), fullInteractions);
 
 /* ---------- data ---------- */
 async function fetchAll(build){
@@ -576,7 +575,7 @@ async function loadData(){
   S.reports = rl.error ? [] : rl.data;
   S.comps = c.data.sort((a,b)=> (b.is_own-a.is_own) || ((b.followers||0)-(a.followers||0)));
   S.snaps = s.map(x=>({...x, followers:toNum(x.followers), engagement_rate:toNum(x.engagement_rate), avg_likes:toNum(x.avg_likes), avg_comments:toNum(x.avg_comments)}));
-  S.posts = p.map(x=>{ const q = {...x, engagement_rate:toNum(x.engagement_rate)}; q.er = perView(fullInteractions(q), q); q.per = perView(publicInteractions(q), q); q.full = hasInsights(q); q.fer = erFollowers(q); return q; });
+  S.posts = p.map(x=>{ const q = {...x, engagement_rate:toNum(x.engagement_rate)}; q.er = perView(publicInteractions(q), q); q.full = hasInsights(q); q.fullEr = q.full ? perView(fullInteractions(q), q) : null; q.fer = erFollowers(q); return q; });
   S.report = r.data[0] || null;
   S.latestReportId = S.report ? S.report.id : 0;
   S.postsBy = {}; S.snapsBy = {};
@@ -600,13 +599,13 @@ function metrics(c, P){
   const er = pooledER(ps);
   const accFER = avg(ps.map(p=>p.fer));
   const fm = {};
-  for(const f of FORMATS){ const fp = ps.filter(p=>p.format===f); fm[f] = { n: fp.length, share: ps.length ? fp.length/ps.length : 0, er: pooledER(fp), per: pooledPublicER(fp), nEr: fp.filter(p=>isNum(p.er)).length }; }
+  for(const f of FORMATS){ const fp = ps.filter(p=>p.format===f); fm[f] = { n: fp.length, share: ps.length ? fp.length/ps.length : 0, er: pooledER(fp), nEr: fp.filter(p=>isNum(p.er)).length }; }
   let best = null; for(const f of FORMATS){ if(fm[f].nEr>=2 && isNum(fm[f].er) && (!best || fm[f].er > fm[best].er)) best = f; }
   return {
     followers: last ? last.followers : P.live ? c.followers : null, er, nEr: ps.filter(p=>isNum(p.er)).length, fer: accFER, accFER, growth,
     // Cross-account comparisons use reels only: competitors' views are public for reels alone.
-    per: pooledPublicER(ps), full: ps.some(hasInsights),
-    reelER: fm.Reel.per, nReelEr: fm.Reel.nEr,
+    fullEr: pooledFullER(ps),
+    reelER: fm.Reel.er, nReelEr: fm.Reel.nEr,
     perWeek: ps.length/P.days*7, n: ps.length, pR: ps,
     likes: avg(ps.map(p=>p.like_count)), comments: avg(ps.map(p=>p.comments_count)),
     views: avg(ps.map(p=>p.view_count)), nViews: ps.filter(p=>isNum(p.view_count)).length,
@@ -695,8 +694,7 @@ async function openPost(id){
     tile(fmtInt(p.view_count), 'Views', vsAvg(p.view_count, base(x=>x.view_count))),
     tile(isNum(p.like_count)?fmtInt(p.like_count):'Hidden', 'Likes', vsAvg(p.like_count, base(x=>x.like_count))),
     tile(fmtInt(p.comments_count), 'Comments', vsAvg(p.comments_count, base(x=>x.comments_count))),
-    tile(fmtPct(p.er), p.full ? 'Engagement rate (all interactions ÷ views)' : 'Engagement rate (likes + comments ÷ views)', vsAvg(p.er, pooledER(peers))),
-    ...(p.full ? [tile(fmtPct(p.per), 'Public ER (likes + comments ÷ views)', vsAvg(p.per, pooledPublicER(peers)))] : []),
+    tile(fmtPct(p.er), 'Engagement rate (likes + comments ÷ views)', vsAvg(p.er, pooledER(peers))),
     tile(fmtPct(p.fer,3), 'Follower ER (÷ followers)', vsAvg(p.fer, base(x=>x.fer))),
     tile(isNum(p.view_count)&&followers ? fmt1(p.view_count/followers*100)+'%' : '–', 'Views ÷ followers', ''),
     tile(isNum(p.view_count)&&p.view_count ? fmt1((p.like_count||0)/p.view_count*1000) : '–', 'Likes per 1K views', ''),
@@ -704,6 +702,7 @@ async function openPost(id){
   ].join('');
   const hasIns = [p.reach,p.saved,p.shares,p.total_interactions,p.avg_watch_ms].some(isNum);
   const ins = hasIns ? [
+    tile(fmtPct(p.fullEr), 'Full ER (incl. saves, shares, reposts)', vsAvg(p.fullEr, pooledFullER(peers)), 1),
     tile(fmtInt(p.reach), 'Accounts reached', vsAvg(p.reach, base(x=>x.reach)), 1),
     tile(fmtInt(p.saved), 'Saves', vsAvg(p.saved, base(x=>x.saved)), 1),
     tile(fmtInt(p.shares), 'Shares', vsAvg(p.shares, base(x=>x.shares)), 1),
@@ -729,10 +728,8 @@ async function openPost(id){
         ${tags?`<div class="chips" style="margin-top:10px">${tags}</div>`:''}</div>
       <div>
         <h3>Public performance</h3><div class="mgrid">${pub}</div>
-        <p class="pd-note">“× avg” compares with @${esc(c.username)}'s ${fmtInt(peers.length)} ${esc(p.format.toLowerCase())}s in ${esc(P.label)}. ${!isNum(p.er) ? '' : p.full
-      ? `ER = (likes ${fmtInt(p.like_count)} + comments ${fmtInt(p.comments_count||0)} + saves ${fmtInt(p.saved||0)} + shares ${fmtInt(p.shares||0)} + reposts ${fmtInt(p.reposts||0)}) ÷ views ${fmtInt(p.view_count)} × 100 = ${fmtPct(p.er)}.`
-      : `ER = (likes ${fmtInt(p.like_count)} + comments ${fmtInt(p.comments_count||0)}) ÷ views ${fmtInt(p.view_count)} × 100 = ${fmtPct(p.er)}. Saves, shares and reposts are private to each account, so they can't be included for competitors.`}${isNum(p.view_count)?'':' Instagram doesn\'t publish views for this post type, so only follower ER is available.'}${isNum(p.like_count)?'':' This account hides like counts, so ER can\'t be calculated.'}</p>
-        ${hasIns ? `<h3>Private insights · Muhra only</h3><div class="mgrid">${ins}</div><p class="pd-note">Lifetime values from Instagram Insights${p.insights_at?', updated '+relTime(p.insights_at):''}.</p>` : c.is_own ? '<p class="pd-note">Private insights appear after the next fetch.</p>' : ''}
+        <p class="pd-note">“× avg” compares with @${esc(c.username)}'s ${fmtInt(peers.length)} ${esc(p.format.toLowerCase())}s in ${esc(P.label)}. ${!isNum(p.er) ? '' : `ER = (likes ${fmtInt(p.like_count)} + comments ${fmtInt(p.comments_count||0)}) ÷ views ${fmtInt(p.view_count)} × 100 = ${fmtPct(p.er)}. The same formula is used for every account.`}${isNum(p.view_count)?'':' Instagram doesn\'t publish views for this post type, so only follower ER is available.'}${isNum(p.like_count)?'':' This account hides like counts, so ER can\'t be calculated.'}</p>
+        ${hasIns ? `<h3>Private insights · Muhra only</h3><div class="mgrid">${ins}</div><p class="pd-note">${isNum(p.fullEr)?`Full ER = (likes ${fmtInt(p.like_count)} + comments ${fmtInt(p.comments_count||0)} + saves ${fmtInt(p.saved||0)} + shares ${fmtInt(p.shares||0)} + reposts ${fmtInt(p.reposts||0)}) ÷ views ${fmtInt(p.view_count)} × 100 = ${fmtPct(p.fullEr)}. Muhra only: competitors' saves, shares and reposts are private, so this is never compared with them. `:''}Lifetime values from Instagram Insights${p.insights_at?', updated '+relTime(p.insights_at):''}.</p>` : c.is_own ? '<p class="pd-note">Private insights appear after the next fetch.</p>' : ''}
         <h3>Growth over time</h3><div id="pdHist"><p class="pd-note">Loading…</p></div>
       </div>
     </div>`;
@@ -923,7 +920,7 @@ function viewOverview(){
   const pendingNote = pending.length ? `<p class="hint" style="margin-top:12px">${pending.length} account${pending.length>1?'s':''} without data yet: ${pending.map(c=>'@'+esc(c.username)+(c.last_error?' (error)':c.status==='paused'?' (paused)':' (waiting)')).join(', ')}.</p>` : '';
   return head + bar + `
   <div class="panel">
-    <div class="panel-head"><div><h2>Leaderboard</h2><p class="hint">${esc(P.short)}. Reel ER = total (likes + comments) ÷ total views × 100 across the period's reels, the same public formula for every account (saves, shares and reposts are private, and competitors only publish views for reels). Follower ER divides by followers instead and covers every post. Click a row for the full breakdown.</p></div></div>
+    <div class="panel-head"><div><h2>Leaderboard</h2><p class="hint">${esc(P.short)}. Reel ER = total (likes + comments) ÷ total views × 100 across the period's reels, the same formula for every account (competitors only publish views for reels, so reels are the like-for-like set). Follower ER divides by followers instead and covers every post. Click a row for the full breakdown.</p></div></div>
     <div class="table-wrap"><table>
       <thead><tr><th>Account</th>${th('followers','Followers')}${th('g30','Growth')}${th('n','Posts')}${th('pw','Posts / week')}${th('er','Reel ER')}${th('fer','Follower ER')}${th('views','Avg views')}${th('likes','Avg likes')}${th('comments','Avg comments')}<th>Best format</th></tr></thead>
       <tbody>${rows.map(({c,m})=>`<tr class="clickable ${c.is_own?'own':''}" data-comp="${c.id}">
@@ -963,7 +960,7 @@ function viewComp(){
   const k = (v,l,d) => `<div class="kpi"><div class="v num">${v}</div><div class="l">${l}</div>${d?`<div class="d num">${d}</div>`:''}</div>`;
   const kpis = `<div class="kpis">
     ${k(fmtK(m.followers),'Followers', m.growth?`<span class="${cls(m.growth.abs)}">${signed(m.growth.abs)}</span> <span class="flat">in ${m.growth.days} day${m.growth.days===1?'':'s'}</span>`:'<span class="flat">needs 2+ snapshots in period</span>')}
-    ${k(fmtPct(m.er),'Engagement rate',`<span class="flat" title="${m.full?'(likes + comments + saves + shares + reposts) ÷ views':'(likes + comments) ÷ views. Saves, shares and reposts are private to each account.'}">${m.full?'all interactions':'likes + comments'} ÷ views · ${fmtInt(m.nEr)} posts${m.full?` · public ${fmtPct(m.per)}`:''}</span>`)}
+    ${k(fmtPct(m.er),'Engagement rate',`<span class="flat" title="Total (likes + comments) ÷ total views × 100, the same formula for every account">likes + comments ÷ views · ${fmtInt(m.nEr)} posts${isNum(m.fullEr)?` · full ER ${fmtPct(m.fullEr)}`:''}</span>`)}
     ${k(fmt1(m.perWeek),'Posts per week',`<span class="flat">${fmtInt(m.n)} in period</span>`)}
     ${k(fmtK(m.views),'Avg views',`<span class="flat">${m.nViews?`${fmtInt(m.nViews)} post${m.nViews===1?'':'s'} with views`:'no view data'}</span>`)}
     ${k(fmtK(m.likes),'Avg likes','<span class="flat">per post</span>')}
@@ -990,7 +987,7 @@ function viewComp(){
   S.postPool = pool.map(p=>String(p.id));
   const posts = shown.map(p=>{ const img = p.thumbnail_url || p.media_url;
     return `<button type="button" class="post" data-post="${esc(p.id)}" aria-label="Open details"><div class="img">${img?`<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<span class="ph">Preview expired</span><span class="fmt">${esc(p.format)}</span>${isNum(p.view_count)?`<span class="views num">${ICON.eye}${fmtK(p.view_count)}</span>`:''}</div>
-      <div class="body"><div class="stats num"><span title="Likes">${ICON.heart}<b>${isNum(p.like_count)?fmtK(p.like_count):'hidden'}</b></span><span title="Comments">${ICON.chat}<b>${fmtK(p.comments_count)}</b></span><span title="${p.full?'ER: (likes + comments + saves + shares + reposts) ÷ views':'ER: (likes + comments) ÷ views'}"><b>${fmtPct(p.er)}</b></span></div>
+      <div class="body"><div class="stats num"><span title="Likes">${ICON.heart}<b>${isNum(p.like_count)?fmtK(p.like_count):'hidden'}</b></span><span title="Comments">${ICON.chat}<b>${fmtK(p.comments_count)}</b></span><span title="ER: (likes + comments) ÷ views"><b>${fmtPct(p.er)}</b></span></div>
       <div class="stats num sub"><span>${shortDate(p.posted_at)}</span>${isNum(p.view_count)?`<span>${fmtK(p.view_count)} views</span>`:'<span>views hidden</span>'}</div>
       <div class="cap" dir="auto">${esc((p.caption||'').slice(0,160))}</div></div></button>`; }).join('');
 
@@ -1006,7 +1003,7 @@ function viewComp(){
   return banner + head + bar + kpis + `
   <div class="grid2">
     <div class="panel"><h2>Follower growth</h2><p class="hint">Daily snapshots · ${esc(P.short)}</p><div class="chart-box sm"><canvas id="chFollowers"></canvas></div></div>
-    <div class="panel"><h2>Format mix and performance</h2><p class="hint">${esc(P.short)} · share of posts · ER (interactions ÷ views)</p>${fmts || '<p class="hint">No posts in this period.</p>'}</div>
+    <div class="panel"><h2>Format mix and performance</h2><p class="hint">${esc(P.short)} · share of posts · ER (likes + comments ÷ views)</p>${fmts || '<p class="hint">No posts in this period.</p>'}</div>
   </div>
   <div class="grid2" style="margin-top:18px">
     <div class="panel"><h2>When they post</h2><p class="hint">Cairo time, 3-hour blocks · ${esc(P.short)}. Number = posts; darker = higher engagement.</p>${heat}</div>
