@@ -529,6 +529,29 @@ $('authBtn').onclick = async () => {
 $('password').addEventListener('keydown', e => { if(e.key==='Enter') $('authBtn').click(); });
 document.addEventListener('click', async e => { if(e.target.closest('[data-signout]')){ await sb.auth.signOut(); location.reload(); } });
 
+/* ---------- engagement rate ----------
+   ER          = (likes + comments + saves + shares + reposts) ÷ views × 100
+                 Saves, shares and reposts are private Instagram Insights, so they exist for Muhra only;
+                 for competitors ER falls back to (likes + comments) ÷ views.
+   Public ER   = (likes + comments) ÷ views × 100 — identical inputs for every account, so it is
+                 the one used whenever accounts are compared (leaderboard, ranking, gaps).
+   Account ER  = Σ interactions ÷ Σ views × 100 over posts that have both (totals, not an average of %).
+   Follower ER = (likes + comments) ÷ followers × 100 — secondary; covers posts without public views.
+   Hidden likes (like_count null) make a post's ER unknown, never 0. */
+const hasInsights = (p) => isNum(p.saved) || isNum(p.shares) || isNum(p.reposts);
+const publicInteractions = (p) => isNum(p.like_count) ? p.like_count + (isNum(p.comments_count) ? p.comments_count : 0) : null;
+const fullInteractions = (p) => { const i = publicInteractions(p); return isNum(i) && hasInsights(p) ? i + (p.saved||0) + (p.shares||0) + (p.reposts||0) : i; };
+const perView = (i, p) => isNum(i) && isNum(p.view_count) && p.view_count > 0 ? i / p.view_count * 100 : null;
+const erFollowers = (p) => isNum(p.like_count) && isNum(p.engagement_rate) ? p.engagement_rate : null;
+// Pooled rate: Σ interactions ÷ Σ views over posts where both are known.
+function pooled(posts, interactionsOf){
+  let num = 0, den = 0;
+  for(const p of posts){ const i = interactionsOf(p); if(isNum(i) && isNum(p.view_count) && p.view_count > 0){ num += i; den += p.view_count; } }
+  return den > 0 ? num / den * 100 : null;
+}
+const pooledER = (posts) => pooled(posts, fullInteractions);
+const pooledPublicER = (posts) => pooled(posts, publicInteractions);
+
 /* ---------- data ---------- */
 async function fetchAll(build){
   const out = []; const size = 1000;
@@ -545,7 +568,7 @@ async function loadData(){
   const [c, s, p, r, rl] = await Promise.all([
     sb.from('ci_competitors').select('*').order('created_at'),
     fetchAll(() => sb.from('ci_snapshots').select('*').order('snap_date').order('competitor_id')),
-    fetchAll(() => sb.from('ci_posts').select('id,competitor_id,caption,format,permalink,media_url,thumbnail_url,posted_at,like_count,comments_count,engagement_rate,hashtags,view_count,reach,saved,shares,total_interactions,avg_watch_ms,total_watch_ms,insights_at').order('posted_at',{ascending:false}).order('id')),
+    fetchAll(() => sb.from('ci_posts').select('id,competitor_id,caption,format,permalink,media_url,thumbnail_url,posted_at,like_count,comments_count,engagement_rate,hashtags,view_count,reach,saved,shares,total_interactions,avg_watch_ms,total_watch_ms,insights_at,reposts').order('posted_at',{ascending:false}).order('id')),
     sb.from('ci_reports').select('*').order('created_at',{ascending:false}).limit(1),
     sb.from('ci_reports').select('id,created_at').neq('content','__NO_KEY__').order('created_at',{ascending:false}).limit(60)
   ]);
@@ -553,7 +576,7 @@ async function loadData(){
   S.reports = rl.error ? [] : rl.data;
   S.comps = c.data.sort((a,b)=> (b.is_own-a.is_own) || ((b.followers||0)-(a.followers||0)));
   S.snaps = s.map(x=>({...x, followers:toNum(x.followers), engagement_rate:toNum(x.engagement_rate), avg_likes:toNum(x.avg_likes), avg_comments:toNum(x.avg_comments)}));
-  S.posts = p.map(x=>({...x, engagement_rate:toNum(x.engagement_rate)}));
+  S.posts = p.map(x=>{ const q = {...x, engagement_rate:toNum(x.engagement_rate)}; q.er = perView(fullInteractions(q), q); q.per = perView(publicInteractions(q), q); q.full = hasInsights(q); q.fer = erFollowers(q); return q; });
   S.report = r.data[0] || null;
   S.latestReportId = S.report ? S.report.id : 0;
   S.postsBy = {}; S.snapsBy = {};
@@ -574,12 +597,16 @@ function metrics(c, P){
   const ss = (S.snapsBy[c.id] || []).filter(snapInPeriod(P)).filter(x=>isNum(x.followers));
   const first = ss[0] || null, last = ss[ss.length-1] || null;
   const growth = first && last && first !== last ? { abs: last.followers - first.followers, pct: first.followers ? (last.followers-first.followers)/first.followers*100 : null, days: Math.round((parseYmd(last.snap_date)-parseYmd(first.snap_date))/DAY) } : null;
-  const accER = avg(ps.map(p=>p.engagement_rate));
+  const er = pooledER(ps);
+  const accFER = avg(ps.map(p=>p.fer));
   const fm = {};
-  for(const f of FORMATS){ const fp = ps.filter(p=>p.format===f); fm[f] = { n: fp.length, share: ps.length ? fp.length/ps.length : 0, er: avg(fp.map(p=>p.engagement_rate)) }; }
-  let best = null; for(const f of FORMATS){ if(fm[f].n>=2 && (!best || fm[f].er > fm[best].er)) best = f; }
+  for(const f of FORMATS){ const fp = ps.filter(p=>p.format===f); fm[f] = { n: fp.length, share: ps.length ? fp.length/ps.length : 0, er: pooledER(fp), per: pooledPublicER(fp), nEr: fp.filter(p=>isNum(p.er)).length }; }
+  let best = null; for(const f of FORMATS){ if(fm[f].nEr>=2 && isNum(fm[f].er) && (!best || fm[f].er > fm[best].er)) best = f; }
   return {
-    followers: last ? last.followers : P.live ? c.followers : null, er: accER, accER, growth,
+    followers: last ? last.followers : P.live ? c.followers : null, er, nEr: ps.filter(p=>isNum(p.er)).length, fer: accFER, accFER, growth,
+    // Cross-account comparisons use reels only: competitors' views are public for reels alone.
+    per: pooledPublicER(ps), full: ps.some(hasInsights),
+    reelER: fm.Reel.per, nReelEr: fm.Reel.nEr,
     perWeek: ps.length/P.days*7, n: ps.length, pR: ps,
     likes: avg(ps.map(p=>p.like_count)), comments: avg(ps.map(p=>p.comments_count)),
     views: avg(ps.map(p=>p.view_count)), nViews: ps.filter(p=>isNum(p.view_count)).length,
@@ -659,8 +686,6 @@ async function openPost(id){
   const peers = (S.postsBy[c.id]||[]).filter(inPeriod(P)).filter(x=>x.format===p.format);
   const base = (f) => avg(peers.map(f));
   const followers = c.followers;
-  const eng = (x) => (x.like_count||0) + (x.comments_count||0);
-  const engPerView = (x) => isNum(x.view_count) && x.view_count>0 ? eng(x)/x.view_count*100 : null;
   const byViews = peers.filter(x=>isNum(x.view_count)).sort((a,b)=>b.view_count-a.view_count);
   const rank = byViews.findIndex(x=>x===p);
   const d = new Date(p.posted_at);
@@ -668,10 +693,11 @@ async function openPost(id){
   const tile = (v, l, cmp, own) => `<div class="mt${own?' own':''}"><div class="v num">${v}</div><div class="l">${l}</div>${cmp||''}</div>`;
   const pub = [
     tile(fmtInt(p.view_count), 'Views', vsAvg(p.view_count, base(x=>x.view_count))),
-    tile(fmtInt(p.like_count), 'Likes', vsAvg(p.like_count, base(x=>x.like_count))),
+    tile(isNum(p.like_count)?fmtInt(p.like_count):'Hidden', 'Likes', vsAvg(p.like_count, base(x=>x.like_count))),
     tile(fmtInt(p.comments_count), 'Comments', vsAvg(p.comments_count, base(x=>x.comments_count))),
-    tile(fmtPct(p.engagement_rate), 'Engagement rate', vsAvg(p.engagement_rate, base(x=>x.engagement_rate))),
-    tile(fmtPct(engPerView(p)), 'Engagement per view', vsAvg(engPerView(p), base(engPerView))),
+    tile(fmtPct(p.er), p.full ? 'Engagement rate (all interactions ÷ views)' : 'Engagement rate (likes + comments ÷ views)', vsAvg(p.er, pooledER(peers))),
+    ...(p.full ? [tile(fmtPct(p.per), 'Public ER (likes + comments ÷ views)', vsAvg(p.per, pooledPublicER(peers)))] : []),
+    tile(fmtPct(p.fer,3), 'Follower ER (÷ followers)', vsAvg(p.fer, base(x=>x.fer))),
     tile(isNum(p.view_count)&&followers ? fmt1(p.view_count/followers*100)+'%' : '–', 'Views ÷ followers', ''),
     tile(isNum(p.view_count)&&p.view_count ? fmt1((p.like_count||0)/p.view_count*1000) : '–', 'Likes per 1K views', ''),
     tile(rank>=0 ? `#${rank+1}<span class="flat" style="font-size:13px;font-weight:400"> of ${byViews.length}</span>` : '–', `By views among ${p.format.toLowerCase()}s`, '')
@@ -681,6 +707,7 @@ async function openPost(id){
     tile(fmtInt(p.reach), 'Accounts reached', vsAvg(p.reach, base(x=>x.reach)), 1),
     tile(fmtInt(p.saved), 'Saves', vsAvg(p.saved, base(x=>x.saved)), 1),
     tile(fmtInt(p.shares), 'Shares', vsAvg(p.shares, base(x=>x.shares)), 1),
+    tile(fmtInt(p.reposts), 'Reposts', vsAvg(p.reposts, base(x=>x.reposts)), 1),
     tile(fmtInt(p.total_interactions), 'Total interactions', vsAvg(p.total_interactions, base(x=>x.total_interactions)), 1),
     tile(isNum(ratio(p.saved,p.reach)) ? fmtPct(ratio(p.saved,p.reach)*100) : '–', 'Save rate (÷ reach)', '', 1),
     tile(isNum(ratio(p.shares,p.reach)) ? fmtPct(ratio(p.shares,p.reach)*100) : '–', 'Share rate (÷ reach)', '', 1),
@@ -702,7 +729,9 @@ async function openPost(id){
         ${tags?`<div class="chips" style="margin-top:10px">${tags}</div>`:''}</div>
       <div>
         <h3>Public performance</h3><div class="mgrid">${pub}</div>
-        <p class="pd-note">“× avg” compares with @${esc(c.username)}'s ${fmtInt(peers.length)} ${esc(p.format.toLowerCase())}s in ${esc(P.label)}.${isNum(p.view_count)?'':' Instagram doesn\'t publish views for this post type.'}</p>
+        <p class="pd-note">“× avg” compares with @${esc(c.username)}'s ${fmtInt(peers.length)} ${esc(p.format.toLowerCase())}s in ${esc(P.label)}. ${!isNum(p.er) ? '' : p.full
+      ? `ER = (likes ${fmtInt(p.like_count)} + comments ${fmtInt(p.comments_count||0)} + saves ${fmtInt(p.saved||0)} + shares ${fmtInt(p.shares||0)} + reposts ${fmtInt(p.reposts||0)}) ÷ views ${fmtInt(p.view_count)} × 100 = ${fmtPct(p.er)}.`
+      : `ER = (likes ${fmtInt(p.like_count)} + comments ${fmtInt(p.comments_count||0)}) ÷ views ${fmtInt(p.view_count)} × 100 = ${fmtPct(p.er)}. Saves, shares and reposts are private to each account, so they can't be included for competitors.`}${isNum(p.view_count)?'':' Instagram doesn\'t publish views for this post type, so only follower ER is available.'}${isNum(p.like_count)?'':' This account hides like counts, so ER can\'t be calculated.'}</p>
         ${hasIns ? `<h3>Private insights · Muhra only</h3><div class="mgrid">${ins}</div><p class="pd-note">Lifetime values from Instagram Insights${p.insights_at?', updated '+relTime(p.insights_at):''}.</p>` : c.is_own ? '<p class="pd-note">Private insights appear after the next fetch.</p>' : ''}
         <h3>Growth over time</h3><div id="pdHist"><p class="pd-note">Loading…</p></div>
       </div>
@@ -746,7 +775,7 @@ function computeGaps(){
   const handle = (c) => '@'+c.username;
 
   // normalised post score: post ER / account's 60-day average ER
-  const norm = (c) => { const m = S.m[c.id]; return m.pR.filter(p=>isNum(p.engagement_rate) && m.accER).map(p=>({...p, rel: p.engagement_rate/m.accER})); };
+  const norm = (c) => { const m = S.m[c.id]; return m.pR.filter(p=>isNum(p.fer) && m.accFER).map(p=>({...p, rel: p.fer/m.accFER})); };
   const rivalPosts = rivals.flatMap(norm);
   const ownPosts = om.pR;
 
@@ -816,10 +845,10 @@ function computeGaps(){
   }
 
   // 6. engagement and growth vs market
-  const medER = median(rivals.map(c=>S.m[c.id].er));
-  if(isNum(medER) && isNum(om.er)){
-    if(om.er < medER*0.8) gaps.push({ sev:'high', title:'Your engagement rate trails the market', ev:`Muhra ${fmtPct(om.er)} vs competitor median ${fmtPct(medER)} (average per post in ${P.label}, likes + comments ÷ followers).`, act:'Use the format and timing fixes above; they are the fastest levers.' });
-    else if(om.er >= medER*1.2) wins.push({ title:'Engagement above market', ev:`Muhra ${fmtPct(om.er)} vs competitor median ${fmtPct(medER)}.` });
+  const medER = median(rivals.map(c=>S.m[c.id].reelER));
+  if(isNum(medER) && isNum(om.reelER)){
+    if(om.reelER < medER*0.8) gaps.push({ sev:'high', title:'Your reel engagement rate trails the market', ev:`Muhra's reels get ${fmtPct(om.reelER)} vs a competitor median of ${fmtPct(medER)} (${P.label}, total likes + comments ÷ total views).`, act:'Use the format and timing fixes above; they are the fastest levers.' });
+    else if(om.reelER >= medER*1.2) wins.push({ title:'Reel engagement above market', ev:`Muhra's reels get ${fmtPct(om.reelER)} vs a competitor median of ${fmtPct(medER)} (likes + comments ÷ views).` });
   }
   const g = (c) => S.m[c.id].growth && S.m[c.id].growth.pct;
   const medG = median(rivals.map(g));
@@ -844,7 +873,7 @@ function renderNav(){
   $('nav').innerHTML = items.map(([k,l])=>`<button data-go="${k}" aria-current="${S.view===k}">${l}</button>`).join('') + `<button data-signout>Sign out</button>`;
   $('clist').innerHTML = S.comps.length ? S.comps.map(c=>{
     const m = S.m[c.id];
-    const status = c.last_error ? '<span class="dot err" title="Error"></span>' : c.status==='paused' ? '<span class="dot pause" title="Paused"></span>' : !c.last_fetched_at ? '<span class="dot wait" title="Waiting for first fetch"></span>' : `<span class="er num">${fmtPct(m.er,1)}</span>`;
+    const status = c.last_error ? '<span class="dot err" title="Error"></span>' : c.status==='paused' ? '<span class="dot pause" title="Paused"></span>' : !c.last_fetched_at ? '<span class="dot wait" title="Waiting for first fetch"></span>' : `<span class="er num" title="Reel ER: likes + comments ÷ views">${fmtPct(m.reelER,1)}</span>`;
     return `<button class="citem" data-comp="${c.id}" aria-current="${S.view==='comp'&&S.selected===c.id}">${avatarHtml(c)}<span><span class="u">@${esc(c.username)}${c.is_own?'<span class="own-dot" title="Muhra"></span>':''}</span><br><span class="s num">${fmtK(c.followers)} followers</span></span>${status}</button>`;
   }).join('') : `<p style="color:var(--muted);font-size:13px;padding:0 10px">No accounts yet.</p>`;
   const opts = S.comps.map(c=>`<option value="${c.id}" ${S.view==='comp'&&S.selected===c.id?'selected':''}>@${esc(c.username)}</option>`).join('');
@@ -887,27 +916,27 @@ function viewOverview(){
   const bar = periodBar();
   const rows = S.comps.filter(c=>S.m[c.id].hasData).map(c=>({c, m:S.m[c.id]}));
   const k = S.sort.key, d = S.sort.dir;
-  const val = (r) => ({ followers:r.m.followers, g30:r.m.growth?r.m.growth.abs:null, n:r.m.n, pw:r.m.perWeek, er:r.m.er, views:r.m.views, likes:r.m.likes, comments:r.m.comments })[k];
+  const val = (r) => ({ followers:r.m.followers, g30:r.m.growth?r.m.growth.abs:null, n:r.m.n, pw:r.m.perWeek, er:r.m.reelER, fer:r.m.fer, views:r.m.views, likes:r.m.likes, comments:r.m.comments })[k];
   rows.sort((a,b)=> ((val(b)??-Infinity) - (val(a)??-Infinity)) * (d===-1?1:-1));
   const th = (key,l) => `<th data-sort="${key}" aria-sort="${S.sort.key===key?(S.sort.dir===-1?'descending':'ascending'):'none'}">${l}</th>`;
   const pending = S.comps.filter(c=>!S.m[c.id].hasData);
   const pendingNote = pending.length ? `<p class="hint" style="margin-top:12px">${pending.length} account${pending.length>1?'s':''} without data yet: ${pending.map(c=>'@'+esc(c.username)+(c.last_error?' (error)':c.status==='paused'?' (paused)':' (waiting)')).join(', ')}.</p>` : '';
   return head + bar + `
   <div class="panel">
-    <div class="panel-head"><div><h2>Leaderboard</h2><p class="hint">${esc(P.short)}. Engagement rate = average (likes + comments) ÷ followers across posts in the period. Click a row for the full breakdown.</p></div></div>
+    <div class="panel-head"><div><h2>Leaderboard</h2><p class="hint">${esc(P.short)}. Reel ER = total (likes + comments) ÷ total views × 100 across the period's reels, the same public formula for every account (saves, shares and reposts are private, and competitors only publish views for reels). Follower ER divides by followers instead and covers every post. Click a row for the full breakdown.</p></div></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Account</th>${th('followers','Followers')}${th('g30','Growth')}${th('n','Posts')}${th('pw','Posts / week')}${th('er','Eng. rate')}${th('views','Avg views')}${th('likes','Avg likes')}${th('comments','Avg comments')}<th>Best format</th></tr></thead>
+      <thead><tr><th>Account</th>${th('followers','Followers')}${th('g30','Growth')}${th('n','Posts')}${th('pw','Posts / week')}${th('er','Reel ER')}${th('fer','Follower ER')}${th('views','Avg views')}${th('likes','Avg likes')}${th('comments','Avg comments')}<th>Best format</th></tr></thead>
       <tbody>${rows.map(({c,m})=>`<tr class="clickable ${c.is_own?'own':''}" data-comp="${c.id}">
         <td><span class="acct">${avatarHtml(c)}<span>@${esc(c.username)}${c.is_own?' <span class="pill brand">Muhra</span>':''}</span></span></td>
         <td class="num">${fmtInt(m.followers)}</td><td class="num">${growthCell(m.growth)}</td><td class="num">${fmtInt(m.n)}</td><td class="num">${fmt1(m.perWeek)}</td>
-        <td class="num"><b>${fmtPct(m.er)}</b></td><td class="num">${fmtK(m.views)}</td><td class="num">${fmtInt(m.likes)}</td><td class="num">${fmtInt(m.comments)}</td><td>${m.best||'–'}</td></tr>`).join('')}</tbody>
+        <td class="num"><b>${fmtPct(m.reelER)}</b></td><td class="num">${fmtPct(m.fer,3)}</td><td class="num">${fmtK(m.views)}</td><td class="num">${fmtInt(m.likes)}</td><td class="num">${fmtInt(m.comments)}</td><td>${m.best||'–'}</td></tr>`).join('')}</tbody>
     </table></div>${pendingNote}
   </div>
   <div class="grid2">
     <div class="panel"><div class="panel-head"><div><h2>Follower trend</h2><p class="hint" id="trendHint">${S.trendMode==='index'?'% change since the start of the period':'Follower count'} · ${esc(P.short)}</p></div>
       <div class="seg"><button data-trend="index" aria-pressed="${S.trendMode==='index'}">Growth %</button><button data-trend="abs" aria-pressed="${S.trendMode==='abs'}">Followers</button></div></div>
       <div class="chart-box"><canvas id="chTrend"></canvas></div></div>
-    <div class="panel"><h2>Engagement rate ranking</h2><p class="hint">Who earns the most interaction per follower · ${esc(P.short)}</p><div class="chart-box"><canvas id="chER"></canvas></div></div>
+    <div class="panel"><h2>Engagement rate ranking</h2><p class="hint">Reels: likes + comments per 100 views · ${esc(P.short)}</p><div class="chart-box"><canvas id="chER"></canvas></div></div>
   </div>`;
 }
 
@@ -934,7 +963,7 @@ function viewComp(){
   const k = (v,l,d) => `<div class="kpi"><div class="v num">${v}</div><div class="l">${l}</div>${d?`<div class="d num">${d}</div>`:''}</div>`;
   const kpis = `<div class="kpis">
     ${k(fmtK(m.followers),'Followers', m.growth?`<span class="${cls(m.growth.abs)}">${signed(m.growth.abs)}</span> <span class="flat">in ${m.growth.days} day${m.growth.days===1?'':'s'}</span>`:'<span class="flat">needs 2+ snapshots in period</span>')}
-    ${k(fmtPct(m.er),'Engagement rate',`<span class="flat">avg of ${fmtInt(m.n)} post${m.n===1?'':'s'}</span>`)}
+    ${k(fmtPct(m.er),'Engagement rate',`<span class="flat" title="${m.full?'(likes + comments + saves + shares + reposts) ÷ views':'(likes + comments) ÷ views. Saves, shares and reposts are private to each account.'}">${m.full?'all interactions':'likes + comments'} ÷ views · ${fmtInt(m.nEr)} posts${m.full?` · public ${fmtPct(m.per)}`:''}</span>`)}
     ${k(fmt1(m.perWeek),'Posts per week',`<span class="flat">${fmtInt(m.n)} in period</span>`)}
     ${k(fmtK(m.views),'Avg views',`<span class="flat">${m.nViews?`${fmtInt(m.nViews)} post${m.nViews===1?'':'s'} with views`:'no view data'}</span>`)}
     ${k(fmtK(m.likes),'Avg likes','<span class="flat">per post</span>')}
@@ -945,7 +974,7 @@ function viewComp(){
 
   // heatmap
   const cells = {}; let maxN = 0;
-  for(const p of m.pR){ const t = cairoParts(p.posted_at); const key = t.day+'-'+t.block; (cells[key] ||= []).push(p.engagement_rate); maxN = Math.max(maxN, cells[key].length); }
+  for(const p of m.pR){ const t = cairoParts(p.posted_at); const key = t.day+'-'+t.block; (cells[key] ||= []).push(p.er); maxN = Math.max(maxN, cells[key].length); }
   const ers = Object.values(cells).map(a=>avg(a)).filter(isNum); const maxER = Math.max(...ers, 0.0001);
   let heat = `<div class="heat"><span></span>${BLOCKS.map(b=>`<span class="hh">${b}</span>`).join('')}`;
   DAYS.forEach((d,di)=>{ heat += `<span class="hl">${d}</span>`; BLOCKS.forEach((b,bi)=>{ const a = cells[di+'-'+bi]; const e = a?avg(a):null; const alpha = a && isNum(e) ? 0.15+0.85*(e/maxER) : 0;
@@ -953,7 +982,7 @@ function viewComp(){
   heat += '</div>';
 
   // posts
-  const sortFns = { views:(a,b)=>(b.view_count??-1)-(a.view_count??-1), er:(a,b)=>(b.engagement_rate??-1)-(a.engagement_rate??-1), likes:(a,b)=>(b.like_count??-1)-(a.like_count??-1), comments:(a,b)=>(b.comments_count??-1)-(a.comments_count??-1), recent:(a,b)=>new Date(b.posted_at)-new Date(a.posted_at) };
+  const sortFns = { views:(a,b)=>(b.view_count??-1)-(a.view_count??-1), er:(a,b)=>(b.er??-1)-(a.er??-1), likes:(a,b)=>(b.like_count??-1)-(a.like_count??-1), comments:(a,b)=>(b.comments_count??-1)-(a.comments_count??-1), recent:(a,b)=>new Date(b.posted_at)-new Date(a.posted_at) };
   const fmtAvail = FORMATS.filter(f=>m.fm[f].n);
   if(S.postFmt!=='all' && !fmtAvail.includes(S.postFmt)) S.postFmt = 'all';
   const pool = m.pR.filter(p=>S.postFmt==='all' || p.format===S.postFmt).slice().sort(sortFns[S.postSort]);
@@ -961,12 +990,12 @@ function viewComp(){
   S.postPool = pool.map(p=>String(p.id));
   const posts = shown.map(p=>{ const img = p.thumbnail_url || p.media_url;
     return `<button type="button" class="post" data-post="${esc(p.id)}" aria-label="Open details"><div class="img">${img?`<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<span class="ph">Preview expired</span><span class="fmt">${esc(p.format)}</span>${isNum(p.view_count)?`<span class="views num">${ICON.eye}${fmtK(p.view_count)}</span>`:''}</div>
-      <div class="body"><div class="stats num"><span title="Likes">${ICON.heart}<b>${fmtK(p.like_count)}</b></span><span title="Comments">${ICON.chat}<b>${fmtK(p.comments_count)}</b></span><span title="Engagement rate"><b>${fmtPct(p.engagement_rate)}</b></span></div>
+      <div class="body"><div class="stats num"><span title="Likes">${ICON.heart}<b>${isNum(p.like_count)?fmtK(p.like_count):'hidden'}</b></span><span title="Comments">${ICON.chat}<b>${fmtK(p.comments_count)}</b></span><span title="${p.full?'ER: (likes + comments + saves + shares + reposts) ÷ views':'ER: (likes + comments) ÷ views'}"><b>${fmtPct(p.er)}</b></span></div>
       <div class="stats num sub"><span>${shortDate(p.posted_at)}</span>${isNum(p.view_count)?`<span>${fmtK(p.view_count)} views</span>`:'<span>views hidden</span>'}</div>
       <div class="cap" dir="auto">${esc((p.caption||'').slice(0,160))}</div></div></button>`; }).join('');
 
   const tagStats = {};
-  for(const p of m.pR) for(const t of (p.hashtags||[])){ (tagStats[t] ||= []).push(p.engagement_rate); }
+  for(const p of m.pR) for(const t of (p.hashtags||[])){ (tagStats[t] ||= []).push(p.er); }
   const tags = Object.entries(tagStats).map(([t,a])=>({t,n:a.length,er:avg(a)})).sort((a,b)=>b.n-a.n || (b.er||0)-(a.er||0)).slice(0,20);
 
   const fmtFilter = fmtAvail.length>1 ? `<div class="fmt-filter seg" role="group" aria-label="Format">${[['all','All formats',m.n]].concat(fmtAvail.map(f=>[f,f+'s',m.fm[f].n])).map(([k,l,n])=>`<button data-pfmt="${k}" aria-pressed="${S.postFmt===k}">${l} <span class="num">${n}</span></button>`).join('')}</div>` : '';
@@ -977,7 +1006,7 @@ function viewComp(){
   return banner + head + bar + kpis + `
   <div class="grid2">
     <div class="panel"><h2>Follower growth</h2><p class="hint">Daily snapshots · ${esc(P.short)}</p><div class="chart-box sm"><canvas id="chFollowers"></canvas></div></div>
-    <div class="panel"><h2>Format mix and performance</h2><p class="hint">${esc(P.short)} · share of posts · average engagement rate</p>${fmts || '<p class="hint">No posts in this period.</p>'}</div>
+    <div class="panel"><h2>Format mix and performance</h2><p class="hint">${esc(P.short)} · share of posts · ER (interactions ÷ views)</p>${fmts || '<p class="hint">No posts in this period.</p>'}</div>
   </div>
   <div class="grid2" style="margin-top:18px">
     <div class="panel"><h2>When they post</h2><p class="hint">Cairo time, 3-hour blocks · ${esc(P.short)}. Number = posts; darker = higher engagement.</p>${heat}</div>
@@ -1234,8 +1263,8 @@ function drawCharts(){
   function drawRest(){
   const erc = $('chER');
   if(erc){
-    const rows = S.comps.filter(c=>isNum(S.m[c.id].er) && S.m[c.id].hasData).sort((a,b)=>S.m[b.id].er-S.m[a.id].er);
-    S.charts.er = new Chart(erc, { type:'bar', data:{ labels: rows.map(c=>'@'+c.username), datasets:[{ data: rows.map(c=>S.m[c.id].er), backgroundColor: rows.map(c=> c.is_own ? cssVar('--brand') : cssVar('--slate')), borderRadius:4 }] },
+    const rows = S.comps.filter(c=>isNum(S.m[c.id].reelER) && S.m[c.id].hasData).sort((a,b)=>S.m[b.id].reelER-S.m[a.id].reelER);
+    S.charts.er = new Chart(erc, { type:'bar', data:{ labels: rows.map(c=>'@'+c.username), datasets:[{ data: rows.map(c=>S.m[c.id].reelER), backgroundColor: rows.map(c=> c.is_own ? cssVar('--brand') : cssVar('--slate')), borderRadius:4 }] },
       options:{ indexAxis:'y', maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(x)=>x.parsed.x.toFixed(2)+'%' } } }, scales:{ x:{ ticks:{ callback:(v)=>v+'%' } }, y:{ grid:{display:false} } } } });
   }
   const fc = $('chFollowers');
