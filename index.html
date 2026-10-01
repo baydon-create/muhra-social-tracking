@@ -60,9 +60,13 @@ a{color:var(--slate)}
 /* Shell */
 .shell{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
 .side{border-right:1px solid var(--line);background:var(--surface);padding:20px 14px;position:sticky;top:env(safe-area-inset-top,0px);height:100vh;overflow-y:auto}
-.brand{display:flex;align-items:baseline;gap:8px;padding:0 8px 18px}
-.brand b{font-size:20px;color:var(--brand);letter-spacing:.5px}
-.brand small{color:var(--muted)}
+.brand{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:4px 8px 20px}
+.brand small{color:var(--muted);font-size:12px;letter-spacing:.4px;text-transform:uppercase}
+.logo{display:block;height:auto;width:100%;max-width:170px}
+.logo-light{display:none}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .logo-dark{display:none} :root:not([data-theme="light"]) .logo-light{display:block} }
+.auth-card .logo{max-width:190px;margin:0 0 18px}
+.mobile-brand{display:none}
 .nav{display:flex;flex-direction:column;gap:2px;margin-bottom:22px}
 .nav button{display:flex;justify-content:space-between;align-items:center;text-align:left;border:none;background:none;padding:9px 10px;border-radius:var(--radius-sm);cursor:pointer}
 .nav button:hover{background:var(--paper)}
@@ -175,12 +179,47 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
 .gap .do b{color:var(--brand)}
 .section-title{font-size:15px;font-weight:600;margin:28px 0 12px}
 
+/* Period */
+.period{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:10px 12px;margin-bottom:18px}
+.period .seg{flex-wrap:wrap}
+.period select,.period input[type=date]{padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:var(--paper);font-size:13px}
+.period select.on{border-color:var(--ink);background:var(--ink);color:var(--surface)}
+.period .custom{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.period .range{margin-inline-start:auto;font-size:13px;color:var(--muted)}
+.period .range b{color:var(--ink);font-weight:600}
+.more{display:flex;justify-content:center;gap:8px;margin-top:16px}
+.fmt-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+
 /* Report */
-.report{direction:rtl;text-align:right;font-size:16px;line-height:1.9;max-width:78ch}
-.report h2{font-size:19px;margin:28px 0 8px;color:var(--brand)}
-.report h3{font-size:16px;margin:18px 0 6px}
-.report ul,.report ol{padding-right:22px;padding-left:0}
-.report li{margin-bottom:6px}
+.report-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;font-size:13px;color:var(--muted)}
+.report-meta select{padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:13px}
+.report-panel{padding:28px 32px}
+.report{font-size:16px;line-height:1.95;max-width:880px;margin-inline:auto}
+.report[dir="rtl"]{text-align:right}
+.report>:first-child{margin-top:0}
+.report p{margin:0 0 14px}
+.report h1{font-size:24px;margin:0 0 18px;line-height:1.4}
+.report h2{font-size:20px;margin:34px 0 14px;padding-bottom:8px;color:var(--brand);border-bottom:2px solid var(--brand-soft);line-height:1.5}
+.report h3{font-size:17px;margin:22px 0 8px;line-height:1.5}
+.report h4{font-size:15px;margin:18px 0 6px;color:var(--muted)}
+.report ul,.report ol{margin:0 0 16px;padding-inline-start:24px;padding-inline-end:0}
+.report li{margin-bottom:8px;padding-inline-start:4px}
+.report li::marker{color:var(--brand);font-weight:600}
+.report b,.report strong{font-weight:700;color:var(--ink)}
+.report code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88em;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:0 5px}
+.report bdi{unicode-bidi:isolate}
+.report hr{border:none;border-top:1px solid var(--line);margin:26px 0}
+.report blockquote{margin:0 0 16px;padding:12px 16px;background:var(--brand-soft);border-inline-start:4px solid var(--brand);border-radius:var(--radius-sm)}
+.report blockquote p:last-child{margin:0}
+.report .tbl{overflow-x:auto;margin:6px 0 20px;border:1px solid var(--line);border-radius:var(--radius-sm)}
+.report table{font-size:14px;line-height:1.6;width:max-content;min-width:100%}
+.report td:not(.n){min-width:110px;max-width:360px}
+.report th,.report td{text-align:start;white-space:normal;padding:10px 14px;vertical-align:top;cursor:default}
+.report th{background:var(--paper);color:var(--ink);font-weight:600;font-size:13px;border-bottom:1px solid var(--line)}
+.report th::after{content:none!important}
+.report tbody tr:nth-child(even) td{background:color-mix(in srgb, var(--paper) 55%, var(--surface))}
+.report td.n,.report th.n{text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+.report tr:last-child td{border-bottom:none}
 
 /* Manage */
 .add-form{display:grid;grid-template-columns:2fr 2fr auto;gap:10px;align-items:end}
@@ -200,6 +239,12 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.spinner{animation-duration:2.4s}}
 
+@media print{
+  .side,.mobile-nav,.mobile-brand,.actions,.period,.report-meta,.toast{display:none!important}
+  .shell{display:block} .main{padding:0} body{background:#fff}
+  .panel{border:none;padding:0}
+  .report{max-width:none}
+}
 @media (max-width:1100px){.kpis{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:900px){
   .shell{grid-template-columns:1fr}
@@ -213,6 +258,12 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
   .fmt-row{grid-template-columns:70px 1fr 56px 64px;gap:8px}
   .profile{flex-direction:column}
   .topbar h1{font-size:22px}
+  .mobile-brand{display:flex;justify-content:center;padding:4px 0 14px}
+  .mobile-brand .logo{max-width:140px}
+  .period .range{margin-inline-start:0;width:100%}
+  .report-panel{padding:20px 16px}
+  .posts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .report{font-size:15px}
 }
 </style>
 </head>
@@ -220,6 +271,7 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
 
 <div id="auth" class="auth hidden">
   <div class="auth-card">
+    <img class="logo logo-dark" src="assets/muhra-logo.png" alt="Muhra"><img class="logo logo-light" src="assets/muhra-logo-light.png" alt="Muhra">
     <h1>Competitor Intel</h1>
     <p id="authSub">Sign in to your Muhra dashboard.</p>
     <div id="authMsg"></div>
@@ -240,12 +292,13 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
 
 <div id="app" class="shell hidden">
   <aside class="side">
-    <div class="brand"><b>MUHRA</b><small>Competitor Intel</small></div>
+    <div class="brand"><img class="logo logo-dark" src="assets/muhra-logo.png" alt="Muhra"><img class="logo logo-light" src="assets/muhra-logo-light.png" alt="Muhra"><small>Competitor Intel</small></div>
     <nav class="nav" id="nav"></nav>
     <h3>Accounts</h3>
     <div class="clist" id="clist"></div>
   </aside>
   <main class="main">
+    <div class="mobile-brand"><img class="logo logo-dark" src="assets/muhra-logo.png" alt="Muhra"><img class="logo logo-light" src="assets/muhra-logo-light.png" alt="Muhra"></div>
     <div class="mobile-nav" id="mnav"></div>
     <div id="view"></div>
   </main>
@@ -265,8 +318,76 @@ const BLOCKS = ['00','03','06','09','12','15','18','21'];
 const FORMATS = ['Reel','Carousel','Image','Video'];
 const PALETTE = ['#3E6A7A','#A36B4F','#5B7F5E','#6A5C85','#B08D57','#4F5D75','#7E8C3E','#9A5C7A','#3F7F86','#86735F','#5F6F52','#7B6A9E','#C07A5A','#4E6E8E','#8C5E3C'];
 
-const S = { user:null, role:null, comps:[], snaps:[], posts:[], report:null, m:{}, postsBy:{}, snapsBy:{},
-  view:'overview', selected:null, charts:{}, sort:{key:'er',dir:-1}, postSort:'er', trendMode:'index', busy:{} };
+const S = { user:null, role:null, comps:[], snaps:[], posts:[], report:null, reports:[], m:{}, postsBy:{}, snapsBy:{},
+  view:'overview', selected:null, charts:{}, sort:{key:'er',dir:-1}, postSort:'er', postFmt:'all', postLimit:24, trendMode:'index', busy:{},
+  range: loadRange() };
+
+/* ---------- period ---------- */
+const PRESETS = [['3d','3 days',3],['7d','7 days',7],['30d','30 days',30],['3m','3 months',91],['6m','6 months',182],['12m','12 months',365],['all','All time',null]];
+function loadRange(){
+  try{ const r = JSON.parse(localStorage.getItem('ci.range')); if(r && r.key) return r; }catch(e){}
+  return { key:'30d' };
+}
+function saveRange(){ try{ localStorage.setItem('ci.range', JSON.stringify(S.range)); }catch(e){} }
+const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const parseYmd = (s) => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+function earliestData(){
+  let t = Date.now();
+  for(const p of S.posts) t = Math.min(t, new Date(p.posted_at).getTime());
+  for(const x of S.snaps) t = Math.min(t, parseYmd(x.snap_date).getTime());
+  return new Date(t);
+}
+// Resolved period: start (inclusive) / end (exclusive) as Dates, plus labels.
+function period(){
+  const r = S.range, now = new Date();
+  let start, end = now, label, short;
+  const pre = PRESETS.find(x=>x[0]===r.key);
+  if(pre && pre[2]){ start = new Date(now.getTime()-pre[2]*DAY); label = 'the last '+pre[1]; short = 'Last '+pre[1]; }
+  else if(r.key==='all'){ start = earliestData(); label = 'all tracked history'; short = 'All time'; }
+  else if(r.key==='month' && r.month){
+    const [y,m] = r.month.split('-').map(Number); start = new Date(y, m-1, 1); end = new Date(y, m, 1);
+    label = short = start.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  }
+  else if(r.key==='custom' && r.from && r.to){
+    start = parseYmd(r.from); end = new Date(parseYmd(r.to).getTime()+DAY);
+    label = short = fmtDate(start)+' – '+fmtDate(new Date(end.getTime()-DAY));
+  }
+  else { S.range = { key:'30d' }; return period(); }
+  const live = end >= now;  // period runs up to the present
+  const days = Math.max(1, ((live ? now : end) - start)/DAY);
+  return { start, end, live, startIso:start.toISOString(), endIso:end.toISOString(), startDay:ymd(start), endDay:ymd(end), days, label, short };
+}
+const fmtDate = (d) => d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+const inPeriod = (P) => (p) => p.posted_at >= P.startIso && p.posted_at < P.endIso;
+const snapInPeriod = (P) => (x) => x.snap_date >= P.startDay && x.snap_date < P.endDay;
+function dataMonths(){
+  const set = new Set(S.posts.map(p=>ymd(new Date(p.posted_at)).slice(0,7)));
+  for(const x of S.snaps) set.add(x.snap_date.slice(0,7));
+  return [...set].sort().reverse();
+}
+function setRange(r){ S.range = r; S.postLimit = 24; saveRange(); recompute(); render(); }
+function periodBar(){
+  const P = period(), r = S.range;
+  const months = dataMonths();
+  const seg = PRESETS.map(([k,l])=>`<button data-range="${k}" aria-pressed="${r.key===k}">${l.replace(' days','D').replace(' months','M').replace('All time','All')}</button>`).join('');
+  const mSel = `<select id="rangeMonth" class="${r.key==='month'?'on':''}" aria-label="Pick a month"><option value="">Month…</option>${months.map(m=>`<option value="${m}" ${r.key==='month'&&r.month===m?'selected':''}>${parseYmd(m+'-01').toLocaleDateString('en-GB',{month:'long',year:'numeric'})}</option>`).join('')}</select>`;
+  const today = ymd(new Date()), first = ymd(earliestData());
+  const custom = r.key==='custom'
+    ? `<span class="custom"><input type="date" id="rangeFrom" value="${esc(r.from||'')}" min="${first}" max="${today}" aria-label="From"> to <input type="date" id="rangeTo" value="${esc(r.to||'')}" min="${first}" max="${today}" aria-label="To"></span>`
+    : `<button class="btn btn-sm" data-range="custom">Custom…</button>`;
+  return `<div class="period"><div class="seg" role="group" aria-label="Period">${seg}</div>${mSel}${custom}
+    <span class="range">${r.key==='custom'?'Custom':esc(P.short)} · <b class="num">${fmtDate(P.start)} – ${fmtDate(P.live ? new Date() : new Date(P.end - DAY))}</b></span></div>`;
+}
+function bindPeriod(){
+  document.querySelectorAll('[data-range]').forEach(b=>b.onclick=()=>{
+    const k = b.dataset.range;
+    if(k==='custom'){ const P = period(); setRange({ key:'custom', from: P.startDay, to: ymd(P.live ? new Date() : new Date(P.end - DAY)) }); }
+    else setRange({ key:k });
+  });
+  const ms = $('rangeMonth'); if(ms) ms.onchange = () => ms.value && setRange({ key:'month', month: ms.value });
+  const f = $('rangeFrom'), t = $('rangeTo');
+  if(f && t){ const apply = () => { if(f.value && t.value){ const [a,b] = f.value<=t.value ? [f.value,t.value] : [t.value,f.value]; setRange({ key:'custom', from:a, to:b }); } }; f.onchange = apply; t.onchange = apply; }
+}
 
 /* ---------- utils ---------- */
 const $ = (id) => document.getElementById(id);
@@ -282,7 +403,6 @@ const fmtPct = (v, d=2) => isNum(v) ? v.toFixed(d)+'%' : '–';
 const pct0 = (v) => isNum(v) ? Math.round(v*100)+'%' : '–';
 const signed = (v, f=fmtK) => !isNum(v) ? '–' : (v>0?'+':v<0?'−':'') + f(Math.abs(v));
 const cls = (v) => !isNum(v) || v===0 ? 'flat' : v>0 ? 'up' : 'down';
-const ageDays = (iso) => (Date.now() - new Date(iso).getTime())/DAY;
 const initials = (u) => (u||'?').replace(/[^a-z0-9]/gi,'').slice(0,2).toUpperCase();
 const relTime = (iso) => { if(!iso) return 'never'; const m=(Date.now()-new Date(iso))/6e4; if(m<1) return 'just now'; if(m<60) return Math.round(m)+' min ago'; const h=m/60; if(h<24) return Math.round(h)+' h ago'; return Math.round(h/24)+' days ago'; };
 const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
@@ -349,49 +469,49 @@ async function fetchAll(build){
   return out;
 }
 async function loadData(){
-  const since = new Date(Date.now()-120*DAY).toISOString();
-  const [c, s, p, r] = await Promise.all([
+  // Full history; the period selector filters it client-side.
+  const [c, s, p, r, rl] = await Promise.all([
     sb.from('ci_competitors').select('*').order('created_at'),
-    fetchAll(() => sb.from('ci_snapshots').select('*').gte('snap_date', since.slice(0,10)).order('snap_date')),
-    fetchAll(() => sb.from('ci_posts').select('id,competitor_id,caption,format,permalink,media_url,thumbnail_url,posted_at,like_count,comments_count,engagement_rate,hashtags').gte('posted_at', since).order('posted_at',{ascending:false})),
-    sb.from('ci_reports').select('*').order('created_at',{ascending:false}).limit(1)
+    fetchAll(() => sb.from('ci_snapshots').select('*').order('snap_date').order('competitor_id')),
+    fetchAll(() => sb.from('ci_posts').select('id,competitor_id,caption,format,permalink,media_url,thumbnail_url,posted_at,like_count,comments_count,engagement_rate,hashtags').order('posted_at',{ascending:false}).order('id')),
+    sb.from('ci_reports').select('*').order('created_at',{ascending:false}).limit(1),
+    sb.from('ci_reports').select('id,created_at').neq('content','__NO_KEY__').order('created_at',{ascending:false}).limit(60)
   ]);
   if(c.error) throw c.error; if(r.error) throw r.error;
+  S.reports = rl.error ? [] : rl.data;
   S.comps = c.data.sort((a,b)=> (b.is_own-a.is_own) || ((b.followers||0)-(a.followers||0)));
   S.snaps = s.map(x=>({...x, followers:toNum(x.followers), engagement_rate:toNum(x.engagement_rate), avg_likes:toNum(x.avg_likes), avg_comments:toNum(x.avg_comments)}));
   S.posts = p.map(x=>({...x, engagement_rate:toNum(x.engagement_rate)}));
   S.report = r.data[0] || null;
+  S.latestReportId = S.report ? S.report.id : 0;
   S.postsBy = {}; S.snapsBy = {};
   for(const x of S.posts) (S.postsBy[x.competitor_id] ||= []).push(x);
   for(const x of S.snaps) (S.snapsBy[x.competitor_id] ||= []).push(x);
+  recompute();
+}
+function recompute(){
+  const P = period();
   S.m = {};
-  for(const comp of S.comps) S.m[comp.id] = metrics(comp);
+  for(const comp of S.comps) S.m[comp.id] = metrics(comp, P);
 }
 
-function metrics(c){
-  const ps = S.postsBy[c.id] || [], ss = S.snapsBy[c.id] || [];
-  const last = ss[ss.length-1] || null;
-  const growth = (days) => {
-    if(ss.length < 2) return null;
-    const target = new Date(Date.now()-days*DAY).toISOString().slice(0,10);
-    const base = ss.find(x=>x.snap_date >= target);
-    if(!base || base === last || !isNum(base.followers) || !isNum(last.followers)) return null;
-    return { abs: last.followers - base.followers, pct: base.followers ? (last.followers-base.followers)/base.followers*100 : null, days: Math.round((new Date(last.snap_date)-new Date(base.snap_date))/DAY) };
-  };
-  const p30 = ps.filter(p=>ageDays(p.posted_at)<=30);
-  const p60 = ps.filter(p=>ageDays(p.posted_at)<=60);
-  const recent = ps.slice(0,12);
-  const er = last && isNum(last.engagement_rate) ? last.engagement_rate : avg(recent.map(p=>p.engagement_rate));
-  const accER = avg(p60.map(p=>p.engagement_rate));
+// All metrics are scoped to the selected period P.
+function metrics(c, P){
+  const all = S.postsBy[c.id] || [];
+  const ps = all.filter(inPeriod(P));
+  const ss = (S.snapsBy[c.id] || []).filter(snapInPeriod(P)).filter(x=>isNum(x.followers));
+  const first = ss[0] || null, last = ss[ss.length-1] || null;
+  const growth = first && last && first !== last ? { abs: last.followers - first.followers, pct: first.followers ? (last.followers-first.followers)/first.followers*100 : null, days: Math.round((parseYmd(last.snap_date)-parseYmd(first.snap_date))/DAY) } : null;
+  const accER = avg(ps.map(p=>p.engagement_rate));
   const fm = {};
-  for(const f of FORMATS){ const fp = p60.filter(p=>p.format===f); fm[f] = { n: fp.length, share: p60.length ? fp.length/p60.length : 0, er: avg(fp.map(p=>p.engagement_rate)) }; }
+  for(const f of FORMATS){ const fp = ps.filter(p=>p.format===f); fm[f] = { n: fp.length, share: ps.length ? fp.length/ps.length : 0, er: avg(fp.map(p=>p.engagement_rate)) }; }
   let best = null; for(const f of FORMATS){ if(fm[f].n>=2 && (!best || fm[f].er > fm[best].er)) best = f; }
   return {
-    followers: c.followers, er, accER, g7: growth(7), g30: growth(30),
-    perWeek: p30.length/30*7, p30: p30.length, p60,
-    likes: avg(recent.map(p=>p.like_count)), comments: avg(recent.map(p=>p.comments_count)),
-    fm, best, hasData: !!c.last_fetched_at && !c.last_error && ps.length>0,
-    capLen: avg(p60.map(p=>(p.caption||'').length))
+    followers: last ? last.followers : P.live ? c.followers : null, er: accER, accER, growth,
+    perWeek: ps.length/P.days*7, n: ps.length, pR: ps,
+    likes: avg(ps.map(p=>p.like_count)), comments: avg(ps.map(p=>p.comments_count)),
+    fm, best, hasData: !!c.last_fetched_at && !c.last_error && all.length>0,
+    capLen: avg(ps.map(p=>(p.caption||'').length))
   };
 }
 
@@ -428,7 +548,7 @@ async function refresh(ids, label){
 async function generateReport(){
   if(S.busy.report) return;
   S.busy.report = true; render();
-  const prev = S.report ? S.report.id : 0;
+  const prev = S.latestReportId || 0;
   try{
     await triggerJob('report', null);
     toast('Writing the AI report… this takes about a minute.');
@@ -436,11 +556,17 @@ async function generateReport(){
     while(Date.now()-t0 < 180000){
       await new Promise(r=>setTimeout(r, 5000));
       const { data } = await sb.from('ci_reports').select('*').order('created_at',{ascending:false}).limit(1);
-      if(data && data[0] && data[0].id !== prev){ S.report = data[0]; break; }
+      if(data && data[0] && data[0].id !== prev){ S.report = data[0]; S.latestReportId = data[0].id; if(data[0].content!=='__NO_KEY__') S.reports.unshift({ id:data[0].id, created_at:data[0].created_at }); break; }
     }
-    toast(S.report && S.report.id !== prev ? 'Report ready.' : 'Still writing. Check back shortly.');
+    toast(S.latestReportId !== prev ? 'Report ready.' : 'Still writing. Check back shortly.');
   }catch(e){ toast(e.message || 'Could not start the report.'); }
   finally{ delete S.busy.report; render(); }
+}
+
+async function loadReport(id){
+  const { data, error } = await sb.from('ci_reports').select('*').eq('id', id).single();
+  if(error){ toast(error.message); return; }
+  S.report = data; render();
 }
 
 /* ---------- gap engine ---------- */
@@ -451,20 +577,21 @@ function computeGaps(){
   if(!S.m[own.id].hasData) return { state:'own-pending', own };
   if(!rivals.length) return { state:'no-rivals' };
   const om = S.m[own.id];
+  const P = period();
   const gaps = [], wins = [];
   const handle = (c) => '@'+c.username;
 
   // normalised post score: post ER / account's 60-day average ER
-  const norm = (c) => { const m = S.m[c.id]; return m.p60.filter(p=>isNum(p.engagement_rate) && m.accER).map(p=>({...p, rel: p.engagement_rate/m.accER})); };
+  const norm = (c) => { const m = S.m[c.id]; return m.pR.filter(p=>isNum(p.engagement_rate) && m.accER).map(p=>({...p, rel: p.engagement_rate/m.accER})); };
   const rivalPosts = rivals.flatMap(norm);
-  const ownPosts = S.m[own.id].p60;
+  const ownPosts = om.pR;
 
   // 1. posting frequency
   const medF = median(rivals.map(c=>S.m[c.id].perWeek));
   const topF = rivals.slice().sort((a,b)=>S.m[b.id].perWeek-S.m[a.id].perWeek)[0];
   if(isNum(medF) && medF>0){
     if(om.perWeek < medF*0.8) gaps.push({ sev: om.perWeek < medF*0.5 ? 'high':'med', title:'You post less often than the market',
-      ev:`Muhra posted ${fmt1(om.perWeek)} times a week over the last 30 days. The competitor median is ${fmt1(medF)}, and ${handle(topF)} posts ${fmt1(S.m[topF.id].perWeek)} a week.`,
+      ev:`Muhra posted ${fmt1(om.perWeek)} times a week over ${P.label}. The competitor median is ${fmt1(medF)}, and ${handle(topF)} posts ${fmt1(S.m[topF.id].perWeek)} a week.`,
       act:`Move to at least ${Math.ceil(medF)} posts a week to stay visible in the feed.` });
     else if(om.perWeek >= medF*1.2) wins.push({ title:'You out-post the market', ev:`${fmt1(om.perWeek)} posts a week vs a competitor median of ${fmt1(medF)}.` });
   }
@@ -479,7 +606,7 @@ function computeGaps(){
       const ownShare = ownPosts.length ? ownPosts.filter(p=>p.format===f).length/ownPosts.length : 0;
       if(lift >= 1.15 && ownShare < share - 0.1)
         gaps.push({ sev: lift>=1.4 ? 'high':'med', title:`${f}s are under-used at Muhra`,
-          ev:`Across competitors, ${f.toLowerCase()}s earn ${fmt1(lift)}× their account's average engagement and make up ${pct0(share)} of posts. They are only ${pct0(ownShare)} of Muhra's last 60 days.`,
+          ev:`Across competitors, ${f.toLowerCase()}s earn ${fmt1(lift)}× their account's average engagement and make up ${pct0(share)} of posts. They are only ${pct0(ownShare)} of Muhra's posts in ${P.label}.`,
           act:(()=>{ const n = Math.max(1, Math.round((share-ownShare)*Math.max(om.perWeek, medF||3))); return `Shift about ${n} post${n>1?'s':''} a week to ${f.toLowerCase()}s.`; })() });
       else if(lift <= 0.85 && ownShare > share + 0.15)
         gaps.push({ sev:'med', title:`Too many ${f.toLowerCase()}s for what they return`,
@@ -527,24 +654,24 @@ function computeGaps(){
   // 6. engagement and growth vs market
   const medER = median(rivals.map(c=>S.m[c.id].er));
   if(isNum(medER) && isNum(om.er)){
-    if(om.er < medER*0.8) gaps.push({ sev:'high', title:'Your engagement rate trails the market', ev:`Muhra ${fmtPct(om.er)} vs competitor median ${fmtPct(medER)} (average of the last 12 posts, likes + comments ÷ followers).`, act:'Use the format and timing fixes above; they are the fastest levers.' });
+    if(om.er < medER*0.8) gaps.push({ sev:'high', title:'Your engagement rate trails the market', ev:`Muhra ${fmtPct(om.er)} vs competitor median ${fmtPct(medER)} (average per post in ${P.label}, likes + comments ÷ followers).`, act:'Use the format and timing fixes above; they are the fastest levers.' });
     else if(om.er >= medER*1.2) wins.push({ title:'Engagement above market', ev:`Muhra ${fmtPct(om.er)} vs competitor median ${fmtPct(medER)}.` });
   }
-  const g = (c) => S.m[c.id].g30 && S.m[c.id].g30.pct;
+  const g = (c) => S.m[c.id].growth && S.m[c.id].growth.pct;
   const medG = median(rivals.map(g));
   if(isNum(medG) && isNum(g(own))){
-    if(g(own) < medG - 0.5) gaps.push({ sev:'med', title:'Your audience grows slower than competitors', ev:`Muhra grew ${fmtPct(g(own),1)} in ${S.m[own.id].g30.days} days vs a competitor median of ${fmtPct(medG,1)}.`, act:'Pair content fixes with a small follower-growth ad or collaboration.' });
+    if(g(own) < medG - 0.5) gaps.push({ sev:'med', title:'Your audience grows slower than competitors', ev:`Muhra grew ${fmtPct(g(own),1)} in ${om.growth.days} days vs a competitor median of ${fmtPct(medG,1)}.`, act:'Pair content fixes with a small follower-growth ad or collaboration.' });
     else if(g(own) > medG + 0.5) wins.push({ title:'Faster follower growth', ev:`Muhra ${fmtPct(g(own),1)} vs competitor median ${fmtPct(medG,1)}.` });
   }
 
   const rank = { high:0, med:1, low:2 };
   gaps.sort((a,b)=>rank[a.sev]-rank[b.sev]);
-  return { state:'ok', gaps, wins, rivals: rivals.length };
+  return { state:'ok', gaps, wins, rivals: rivals.length, P };
 }
 
 /* ---------- rendering ---------- */
 function destroyCharts(){ for(const k in S.charts){ S.charts[k].destroy(); } S.charts = {}; }
-function go(view, id){ S.view = view; S.selected = id ?? null; render(); window.scrollTo(0,0); }
+function go(view, id){ if(id !== S.selected){ S.postLimit = 24; S.postFmt = 'all'; } S.view = view; S.selected = id ?? null; render(); window.scrollTo(0,0); }
 
 function renderNav(){
   const admin = S.role === 'admin';
@@ -587,32 +714,34 @@ function growthCell(g){ if(!g) return '<span class="flat">–</span>'; return `<
 
 function viewOverview(){
   const busy = S.busy.all;
+  const P = period();
   const head = `<div class="topbar"><div><h1>Overview</h1><div class="sub">${S.comps.filter(c=>c.status==='active').length} active accounts · Instagram · updated daily at 05:00 Cairo</div></div>
     <div class="actions">${S.role==='admin'?`<button class="btn" data-action="refresh-all" ${busy?'disabled':''}>${busy?'<span class="spinner"></span> Fetching…':'Refresh all now'}</button>`:''}</div></div>`;
   if(!S.comps.length) return head + emptyAll();
+  const bar = periodBar();
   const rows = S.comps.filter(c=>S.m[c.id].hasData).map(c=>({c, m:S.m[c.id]}));
   const k = S.sort.key, d = S.sort.dir;
-  const val = (r) => ({ followers:r.m.followers, g30:r.m.g30?r.m.g30.abs:null, pw:r.m.perWeek, er:r.m.er, likes:r.m.likes, comments:r.m.comments })[k];
+  const val = (r) => ({ followers:r.m.followers, g30:r.m.growth?r.m.growth.abs:null, n:r.m.n, pw:r.m.perWeek, er:r.m.er, likes:r.m.likes, comments:r.m.comments })[k];
   rows.sort((a,b)=> ((val(b)??-Infinity) - (val(a)??-Infinity)) * (d===-1?1:-1));
   const th = (key,l) => `<th data-sort="${key}" aria-sort="${S.sort.key===key?(S.sort.dir===-1?'descending':'ascending'):'none'}">${l}</th>`;
   const pending = S.comps.filter(c=>!S.m[c.id].hasData);
   const pendingNote = pending.length ? `<p class="hint" style="margin-top:12px">${pending.length} account${pending.length>1?'s':''} without data yet: ${pending.map(c=>'@'+esc(c.username)+(c.last_error?' (error)':c.status==='paused'?' (paused)':' (waiting)')).join(', ')}.</p>` : '';
-  return head + `
+  return head + bar + `
   <div class="panel">
-    <div class="panel-head"><div><h2>Leaderboard</h2><p class="hint">Engagement rate = average (likes + comments) ÷ followers on the last 12 posts. Click a row for the full breakdown.</p></div></div>
+    <div class="panel-head"><div><h2>Leaderboard</h2><p class="hint">${esc(P.short)}. Engagement rate = average (likes + comments) ÷ followers across posts in the period. Click a row for the full breakdown.</p></div></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Account</th>${th('followers','Followers')}${th('g30','30-day growth')}${th('pw','Posts / week')}${th('er','Eng. rate')}${th('likes','Avg likes')}${th('comments','Avg comments')}<th>Best format</th></tr></thead>
+      <thead><tr><th>Account</th>${th('followers','Followers')}${th('g30','Growth')}${th('n','Posts')}${th('pw','Posts / week')}${th('er','Eng. rate')}${th('likes','Avg likes')}${th('comments','Avg comments')}<th>Best format</th></tr></thead>
       <tbody>${rows.map(({c,m})=>`<tr class="clickable ${c.is_own?'own':''}" data-comp="${c.id}">
         <td><span class="acct">${avatarHtml(c)}<span>@${esc(c.username)}${c.is_own?' <span class="pill brand">Muhra</span>':''}</span></span></td>
-        <td class="num">${fmtInt(m.followers)}</td><td class="num">${growthCell(m.g30)}</td><td class="num">${fmt1(m.perWeek)}</td>
+        <td class="num">${fmtInt(m.followers)}</td><td class="num">${growthCell(m.growth)}</td><td class="num">${fmtInt(m.n)}</td><td class="num">${fmt1(m.perWeek)}</td>
         <td class="num"><b>${fmtPct(m.er)}</b></td><td class="num">${fmtInt(m.likes)}</td><td class="num">${fmtInt(m.comments)}</td><td>${m.best||'–'}</td></tr>`).join('')}</tbody>
     </table></div>${pendingNote}
   </div>
   <div class="grid2">
-    <div class="panel"><div class="panel-head"><div><h2>Follower trend</h2><p class="hint" id="trendHint">${S.trendMode==='index'?'Growth since tracking started, as % change':'Follower count'}</p></div>
+    <div class="panel"><div class="panel-head"><div><h2>Follower trend</h2><p class="hint" id="trendHint">${S.trendMode==='index'?'% change since the start of the period':'Follower count'} · ${esc(P.short)}</p></div>
       <div class="seg"><button data-trend="index" aria-pressed="${S.trendMode==='index'}">Growth %</button><button data-trend="abs" aria-pressed="${S.trendMode==='abs'}">Followers</button></div></div>
       <div class="chart-box"><canvas id="chTrend"></canvas></div></div>
-    <div class="panel"><h2>Engagement rate ranking</h2><p class="hint">Who earns the most interaction per follower</p><div class="chart-box"><canvas id="chER"></canvas></div></div>
+    <div class="panel"><h2>Engagement rate ranking</h2><p class="hint">Who earns the most interaction per follower · ${esc(P.short)}</p><div class="chart-box"><canvas id="chER"></canvas></div></div>
   </div>`;
 }
 
@@ -620,6 +749,7 @@ function viewComp(){
   const c = S.comps.find(x=>x.id===S.selected);
   if(!c) return emptyAll();
   const m = S.m[c.id];
+  const P = period();
   const busy = S.busy[String(c.id)];
   const admin = S.role==='admin';
   let banner = '';
@@ -634,20 +764,21 @@ function viewComp(){
       <p style="font-size:13px;color:var(--muted);margin:8px 0 0">Updated ${relTime(c.last_fetched_at)} · ${fmtInt(c.media_count)} posts total</p>
     </div>${admin?`<button class="btn" data-action="refresh-one" data-id="${c.id}" ${busy?'disabled':''}>${busy?'<span class="spinner"></span> Fetching…':'Refresh now'}</button>`:''}</div></div>`;
   if(!m.hasData) return banner + head;
+  const bar = periodBar();
   const k = (v,l,d) => `<div class="kpi"><div class="v num">${v}</div><div class="l">${l}</div>${d?`<div class="d num">${d}</div>`:''}</div>`;
   const kpis = `<div class="kpis">
-    ${k(fmtK(m.followers),'Followers', m.g30?`<span class="${cls(m.g30.abs)}">${signed(m.g30.abs)}</span> <span class="flat">in ${m.g30.days} days</span>`:'<span class="flat">growth shows after day 2</span>')}
-    ${k(fmtPct(m.er),'Engagement rate','<span class="flat">last 12 posts</span>')}
-    ${k(fmt1(m.perWeek),'Posts per week','<span class="flat">last 30 days</span>')}
-    ${k(fmtK(m.likes),'Avg likes','')}
-    ${k(fmtK(m.comments),'Avg comments','')}</div>`;
+    ${k(fmtK(m.followers),'Followers', m.growth?`<span class="${cls(m.growth.abs)}">${signed(m.growth.abs)}</span> <span class="flat">in ${m.growth.days} day${m.growth.days===1?'':'s'}</span>`:'<span class="flat">needs 2+ snapshots in period</span>')}
+    ${k(fmtPct(m.er),'Engagement rate',`<span class="flat">avg of ${fmtInt(m.n)} post${m.n===1?'':'s'}</span>`)}
+    ${k(fmt1(m.perWeek),'Posts per week',`<span class="flat">${fmtInt(m.n)} in period</span>`)}
+    ${k(fmtK(m.likes),'Avg likes','<span class="flat">per post</span>')}
+    ${k(fmtK(m.comments),'Avg comments','<span class="flat">per post</span>')}</div>`;
 
   const maxShare = Math.max(...FORMATS.map(f=>m.fm[f].share), 0.01);
   const fmts = FORMATS.filter(f=>m.fm[f].n).map(f=>`<div class="fmt-row"><span>${f}</span><span class="bar"><i style="width:${m.fm[f].share/maxShare*100}%"></i></span><span class="num" style="text-align:right">${pct0(m.fm[f].share)}</span><span class="num" style="text-align:right">${fmtPct(m.fm[f].er)}</span></div>`).join('');
 
   // heatmap
   const cells = {}; let maxN = 0;
-  for(const p of m.p60){ const t = cairoParts(p.posted_at); const key = t.day+'-'+t.block; (cells[key] ||= []).push(p.engagement_rate); maxN = Math.max(maxN, cells[key].length); }
+  for(const p of m.pR){ const t = cairoParts(p.posted_at); const key = t.day+'-'+t.block; (cells[key] ||= []).push(p.engagement_rate); maxN = Math.max(maxN, cells[key].length); }
   const ers = Object.values(cells).map(a=>avg(a)).filter(isNum); const maxER = Math.max(...ers, 0.0001);
   let heat = `<div class="heat"><span></span>${BLOCKS.map(b=>`<span class="hh">${b}</span>`).join('')}`;
   DAYS.forEach((d,di)=>{ heat += `<span class="hl">${d}</span>`; BLOCKS.forEach((b,bi)=>{ const a = cells[di+'-'+bi]; const e = a?avg(a):null; const alpha = a && isNum(e) ? 0.15+0.85*(e/maxER) : 0;
@@ -656,29 +787,37 @@ function viewComp(){
 
   // posts
   const sortFns = { er:(a,b)=>(b.engagement_rate??-1)-(a.engagement_rate??-1), likes:(a,b)=>(b.like_count??-1)-(a.like_count??-1), comments:(a,b)=>(b.comments_count??-1)-(a.comments_count??-1), recent:(a,b)=>new Date(b.posted_at)-new Date(a.posted_at) };
-  const pool = (S.postsBy[c.id]||[]).filter(p=>S.postSort==='recent' || ageDays(p.posted_at)<=90).slice().sort(sortFns[S.postSort]).slice(0,12);
-  const posts = pool.map(p=>{ const img = p.thumbnail_url || p.media_url; const d = new Date(p.posted_at);
+  const fmtAvail = FORMATS.filter(f=>m.fm[f].n);
+  if(S.postFmt!=='all' && !fmtAvail.includes(S.postFmt)) S.postFmt = 'all';
+  const pool = m.pR.filter(p=>S.postFmt==='all' || p.format===S.postFmt).slice().sort(sortFns[S.postSort]);
+  const shown = pool.slice(0, S.postLimit);
+  const posts = shown.map(p=>{ const img = p.thumbnail_url || p.media_url; const d = new Date(p.posted_at);
     return `<a class="post" href="${esc(p.permalink||'#')}" target="_blank" rel="noopener"><div class="img">${img?`<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<span class="ph">Preview expired<br>open on Instagram</span><span class="fmt">${esc(p.format)}</span></div>
       <div class="body"><div class="stats num"><span><b>${fmtK(p.like_count)}</b> likes</span><span><b>${fmtK(p.comments_count)}</b> com.</span></div>
-      <div class="stats num" style="margin-top:2px"><span>${d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</span><span><b>${fmtPct(p.engagement_rate)}</b></span></div>
+      <div class="stats num" style="margin-top:2px"><span>${d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year: d.getFullYear()===new Date().getFullYear()?undefined:'2-digit'})}</span><span><b>${fmtPct(p.engagement_rate)}</b></span></div>
       <div class="cap" dir="auto">${esc((p.caption||'').slice(0,160))}</div></div></a>`; }).join('');
 
   const tagStats = {};
-  for(const p of m.p60) for(const t of (p.hashtags||[])){ (tagStats[t] ||= []).push(p.engagement_rate); }
+  for(const p of m.pR) for(const t of (p.hashtags||[])){ (tagStats[t] ||= []).push(p.engagement_rate); }
   const tags = Object.entries(tagStats).map(([t,a])=>({t,n:a.length,er:avg(a)})).sort((a,b)=>b.n-a.n || (b.er||0)-(a.er||0)).slice(0,20);
 
-  return banner + head + kpis + `
+  const fmtFilter = fmtAvail.length>1 ? `<div class="fmt-filter seg" role="group" aria-label="Format">${[['all','All formats',m.n]].concat(fmtAvail.map(f=>[f,f+'s',m.fm[f].n])).map(([k,l,n])=>`<button data-pfmt="${k}" aria-pressed="${S.postFmt===k}">${l} <span class="num">${n}</span></button>`).join('')}</div>` : '';
+  const left = pool.length - shown.length;
+  const more = left>0 ? `<div class="more"><button class="btn" data-more="24">Show ${Math.min(24,left)} more</button><button class="btn" data-more="all">Show all ${fmtInt(pool.length)}</button></div>` : '';
+  const sortLabel = { er:'highest engagement', likes:'most likes', comments:'most comments', recent:'newest' }[S.postSort];
+
+  return banner + head + bar + kpis + `
   <div class="grid2">
-    <div class="panel"><h2>Follower growth</h2><p class="hint">Daily snapshot since tracking started</p><div class="chart-box sm"><canvas id="chFollowers"></canvas></div></div>
-    <div class="panel"><h2>Format mix and performance</h2><p class="hint">Last 60 days · share of posts · average engagement rate</p>${fmts || '<p class="hint">No posts in the last 60 days.</p>'}</div>
+    <div class="panel"><h2>Follower growth</h2><p class="hint">Daily snapshots · ${esc(P.short)}</p><div class="chart-box sm"><canvas id="chFollowers"></canvas></div></div>
+    <div class="panel"><h2>Format mix and performance</h2><p class="hint">${esc(P.short)} · share of posts · average engagement rate</p>${fmts || '<p class="hint">No posts in this period.</p>'}</div>
   </div>
   <div class="grid2" style="margin-top:18px">
-    <div class="panel"><h2>When they post</h2><p class="hint">Cairo time, 3-hour blocks, last 60 days. Number = posts; darker = higher engagement.</p>${heat}</div>
-    <div class="panel"><h2>Hashtags they use</h2><p class="hint">Last 60 days · number of posts</p>${tags.length?`<div class="chips">${tags.map(x=>`<span class="chip">#${esc(x.t)}<b class="num">${x.n}</b></span>`).join('')}</div>`:'<p class="hint">No hashtags used.</p>'}</div>
+    <div class="panel"><h2>When they post</h2><p class="hint">Cairo time, 3-hour blocks · ${esc(P.short)}. Number = posts; darker = higher engagement.</p>${heat}</div>
+    <div class="panel"><h2>Hashtags they use</h2><p class="hint">${esc(P.short)} · number of posts</p>${tags.length?`<div class="chips">${tags.map(x=>`<span class="chip">#${esc(x.t)}<b class="num">${x.n}</b></span>`).join('')}</div>`:'<p class="hint">No hashtags used.</p>'}</div>
   </div>
-  <div class="panel" style="margin-top:18px"><div class="panel-head"><div><h2>Best-performing content</h2><p class="hint">${S.postSort==='recent'?'Most recent posts':'Top 12 from the last 90 days'}</p></div>
+  <div class="panel" style="margin-top:18px"><div class="panel-head"><div><h2>Content</h2><p class="hint num">Showing ${fmtInt(shown.length)} of ${fmtInt(pool.length)} posts · ${esc(P.short)} · sorted by ${sortLabel}</p></div>
     <div class="seg">${[['er','Engagement'],['likes','Likes'],['comments','Comments'],['recent','Recent']].map(([k,l])=>`<button data-psort="${k}" aria-pressed="${S.postSort===k}">${l}</button>`).join('')}</div></div>
-    <div class="posts">${posts || '<p class="hint">No posts yet.</p>'}</div></div>`;
+    ${fmtFilter}<div class="posts">${posts || '<p class="hint">No posts in this period. Try a longer range above.</p>'}</div>${more}</div>`;
 }
 
 function viewGaps(){
@@ -690,37 +829,95 @@ function viewGaps(){
   if(r.state==='no-rivals') return head + `<div class="panel empty"><h2>Add competitors to compare against</h2><p>At least one competitor with data is needed.</p>${admin?'<button class="btn btn-primary" data-go="manage">Add competitors</button>':''}</div>`;
   const card = (g) => `<div class="gap ${g.sev==='high'?'high':''}"><span class="rail"></span><div><h3>${esc(g.title)}</h3><p class="ev">${esc(g.ev)}</p><div class="do"><b>Do this:</b> ${esc(g.act)}</div></div></div>`;
   const win = (g) => `<div class="gap good"><span class="rail"></span><div><h3>${esc(g.title)}</h3><p class="ev" style="margin:0">${esc(g.ev)}</p></div></div>`;
-  return head + `<p class="hint" style="color:var(--muted);margin:-8px 0 18px">Compared against ${r.rivals} competitor${r.rivals>1?'s':''}. Engagement is normalised per account, so big and small accounts are compared fairly.</p>`
+  return head + periodBar() + `<p class="hint" style="color:var(--muted);margin:-4px 0 18px">${esc(r.P.short)} · compared against ${r.rivals} competitor${r.rivals>1?'s':''}. Engagement is normalised per account, so big and small accounts are compared fairly.${r.P.days<14?' Short periods have few posts, so fewer gaps can be detected — 30 days or more is more reliable.':''}</p>`
     + (r.gaps.length ? r.gaps.map(card).join('') : `<div class="panel empty"><h2>No major gaps found</h2><p>Muhra matches or beats the market on every measured dimension.</p></div>`)
     + (r.wins.length ? `<div class="section-title">Where Muhra leads</div>` + r.wins.map(win).join('') : '')
     + `<p class="hint" style="color:var(--muted);margin-top:18px">For content ideas and the reasoning behind these patterns, open the <button class="linkbtn" data-go="report">AI report</button>.</p>`;
 }
 
-function mdToHtml(md){
-  const lines = md.replace(/\r/g,'').split('\n'); let html = ''; let list = null;
-  const inline = (s) => esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(^|\s)\*(?!\s)(.+?)\*(?=\s|$)/g,'$1<i>$2</i>');
-  const close = () => { if(list){ html += `</${list}>`; list = null; } };
-  for(const raw of lines){
-    const l = raw.trim();
-    if(!l){ close(); continue; }
-    let m;
-    if((m = l.match(/^(#{1,4})\s+(.*)$/))){ close(); const lv = Math.min(3, Math.max(2, m[1].length)); html += `<h${lv}>${inline(m[2])}</h${lv}>`; }
-    else if((m = l.match(/^[-*•]\s+(.*)$/))){ if(list!=='ul'){ close(); html+='<ul>'; list='ul'; } html += `<li>${inline(m[1])}</li>`; }
-    else if((m = l.match(/^\d+[.)]\s+(.*)$/))){ if(list!=='ol'){ close(); html+='<ol>'; list='ol'; } html += `<li>${inline(m[1])}</li>`; }
-    else if(/^-{3,}$/.test(l)){ close(); html += '<hr style="border:none;border-top:1px solid var(--line)">'; }
-    else { close(); html += `<p>${inline(l)}</p>`; }
+const ARABIC = /[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]/;
+// Latin words, @handles, #tags, numbers and percentages, kept together as one left-to-right run.
+const LTR_RUN = /[A-Za-z0-9@#$+−][A-Za-z0-9@#$._&%+\-–−×/:'’,\s]*[A-Za-z0-9%]|[A-Za-z0-9]/g;
+function mdInline(src, rtl){
+  // Pull out code spans and links first so they are never split or re-escaped.
+  const keep = [];
+  const stash = (h) => '\u0000'+(keep.push(h)-1)+'\u0000';
+  let t = src.replace(/`([^`]+)`/g, (_,c)=>stash(`<code dir="ltr">${esc(c)}</code>`))
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, (_,l,u)=>stash(`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(l)}</a>`));
+  // Escape, isolating LTR runs inside right-to-left text.
+  let out = '', last = 0;
+  if(rtl){
+    for(const m of t.matchAll(LTR_RUN)){
+      out += esc(t.slice(last, m.index));
+      out += /[A-Za-z0-9]/.test(m[0]) && !/^\d{1,3}$/.test(m[0]) ? `<bdi dir="ltr">${esc(m[0])}</bdi>` : esc(m[0]);
+      last = m.index + m[0].length;
+    }
   }
-  close(); return html;
+  out += esc(t.slice(last));
+  out = out.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/__(.+?)__/g,'<b>$1</b>')
+    .replace(/(^|[\s(>])\*(?!\s)(.+?)\*(?=[\s).,:;!?،؛<]|$)/g,'$1<i>$2</i>');
+  return out.replace(/\u0000(\d+)\u0000/g, (_,i)=>keep[i]);
+}
+const isTableRow = (l) => /^\|.*\|$/.test(l) || (l.startsWith('|') && l.split('|').length>2);
+const isTableSep = (l) => /^\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?$/.test(l);
+const splitRow = (l) => l.replace(/^\|/,'').replace(/\|\s*$/,'').split(/(?<!\\)\|/).map(x=>x.trim().replace(/\\\|/g,'|'));
+function mdToHtml(md){
+  const rtl = ARABIC.test(md);
+  const inline = (x) => mdInline(x, rtl);
+  const lines = md.replace(/\r/g,'').split('\n');
+  let html = '', list = null, para = [];
+  const flushPara = () => { if(para.length){ html += `<p>${para.map(inline).join('<br>')}</p>`; para = []; } };
+  const closeList = () => { if(list){ html += `</${list}>`; list = null; } };
+  const close = () => { flushPara(); closeList(); };
+  const isNumCell = (x) => /^[\s*]*[-+−]?[\d.,]+\s*[%×x]?[\s*]*$/.test(x);
+  for(let i=0; i<lines.length; i++){
+    const l = lines[i].trim();
+    if(!l){ flushPara(); continue; }
+    let m;
+    if(isTableRow(l) && !isTableSep(l)){
+      close();
+      // Gather the table, tolerating blank lines between rows.
+      const rows = [];
+      let j = i;
+      for(; j<lines.length; j++){
+        const t = lines[j].trim();
+        if(!t){ let k = j+1; while(k<lines.length && !lines[k].trim()) k++; if(k<lines.length && isTableRow(lines[k].trim())){ j = k-1; continue; } break; }
+        if(!isTableRow(t)) break;
+        rows.push(t);
+      }
+      i = j-1;
+      const hasHead = rows.length>1 && isTableSep(rows[1]);
+      const head = hasHead ? splitRow(rows[0]) : null;
+      const body = rows.slice(hasHead?2:0).filter(r=>!isTableSep(r)).map(splitRow);
+      const cols = Math.max(head?head.length:0, ...body.map(r=>r.length));
+      const numCol = Array.from({length:cols}, (_,c)=> body.length>0 && body.every(r=> !r[c] || isNumCell(r[c].replace(/\(.*\)/,''))));
+      const cell = (tag, x, c) => `<${tag}${numCol[c]?' class="n"':''}>${inline(x||'')}</${tag}>`;
+      html += `<div class="tbl"><table>${head?`<thead><tr>${Array.from({length:cols},(_,c)=>cell('th',head[c],c)).join('')}</tr></thead>`:''}<tbody>${body.map(r=>`<tr>${Array.from({length:cols},(_,c)=>cell('td',r[c],c)).join('')}</tr>`).join('')}</tbody></table></div>`;
+    }
+    else if(isTableSep(l) && l.includes('|')){ /* orphan separator line */ }
+    else if((m = l.match(/^(#{1,6})\s+(.*?)\s*#*$/))){ close(); const lv = Math.min(4, Math.max(2, m[1].length)); html += `<h${lv}>${inline(m[2])}</h${lv}>`; }
+    else if(/^(-{3,}|\*{3,}|_{3,})$/.test(l)){ close(); html += '<hr>'; }
+    else if((m = l.match(/^>\s?(.*)$/))){ close(); const q = [m[1]]; while(i+1<lines.length && /^\s*>/.test(lines[i+1])){ i++; q.push(lines[i].trim().replace(/^>\s?/,'')); } html += `<blockquote>${q.filter(Boolean).map(x=>`<p>${inline(x)}</p>`).join('')}</blockquote>`; }
+    else if((m = l.match(/^[-*•+]\s+(.*)$/))){ flushPara(); if(list!=='ul'){ closeList(); html+='<ul>'; list='ul'; } html += `<li>${inline(m[1])}</li>`; }
+    else if((m = l.match(/^(\d+)[.)]\s+(.*)$/))){ flushPara(); if(list!=='ol'){ closeList(); html+=`<ol start="${Number(m[1])}">`; list='ol'; } html += `<li>${inline(m[2])}</li>`; }
+    else if(list && /^\s{2,}\S/.test(lines[i])){ html = html.replace(/<\/li>$/, `<br>${inline(l)}</li>`); }
+    else { closeList(); para.push(l); }
+  }
+  close();
+  return { html, rtl };
 }
 function viewReport(){
   const admin = S.role==='admin', busy = S.busy.report;
   const rep = S.report;
-  const head = `<div class="topbar"><div><h1>AI report</h1><div class="sub">${rep && rep.content!=='__NO_KEY__' ? 'Generated '+new Date(rep.created_at).toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'})+' · refreshed every Sunday 07:00' : 'Weekly Arabic strategy report with 10 content ideas'}</div></div>
-    <div class="actions">${admin?`<button class="btn btn-primary" data-action="report" ${busy?'disabled':''}>${busy?'<span class="spinner"></span> Writing…':'Generate now'}</button>`:''}</div></div>`;
+  const has = rep && rep.content!=='__NO_KEY__';
+  const head = `<div class="topbar"><div><h1>AI report</h1><div class="sub">${has ? 'Generated '+new Date(rep.created_at).toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'})+' · refreshed every Sunday 07:00' : 'Weekly Arabic strategy report with 10 content ideas'}</div></div>
+    <div class="actions">${has?'<button class="btn" data-action="print">Print / PDF</button>':''}${admin?`<button class="btn btn-primary" data-action="report" ${busy?'disabled':''}>${busy?'<span class="spinner"></span> Writing…':'Generate now'}</button>`:''}</div></div>`;
   if(rep && rep.content==='__NO_KEY__') return head + `<div class="panel"><h2>Add a free Gemini key to switch this on</h2><p class="hint">The report is written by Google Gemini on its free tier, so it costs nothing.</p>
     <ol style="font-size:14px;line-height:1.8;margin:0;padding-left:20px"><li>Open <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> and create an API key.</li><li>In n8n, open <b>Muhra Competitor Intel (Instagram)</b> → <b>Config</b> node and paste it into <code>GEMINI_API_KEY</code>.</li><li>Save, then press <b>Generate now</b> here.</li></ol></div>`;
   if(!rep) return head + `<div class="panel empty"><h2>No report yet</h2><p>The first report is written on Sunday at 07:00 Cairo, once there is tracked data.${admin?' You can also generate one now.':''}</p></div>`;
-  return head + `<div class="panel"><div class="report">${mdToHtml(rep.content)}</div></div>`;
+  const doc = mdToHtml(rep.content);
+  const hist = S.reports.length>1 ? `<div class="report-meta"><label for="reportPick">Report history</label><select id="reportPick">${S.reports.map((x,i)=>`<option value="${x.id}" ${x.id===rep.id?'selected':''}>${new Date(x.created_at).toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'})}${i===0?' · latest':''}</option>`).join('')}</select>${S.reports[0] && rep.id!==S.reports[0].id?'<button class="linkbtn" data-action="report-latest">Back to latest</button>':''}</div>` : '';
+  return head + hist + `<div class="panel report-panel"><article class="report" dir="${doc.rtl?'rtl':'ltr'}" lang="${doc.rtl?'ar':'en'}">${doc.html}</article></div>`;
 }
 
 function viewManage(){
@@ -766,7 +963,11 @@ function parseHandle(input){
 function bindView(){
   document.querySelectorAll('[data-sort]').forEach(th=>th.onclick=()=>{ const k=th.dataset.sort; S.sort = { key:k, dir: S.sort.key===k ? -S.sort.dir : -1 }; render(); });
   document.querySelectorAll('[data-trend]').forEach(b=>b.onclick=()=>{ S.trendMode=b.dataset.trend; render(); });
-  document.querySelectorAll('[data-psort]').forEach(b=>b.onclick=()=>{ S.postSort=b.dataset.psort; render(); });
+  document.querySelectorAll('[data-psort]').forEach(b=>b.onclick=()=>{ S.postSort=b.dataset.psort; S.postLimit=24; render(); });
+  document.querySelectorAll('[data-pfmt]').forEach(b=>b.onclick=()=>{ S.postFmt=b.dataset.pfmt; S.postLimit=24; render(); });
+  document.querySelectorAll('[data-more]').forEach(b=>b.onclick=()=>{ const y = window.scrollY; S.postLimit = b.dataset.more==='all' ? Infinity : S.postLimit+24; render(); window.scrollTo(0,y); });
+  bindPeriod();
+  const rp = $('reportPick'); if(rp) rp.onchange = () => loadReport(Number(rp.value));
   document.querySelectorAll('[data-action]').forEach(b=>b.onclick=()=>onAction(b.dataset.action, Number(b.dataset.id)));
   document.querySelectorAll('[data-notes]').forEach(inp=>inp.onchange=async()=>{
     const { error } = await sb.from('ci_competitors').update({ notes: inp.value.trim() || null }).eq('id', Number(inp.dataset.notes));
@@ -803,6 +1004,8 @@ async function onAction(a, id){
     if(a==='refresh-all') return refresh(null);
     if(a==='refresh-one') return refresh([id], `Fetching @${c.username}…`);
     if(a==='report') return generateReport();
+    if(a==='print') return window.print();
+    if(a==='report-latest') return loadReport(S.reports[0].id);
     if(a==='toggle'){
       const status = c.status==='active' ? 'paused' : 'active';
       const { error } = await sb.from('ci_competitors').update({ status }).eq('id', id); if(error) throw error;
@@ -831,17 +1034,20 @@ function chartDefaults(){
 function drawCharts(){
   if(!window.Chart) return;
   chartDefaults();
+  const P = period(), inP = snapInPeriod(P);
+  const dateLabel = (d) => parseYmd(d).toLocaleDateString('en-GB',{day:'numeric',month:'short', year: P.days>330 ? '2-digit' : undefined});
   const trend = $('chTrend');
   if(trend){
-    const comps = S.comps.filter(c=>(S.snapsBy[c.id]||[]).length);
-    const dates = [...new Set(S.snaps.map(s=>s.snap_date))].sort();
+    const snapsOf = (c) => (S.snapsBy[c.id]||[]).filter(inP);
+    const comps = S.comps.filter(c=>snapsOf(c).length);
+    const dates = [...new Set(S.snaps.filter(inP).map(s=>s.snap_date))].sort();
     const ds = comps.map(c=>{
-      const ss = S.snapsBy[c.id]; const base = ss.find(s=>isNum(s.followers));
+      const ss = snapsOf(c); const base = ss.find(s=>isNum(s.followers));
       const map = Object.fromEntries(ss.map(s=>[s.snap_date, s.followers]));
       return { label:'@'+c.username, data: dates.map(d=> map[d]==null ? null : S.trendMode==='index' ? (base&&base.followers? (map[d]-base.followers)/base.followers*100 : null) : map[d]),
         borderColor: colorFor(c), backgroundColor: colorFor(c), borderWidth: c.is_own?3:1.6, pointRadius: dates.length<15?3:0, spanGaps:true, tension:.25 };
     });
-    S.charts.trend = new Chart(trend, { type:'line', data:{ labels: dates.map(d=>new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short'})), datasets: ds },
+    S.charts.trend = new Chart(trend, { type:'line', data:{ labels: dates.map(dateLabel), datasets: ds },
       options:{ maintainAspectRatio:false, interaction:{mode:'index',intersect:false}, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, usePointStyle:true } },
         tooltip:{ callbacks:{ label:(x)=> x.dataset.label+': '+(S.trendMode==='index'? (x.parsed.y>0?'+':'')+x.parsed.y.toFixed(2)+'%' : fmtInt(x.parsed.y)) } } },
         scales:{ y:{ ticks:{ callback:(v)=> S.trendMode==='index' ? v+'%' : fmtK(v) } }, x:{ grid:{ display:false } } } } });
@@ -854,8 +1060,8 @@ function drawCharts(){
   }
   const fc = $('chFollowers');
   if(fc){
-    const c = S.comps.find(x=>x.id===S.selected); const ss = (S.snapsBy[c.id]||[]).filter(s=>isNum(s.followers));
-    S.charts.f = new Chart(fc, { type:'line', data:{ labels: ss.map(s=>new Date(s.snap_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'})),
+    const c = S.comps.find(x=>x.id===S.selected); const ss = (S.snapsBy[c.id]||[]).filter(inP).filter(s=>isNum(s.followers));
+    S.charts.f = new Chart(fc, { type:'line', data:{ labels: ss.map(s=>dateLabel(s.snap_date)),
       datasets:[{ data: ss.map(s=>s.followers), borderColor: colorFor(c), backgroundColor: 'transparent', borderWidth:2.5, pointRadius: ss.length<15?3:0, tension:.25 }] },
       options:{ maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(x)=>fmtInt(x.parsed.y)+' followers' } } }, scales:{ y:{ ticks:{ callback:(v)=>fmtK(v) } }, x:{ grid:{display:false} } } } });
   }
