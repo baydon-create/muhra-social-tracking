@@ -413,6 +413,12 @@ function cairoParts(iso){
   let h = Number(parts.find(p=>p.type==='hour').value); if(h===24) h=0;
   return { day: DAYS.indexOf(wd), block: Math.floor(h/3) };
 }
+// Instagram's desktop site turns /reel/<code> links into its scrolling Reels feed, which often
+// starts on a different reel. /p/<code> opens that exact post (reels included) on its own page.
+function postUrl(p){
+  const m = (p.permalink||'').match(/instagram\.com\/(?:[^/]+\/)?(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/);
+  return m ? `https://www.instagram.com/p/${m[1]}/` : (p.permalink || '#');
+}
 function toast(t, ms=3200){ const el=$('toast'); el.textContent=t; el.classList.remove('hidden'); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.add('hidden'), ms); }
 function avatarHtml(c, lg){
   const k = lg ? 'avatar lg' : 'avatar';
@@ -792,7 +798,7 @@ function viewComp(){
   const pool = m.pR.filter(p=>S.postFmt==='all' || p.format===S.postFmt).slice().sort(sortFns[S.postSort]);
   const shown = pool.slice(0, S.postLimit);
   const posts = shown.map(p=>{ const img = p.thumbnail_url || p.media_url; const d = new Date(p.posted_at);
-    return `<a class="post" href="${esc(p.permalink||'#')}" target="_blank" rel="noopener"><div class="img">${img?`<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<span class="ph">Preview expired<br>open on Instagram</span><span class="fmt">${esc(p.format)}</span></div>
+    return `<a class="post" href="${esc(postUrl(p))}" target="_blank" rel="noopener"><div class="img">${img?`<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<span class="ph">Preview expired<br>open on Instagram</span><span class="fmt">${esc(p.format)}</span></div>
       <div class="body"><div class="stats num"><span><b>${fmtK(p.like_count)}</b> likes</span><span><b>${fmtK(p.comments_count)}</b> com.</span></div>
       <div class="stats num" style="margin-top:2px"><span>${d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year: d.getFullYear()===new Date().getFullYear()?undefined:'2-digit'})}</span><span><b>${fmtPct(p.engagement_rate)}</b></span></div>
       <div class="cap" dir="auto">${esc((p.caption||'').slice(0,160))}</div></div></a>`; }).join('');
