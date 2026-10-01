@@ -132,6 +132,10 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
 
 .chart-box{position:relative;height:280px}
 .chart-box.sm{height:220px}
+.chart-empty{min-height:200px;display:flex;flex-direction:column;justify-content:center;gap:6px;padding:20px;border:1px dashed var(--line);border-radius:var(--radius-sm);background:var(--paper);font-size:14px}
+.chart-empty p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
+.chart-empty .big{font-size:26px;font-weight:600;margin-top:6px}
+.chart-empty .big span{font-size:13px;font-weight:400;color:var(--muted)}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px}
 .seg button{border:none;background:none;padding:4px 12px;border-radius:999px;cursor:pointer;font-size:13px;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--brand);color:var(--on-brand)}
@@ -408,7 +412,7 @@ function period(){
   else { S.range = { key:'30d' }; return period(); }
   const live = end >= now;  // period runs up to the present
   const days = Math.max(1, ((live ? now : end) - start)/DAY);
-  return { start, end, live, startIso:start.toISOString(), endIso:end.toISOString(), startDay:ymd(start), endDay:ymd(end), days, label, short };
+  return { start, end, live, startIso:start.toISOString(), endIso:end.toISOString(), startDay:ymd(start), endDay:ymd(live ? new Date(now.getTime()+DAY) : end), days, label, short };
 }
 const fmtDate = (d) => d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
 const inPeriod = (P) => (p) => p.posted_at >= P.startIso && p.posted_at < P.endIso;
@@ -1201,8 +1205,18 @@ function drawCharts(){
   const P = period(), inP = snapInPeriod(P);
   const dateLabel = (d) => parseYmd(d).toLocaleDateString('en-GB',{day:'numeric',month:'short', year: P.days>330 ? '2-digit' : undefined});
   const trend = $('chTrend');
+  // Instagram only exposes today's follower count, so history builds up one snapshot per day.
+  const notEnough = (el, dates, extra) => {
+    if(dates.length >= 2) return false;
+    const first = S.snaps.length ? S.snaps.reduce((a,b)=>a.snap_date<b.snap_date?a:b).snap_date : null;
+    el.parentElement.outerHTML = `<div class="chart-empty"><b>${dates.length ? 'Only 1 day of follower data in this period' : 'No follower data in this period'}</b>
+      <p>Instagram doesn't share past follower counts, so the dashboard records one snapshot every day at 05:00 Cairo${first?` (since ${fmtDate(parseYmd(first))})`:''}. The line appears once there are two days.</p>${extra||''}</div>`;
+    return true;
+  };
   if(trend){
     const snapsOf = (c) => (S.snapsBy[c.id]||[]).filter(inP);
+    const tDates = [...new Set(S.snaps.filter(inP).map(s=>s.snap_date))];
+    if(notEnough(trend, tDates)) return drawRest();
     const comps = S.comps.filter(c=>snapsOf(c).length);
     const dates = [...new Set(S.snaps.filter(inP).map(s=>s.snap_date))].sort();
     const ds = comps.map(c=>{
@@ -1216,6 +1230,8 @@ function drawCharts(){
         tooltip:{ callbacks:{ label:(x)=> x.dataset.label+': '+(S.trendMode==='index'? (x.parsed.y>0?'+':'')+x.parsed.y.toFixed(2)+'%' : fmtInt(x.parsed.y)) } } },
         scales:{ y:{ ticks:{ callback:(v)=> S.trendMode==='index' ? v+'%' : fmtK(v) } }, x:{ grid:{ display:false } } } } });
   }
+  drawRest();
+  function drawRest(){
   const erc = $('chER');
   if(erc){
     const rows = S.comps.filter(c=>isNum(S.m[c.id].er) && S.m[c.id].hasData).sort((a,b)=>S.m[b.id].er-S.m[a.id].er);
@@ -1225,9 +1241,11 @@ function drawCharts(){
   const fc = $('chFollowers');
   if(fc){
     const c = S.comps.find(x=>x.id===S.selected); const ss = (S.snapsBy[c.id]||[]).filter(inP).filter(s=>isNum(s.followers));
+    if(notEnough(fc, ss.map(s=>s.snap_date), `<div class="big num">${fmtInt(ss.length ? ss[ss.length-1].followers : c.followers)} <span>followers now</span></div>`)) return;
     S.charts.f = new Chart(fc, { type:'line', data:{ labels: ss.map(s=>dateLabel(s.snap_date)),
       datasets:[{ data: ss.map(s=>s.followers), borderColor: colorFor(c), backgroundColor: 'transparent', borderWidth:2.5, pointRadius: ss.length<15?3:0, tension:.25 }] },
       options:{ maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(x)=>fmtInt(x.parsed.y)+' followers' } } }, scales:{ y:{ ticks:{ callback:(v)=>fmtK(v) } }, x:{ grid:{display:false} } } } });
+  }
   }
 }
 
