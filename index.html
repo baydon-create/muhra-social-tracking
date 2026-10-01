@@ -11,9 +11,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
-  --paper:#F3F4F1; --surface:#FFFFFF; --ink:#1E2A2C; --muted:#6B7572; --line:#DDE1DC;
-  --brand:#7A2334; --brand-soft:#F4E6E8; --good:#2F6B4F; --good-soft:#E3F0E8; --warn:#8A5A12; --warn-soft:#F7EDDB;
-  --bad:#9B2C2C; --bad-soft:#F8E4E4; --slate:#3E6A7A;
+  /* Muhra brand: logo brown on light beige */
+  --paper:#F5EEE3; --surface:#FFFCF7; --ink:#2C2018; --muted:#7A6858; --line:#E6DACA;
+  --brand:#4A3123; --brand-soft:#EEE2D0; --on-brand:#FFF8EE; --accent:#A9845A;
+  --good:#3E6B48; --good-soft:#E4EDDF; --warn:#91631C; --warn-soft:#F6EAD3;
+  --bad:#A23B2E; --bad-soft:#F7E2DC; --slate:#A9845A; --link:#6B4630;
   --radius-lg:14px; --radius-sm:8px;
   --font:'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, Arial, sans-serif;
   box-sizing:border-box;
@@ -21,16 +23,17 @@
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --paper:#131A1B; --surface:#1B2426; --ink:#E6EBE8; --muted:#95A09C; --line:#2C3739;
-    --brand:#D9848F; --brand-soft:#3A2227; --good:#7CC39B; --good-soft:#1E3328; --warn:#E0B266; --warn-soft:#3A2E1A;
-    --bad:#EC8C8C; --bad-soft:#3B2020; --slate:#86B3C2;
+    --paper:#17120E; --surface:#211A15; --ink:#F2E9DC; --muted:#A8998A; --line:#3A2F27;
+    --brand:#DCC3A0; --brand-soft:#3A2D22; --on-brand:#2C2018; --accent:#C9A57E;
+    --good:#8FC59A; --good-soft:#1F2E22; --warn:#E2B66C; --warn-soft:#3A2D18;
+    --bad:#EE9583; --bad-soft:#3D221D; --slate:#C9A57E; --link:#E3C8A2;
   }
 }
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
 button,input,textarea,select{font:inherit;color:inherit}
-a{color:var(--slate)}
+a{color:var(--link)}
 :focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:4px}
 .num{font-variant-numeric:tabular-nums}
 .hidden{display:none!important}
@@ -46,13 +49,16 @@ a{color:var(--slate)}
 .input:focus{border-color:var(--brand);outline:none}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-weight:500;white-space:nowrap}
 .btn:hover{border-color:var(--ink)}
+a.btn{text-decoration:none}
+.iconbtn{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;flex-shrink:0;font-size:18px;line-height:1}
+.iconbtn:hover{border-color:var(--brand)}
 .btn:disabled{opacity:.55;cursor:default}
-.btn-primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn-primary{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
 .btn-primary:hover{filter:brightness(1.08);border-color:var(--brand)}
 .btn-danger{color:var(--bad)}
 .btn-sm{padding:5px 12px;font-size:13px}
 .btn-block{width:100%;justify-content:center}
-.linkbtn{background:none;border:none;color:var(--slate);cursor:pointer;padding:0;text-decoration:underline}
+.linkbtn{background:none;border:none;color:var(--link);cursor:pointer;padding:0;text-decoration:underline}
 .msg{font-size:14px;padding:10px 12px;border-radius:var(--radius-sm);margin-bottom:14px}
 .msg.err{background:var(--bad-soft);color:var(--bad)}
 .msg.ok{background:var(--good-soft);color:var(--good)}
@@ -66,7 +72,11 @@ a{color:var(--slate)}
 .logo-light{display:none}
 @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .logo-dark{display:none} :root:not([data-theme="light"]) .logo-light{display:block} }
 .auth-card .logo{max-width:190px;margin:0 0 18px}
-.mobile-brand{display:none}
+.mobile-head{display:none}
+.credit{font-size:11.5px;line-height:1.5;color:var(--muted);letter-spacing:.2px}
+.credit b{color:var(--brand);font-weight:600}
+.side .credit{margin:28px 10px 0;padding-top:14px;border-top:1px solid var(--line)}
+.auth-card .credit{margin:22px 0 0;text-align:center}
 .nav{display:flex;flex-direction:column;gap:2px;margin-bottom:22px}
 .nav button{display:flex;justify-content:space-between;align-items:center;text-align:left;border:none;background:none;padding:9px 10px;border-radius:var(--radius-sm);cursor:pointer}
 .nav button:hover{background:var(--paper)}
@@ -99,7 +109,7 @@ a{color:var(--slate)}
 .grid2>.panel{margin-bottom:0}
 .stack{display:flex;flex-direction:column;gap:18px}
 
-.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:18px}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:18px}
 .kpi{background:var(--surface);padding:16px 18px}
 .kpi .v{font-size:24px;font-weight:600;line-height:1.2}
 .kpi .l{font-size:13px;color:var(--muted)}
@@ -124,7 +134,7 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
 .chart-box.sm{height:220px}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px}
 .seg button{border:none;background:none;padding:4px 12px;border-radius:999px;cursor:pointer;font-size:13px;color:var(--muted)}
-.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.seg button[aria-pressed="true"]{background:var(--brand);color:var(--on-brand)}
 .panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px}
 .panel-head .hint{margin:0}
 
@@ -153,14 +163,18 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
 
 /* Posts */
 .posts{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
-.post{border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;background:var(--surface);display:flex;flex-direction:column;text-decoration:none;color:inherit}
-.post:hover{border-color:var(--ink)}
+.post{border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;background:var(--surface);display:flex;flex-direction:column;text-decoration:none;color:inherit;padding:0;text-align:start;cursor:pointer;width:100%}
+.post:hover{border-color:var(--brand);box-shadow:0 4px 14px rgba(44,32,24,.08)}
 .post .img{aspect-ratio:4/5;background:var(--paper);position:relative;overflow:hidden}
 .post .img img{width:100%;height:100%;object-fit:cover;display:block}
-.post .img .fmt{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;padding:2px 8px;border-radius:999px}
+.post .img .fmt{position:absolute;left:8px;top:8px;background:rgba(44,32,24,.72);color:#FFF8EE;font-size:11px;padding:2px 8px;border-radius:999px}
+.post .img .views{position:absolute;left:8px;bottom:8px;display:inline-flex;align-items:center;gap:4px;background:rgba(44,32,24,.72);color:#FFF8EE;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px}
+.ico{width:14px;height:14px;flex-shrink:0;vertical-align:-2px}
+.post .stats span{display:inline-flex;align-items:center;gap:4px}
+.post .stats.sub{margin-top:3px;font-size:12px}
 .post .img .ph{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:13px;text-align:center;padding:10px}
 .post .body{padding:10px;font-size:13px}
-.post .stats{display:flex;justify-content:space-between;color:var(--muted)}
+.post .stats{display:flex;justify-content:space-between;gap:6px;color:var(--muted)}
 .post .stats b{color:var(--ink);font-weight:600}
 .post .cap{margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--muted)}
 
@@ -183,7 +197,7 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
 .period{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:10px 12px;margin-bottom:18px}
 .period .seg{flex-wrap:wrap}
 .period select,.period input[type=date]{padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:var(--paper);font-size:13px}
-.period select.on{border-color:var(--ink);background:var(--ink);color:var(--surface)}
+.period select.on{border-color:var(--brand);background:var(--brand);color:var(--on-brand)}
 .period .custom{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
 .period .range{margin-inline-start:auto;font-size:13px;color:var(--muted)}
 .period .range b{color:var(--ink);font-weight:600}
@@ -239,8 +253,30 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.spinner{animation-duration:2.4s}}
 
+/* Post detail */
+.pd{border:none;padding:0;border-radius:var(--radius-lg);background:var(--surface);color:var(--ink);width:min(1040px,calc(100vw - 32px));max-height:calc(100vh - 40px);box-shadow:0 24px 60px rgba(28,18,10,.35)}
+.pd::backdrop{background:rgba(28,18,10,.55)}
+.pd-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:2}
+.pd-head .t{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pd-head .t small{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
+.pd-body{display:grid;grid-template-columns:320px 1fr;gap:22px;padding:18px}
+.pd-media{position:relative;border-radius:var(--radius-sm);overflow:hidden;background:var(--paper);aspect-ratio:4/5}
+.pd-media img{width:100%;height:100%;object-fit:cover;display:block}
+.pd-media .ph{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:13px}
+.pd-cap{font-size:13.5px;white-space:pre-line;color:var(--ink);margin:12px 0 0;max-height:220px;overflow:auto;line-height:1.7}
+.pd h3{font-size:13px;color:var(--muted);font-weight:500;margin:18px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.pd h3:first-child{margin-top:0}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.mt{background:var(--paper);border-radius:var(--radius-sm);padding:10px 12px}
+.mt .v{font-size:20px;font-weight:600;line-height:1.25}
+.mt .l{font-size:12.5px;color:var(--muted)}
+.mt .c{font-size:12px;margin-top:2px}
+.mt.own{background:var(--brand-soft)}
+.pd-note{font-size:12.5px;color:var(--muted);margin:8px 0 0}
+.pd .chart-box{height:200px}
+@media (max-width:760px){ .pd{width:100vw;max-width:100vw;max-height:100dvh;height:100dvh;border-radius:0;margin:0} .pd-body{grid-template-columns:1fr;padding:14px} .pd-head{padding:12px 14px;gap:8px} .pd-head .lbl{display:none} .pd-head .btn{padding:9px 11px} .pd-media{max-height:58vh} .mgrid{grid-template-columns:repeat(2,1fr)} }
 @media print{
-  .side,.mobile-nav,.mobile-brand,.actions,.period,.report-meta,.toast{display:none!important}
+  .side,.mobile-head,.actions,.period,.report-meta,.toast{display:none!important}
   .shell{display:block} .main{padding:0} body{background:#fff}
   .panel{border:none;padding:0}
   .report{max-width:none}
@@ -249,8 +285,16 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
 @media (max-width:900px){
   .shell{grid-template-columns:1fr}
   .side{display:none}
-  .mobile-nav{display:flex;gap:8px;overflow-x:auto;margin:-8px -16px 18px;padding:0 16px 4px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--paper);z-index:5}
-  .mobile-nav button,.mobile-nav select{flex-shrink:0}
+  .mobile-head{display:block;margin:-20px -16px 18px;padding:14px 16px 0;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+  .mh-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px}
+  .mh-brand{display:flex;flex-direction:column;gap:4px;min-width:0}
+  .mh-brand .logo{max-width:118px}
+  .mh-brand .credit{font-size:10.5px}
+  .mobile-nav{display:grid;grid-template-columns:repeat(var(--tabs,4),1fr);gap:4px;padding-bottom:10px}
+  .mtab{border:none;background:none;padding:8px 2px;border-radius:10px;font-size:12.5px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap}
+  .mtab[aria-current="true"]{background:var(--brand);color:var(--on-brand)}
+  .macct{grid-column:1/-1;margin-top:4px;width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper);font-size:14px}
+  .side .credit{display:none}
   .main{padding:20px 16px 60px}
   .grid2{grid-template-columns:1fr}
   .kpis{grid-template-columns:repeat(2,1fr)}
@@ -258,8 +302,6 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
   .fmt-row{grid-template-columns:70px 1fr 56px 64px;gap:8px}
   .profile{flex-direction:column}
   .topbar h1{font-size:22px}
-  .mobile-brand{display:flex;justify-content:center;padding:4px 0 14px}
-  .mobile-brand .logo{max-width:140px}
   .period .range{margin-inline-start:0;width:100%}
   .report-panel{padding:20px 16px}
   .posts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -279,6 +321,7 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
     <label class="field"><span>Password</span><input id="password" class="input" type="password" autocomplete="current-password"></label>
     <button id="authBtn" class="btn btn-primary btn-block">Sign in</button>
     <p style="margin:16px 0 0;font-size:14px;color:var(--muted)"><span id="authSwitchText">First time here?</span> <button id="authSwitch" class="linkbtn">Create the admin account</button></p>
+    <p class="credit">Created by <b>Dr. Mohamed Baydon</b> for Muhra</p>
   </div>
 </div>
 
@@ -287,6 +330,7 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
     <h1>Access pending</h1>
     <p>This account can't view the dashboard yet. Ask the dashboard owner to grant access.</p>
     <button class="btn btn-block" data-signout>Sign out</button>
+    <p class="credit">Created by <b>Dr. Mohamed Baydon</b> for Muhra</p>
   </div>
 </div>
 
@@ -296,14 +340,22 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
     <nav class="nav" id="nav"></nav>
     <h3>Accounts</h3>
     <div class="clist" id="clist"></div>
+    <p class="credit">Created by <b>Dr. Mohamed Baydon</b> for Muhra</p>
   </aside>
   <main class="main">
-    <div class="mobile-brand"><img class="logo logo-dark" src="assets/muhra-logo.png" alt="Muhra"><img class="logo logo-light" src="assets/muhra-logo-light.png" alt="Muhra"></div>
-    <div class="mobile-nav" id="mnav"></div>
+    <header class="mobile-head">
+      <div class="mh-top">
+        <div class="mh-brand"><img class="logo logo-dark" src="assets/muhra-logo.png" alt="Muhra"><img class="logo logo-light" src="assets/muhra-logo-light.png" alt="Muhra">
+          <span class="credit">Created by <b>Dr. Mohamed Baydon</b> for Muhra</span></div>
+        <button class="iconbtn" data-signout aria-label="Sign out" title="Sign out"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></button>
+      </div>
+      <nav class="mobile-nav" id="mnav"></nav>
+    </header>
     <div id="view"></div>
   </main>
 </div>
 
+<dialog id="postDlg" class="pd" aria-label="Post details"></dialog>
 <div id="toast" class="toast hidden" role="status"></div>
 
 <script>
@@ -316,7 +368,8 @@ const DAY = 864e5;
 const DAYS = ['Sat','Sun','Mon','Tue','Wed','Thu','Fri'];
 const BLOCKS = ['00','03','06','09','12','15','18','21'];
 const FORMATS = ['Reel','Carousel','Image','Video'];
-const PALETTE = ['#3E6A7A','#A36B4F','#5B7F5E','#6A5C85','#B08D57','#4F5D75','#7E8C3E','#9A5C7A','#3F7F86','#86735F','#5F6F52','#7B6A9E','#C07A5A','#4E6E8E','#8C5E3C'];
+// Warm, brand-adjacent series colours; Muhra itself always draws in --brand.
+const PALETTE = ['#B08A5B','#6F8A86','#A3655A','#7F7B55','#8B7299','#5F7389','#C2A27A','#6E8F6B','#B07C8F','#8E6E52','#4F6F78','#9C8A4E','#7D5F7A','#5C7A5C','#A87A4A'];
 
 const S = { user:null, role:null, comps:[], snaps:[], posts:[], report:null, reports:[], m:{}, postsBy:{}, snapsBy:{},
   view:'overview', selected:null, charts:{}, sort:{key:'er',dir:-1}, postSort:'er', postFmt:'all', postLimit:24, trendMode:'index', busy:{},
@@ -419,6 +472,15 @@ function postUrl(p){
   const m = (p.permalink||'').match(/instagram\.com\/(?:[^/]+\/)?(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/);
   return m ? `https://www.instagram.com/p/${m[1]}/` : (p.permalink || '#');
 }
+const ICON = {
+  eye:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+  heart:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
+  chat:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.8-.9L3 21l1.9-5.2A8.4 8.4 0 1 1 21 11.5z"/></svg>',
+  ext:'<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14L21 3"/></svg>'
+};
+const shortDate = (iso) => { const d = new Date(iso); return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year: d.getFullYear()===new Date().getFullYear()?undefined:'2-digit'}); };
+const fmtSec = (ms) => !isNum(ms) ? '–' : ms < 60000 ? (ms/1000).toFixed(1)+' s' : Math.floor(ms/60000)+' m '+Math.round(ms%60000/1000)+' s';
+const fmtHours = (ms) => !isNum(ms) ? '–' : ms >= 36e5 ? fmt1(ms/36e5)+' h' : Math.round(ms/6e4)+' min';
 function toast(t, ms=3200){ const el=$('toast'); el.textContent=t; el.classList.remove('hidden'); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.add('hidden'), ms); }
 function avatarHtml(c, lg){
   const k = lg ? 'avatar lg' : 'avatar';
@@ -479,7 +541,7 @@ async function loadData(){
   const [c, s, p, r, rl] = await Promise.all([
     sb.from('ci_competitors').select('*').order('created_at'),
     fetchAll(() => sb.from('ci_snapshots').select('*').order('snap_date').order('competitor_id')),
-    fetchAll(() => sb.from('ci_posts').select('id,competitor_id,caption,format,permalink,media_url,thumbnail_url,posted_at,like_count,comments_count,engagement_rate,hashtags').order('posted_at',{ascending:false}).order('id')),
+    fetchAll(() => sb.from('ci_posts').select('id,competitor_id,caption,format,permalink,media_url,thumbnail_url,posted_at,like_count,comments_count,engagement_rate,hashtags,view_count,reach,saved,shares,total_interactions,avg_watch_ms,total_watch_ms,insights_at').order('posted_at',{ascending:false}).order('id')),
     sb.from('ci_reports').select('*').order('created_at',{ascending:false}).limit(1),
     sb.from('ci_reports').select('id,created_at').neq('content','__NO_KEY__').order('created_at',{ascending:false}).limit(60)
   ]);
@@ -516,6 +578,7 @@ function metrics(c, P){
     followers: last ? last.followers : P.live ? c.followers : null, er: accER, accER, growth,
     perWeek: ps.length/P.days*7, n: ps.length, pR: ps,
     likes: avg(ps.map(p=>p.like_count)), comments: avg(ps.map(p=>p.comments_count)),
+    views: avg(ps.map(p=>p.view_count)), nViews: ps.filter(p=>isNum(p.view_count)).length,
     fm, best, hasData: !!c.last_fetched_at && !c.last_error && all.length>0,
     capLen: avg(ps.map(p=>(p.caption||'').length))
   };
@@ -574,6 +637,97 @@ async function loadReport(id){
   if(error){ toast(error.message); return; }
   S.report = data; render();
 }
+
+/* ---------- post detail ---------- */
+const ratio = (a, b) => isNum(a) && isNum(b) && b > 0 ? a / b : null;
+function vsAvg(v, base){
+  const r = ratio(v, base);
+  if(!isNum(r)) return '';
+  const c = r >= 1.15 ? 'up' : r <= 0.85 ? 'down' : 'flat';
+  return `<div class="c ${c}">${r>=10?Math.round(r):fmt1(r)}× avg</div>`;
+}
+async function openPost(id){
+  id = String(id);
+  const p = S.posts.find(x=>String(x.id)===id); if(!p) return;
+  const c = S.comps.find(x=>x.id===p.competitor_id);
+  const P = period();
+  // Baseline: same account, same format, selected period
+  const peers = (S.postsBy[c.id]||[]).filter(inPeriod(P)).filter(x=>x.format===p.format);
+  const base = (f) => avg(peers.map(f));
+  const followers = c.followers;
+  const eng = (x) => (x.like_count||0) + (x.comments_count||0);
+  const engPerView = (x) => isNum(x.view_count) && x.view_count>0 ? eng(x)/x.view_count*100 : null;
+  const byViews = peers.filter(x=>isNum(x.view_count)).sort((a,b)=>b.view_count-a.view_count);
+  const rank = byViews.findIndex(x=>x===p);
+  const d = new Date(p.posted_at);
+  const when = d.toLocaleString('en-GB',{ timeZone:'Africa/Cairo', weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  const tile = (v, l, cmp, own) => `<div class="mt${own?' own':''}"><div class="v num">${v}</div><div class="l">${l}</div>${cmp||''}</div>`;
+  const pub = [
+    tile(fmtInt(p.view_count), 'Views', vsAvg(p.view_count, base(x=>x.view_count))),
+    tile(fmtInt(p.like_count), 'Likes', vsAvg(p.like_count, base(x=>x.like_count))),
+    tile(fmtInt(p.comments_count), 'Comments', vsAvg(p.comments_count, base(x=>x.comments_count))),
+    tile(fmtPct(p.engagement_rate), 'Engagement rate', vsAvg(p.engagement_rate, base(x=>x.engagement_rate))),
+    tile(fmtPct(engPerView(p)), 'Engagement per view', vsAvg(engPerView(p), base(engPerView))),
+    tile(isNum(p.view_count)&&followers ? fmt1(p.view_count/followers*100)+'%' : '–', 'Views ÷ followers', ''),
+    tile(isNum(p.view_count)&&p.view_count ? fmt1((p.like_count||0)/p.view_count*1000) : '–', 'Likes per 1K views', ''),
+    tile(rank>=0 ? `#${rank+1}<span class="flat" style="font-size:13px;font-weight:400"> of ${byViews.length}</span>` : '–', `By views among ${p.format.toLowerCase()}s`, '')
+  ].join('');
+  const hasIns = [p.reach,p.saved,p.shares,p.total_interactions,p.avg_watch_ms].some(isNum);
+  const ins = hasIns ? [
+    tile(fmtInt(p.reach), 'Accounts reached', vsAvg(p.reach, base(x=>x.reach)), 1),
+    tile(fmtInt(p.saved), 'Saves', vsAvg(p.saved, base(x=>x.saved)), 1),
+    tile(fmtInt(p.shares), 'Shares', vsAvg(p.shares, base(x=>x.shares)), 1),
+    tile(fmtInt(p.total_interactions), 'Total interactions', vsAvg(p.total_interactions, base(x=>x.total_interactions)), 1),
+    tile(isNum(ratio(p.saved,p.reach)) ? fmtPct(ratio(p.saved,p.reach)*100) : '–', 'Save rate (÷ reach)', '', 1),
+    tile(isNum(ratio(p.shares,p.reach)) ? fmtPct(ratio(p.shares,p.reach)*100) : '–', 'Share rate (÷ reach)', '', 1),
+    tile(isNum(ratio(p.view_count,p.reach)) ? fmt1(ratio(p.view_count,p.reach))+'×' : '–', 'Views per account reached', '', 1),
+    ...(p.format==='Reel' || isNum(p.avg_watch_ms) ? [
+      tile(fmtSec(p.avg_watch_ms), 'Avg watch time', vsAvg(p.avg_watch_ms, base(x=>x.avg_watch_ms)), 1),
+      tile(fmtHours(p.total_watch_ms), 'Total watch time', '', 1)] : [])
+  ].join('') : '';
+  const tags = (p.hashtags||[]).map(t=>`<span class="chip">#${esc(t)}</span>`).join('');
+  const img = p.thumbnail_url || p.media_url;
+  const idx = (S.postPool||[]).indexOf(id);
+  const nav = (dir) => { const n = (S.postPool||[])[idx+dir]; return n ? `<button class="iconbtn" data-pnav="${esc(n)}" aria-label="${dir<0?'Previous':'Next'} post">${dir<0?'‹':'›'}</button>` : ''; };
+  const dlg = $('postDlg');
+  dlg.innerHTML = `<div class="pd-head">${avatarHtml(c)}<div class="t">@${esc(c.username)} · ${esc(p.format)}<small>${esc(when)} Cairo</small></div>
+      ${nav(-1)}${nav(1)}<a class="btn btn-sm btn-primary" href="${esc(postUrl(p))}" target="_blank" rel="noopener">${ICON.ext}<span class="lbl"> Instagram</span></a><button class="iconbtn" data-pclose aria-label="Close">✕</button></div>
+    <div class="pd-body">
+      <div><div class="pd-media">${img?`<img src="${esc(img)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<span class="ph">Preview expired</span></div>
+        ${p.caption?`<p class="pd-cap" dir="auto">${esc(p.caption)}</p>`:''}
+        ${tags?`<div class="chips" style="margin-top:10px">${tags}</div>`:''}</div>
+      <div>
+        <h3>Public performance</h3><div class="mgrid">${pub}</div>
+        <p class="pd-note">“× avg” compares with @${esc(c.username)}'s ${fmtInt(peers.length)} ${esc(p.format.toLowerCase())}s in ${esc(P.label)}.${isNum(p.view_count)?'':' Instagram doesn\'t publish views for this post type.'}</p>
+        ${hasIns ? `<h3>Private insights · Muhra only</h3><div class="mgrid">${ins}</div><p class="pd-note">Lifetime values from Instagram Insights${p.insights_at?', updated '+relTime(p.insights_at):''}.</p>` : c.is_own ? '<p class="pd-note">Private insights appear after the next fetch.</p>' : ''}
+        <h3>Growth over time</h3><div id="pdHist"><p class="pd-note">Loading…</p></div>
+      </div>
+    </div>`;
+  if(!dlg.open) dlg.showModal();
+  dlg.scrollTop = 0;
+  // daily history for this post
+  const { data, error } = await sb.from('ci_post_stats').select('snap_date,view_count,like_count,comments_count').eq('post_id', p.id).order('snap_date');
+  const box = $('pdHist'); if(!box || !dlg.open) return;
+  if(error || !data || data.length < 2){ box.innerHTML = `<p class="pd-note">${error?esc(error.message):'Tracked daily from now on; the curve appears after the second day of data.'}</p>`; return; }
+  box.innerHTML = '<div class="chart-box"><canvas id="chPost"></canvas></div>';
+  if(S.charts.post) S.charts.post.destroy();
+  const hasV = data.some(x=>isNum(x.view_count));
+  S.charts.post = new Chart($('chPost'), { type:'line', data:{ labels: data.map(x=>parseYmd(x.snap_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'})),
+    datasets:[ ...(hasV?[{ label:'Views', data:data.map(x=>x.view_count), borderColor:cssVar('--brand'), backgroundColor:cssVar('--brand'), yAxisID:'y', tension:.25, pointRadius:2 }]:[]),
+      { label:'Likes', data:data.map(x=>x.like_count), borderColor:cssVar('--accent'), backgroundColor:cssVar('--accent'), yAxisID: hasV?'y1':'y', tension:.25, pointRadius:2 } ] },
+    options:{ maintainAspectRatio:false, interaction:{mode:'index',intersect:false}, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, usePointStyle:true } } },
+      scales:{ y:{ ticks:{ callback:(v)=>fmtK(v) } }, ...(hasV?{ y1:{ position:'right', grid:{ drawOnChartArea:false }, ticks:{ callback:(v)=>fmtK(v) } } }:{}), x:{ grid:{ display:false } } } } });
+}
+document.addEventListener('click', e => {
+  const card = e.target.closest('[data-post]'); if(card){ openPost(card.dataset.post); return; }
+  const nv = e.target.closest('[data-pnav]'); if(nv){ openPost(nv.dataset.pnav); return; }
+  const dlg = $('postDlg');
+  if(e.target.closest('[data-pclose]') || e.target === dlg) dlg.close();
+});
+document.addEventListener('keydown', e => {
+  const dlg = $('postDlg'); if(!dlg.open) return;
+  if(e.key==='ArrowRight' || e.key==='ArrowLeft'){ const b = dlg.querySelectorAll('[data-pnav]'); const t = [...b].find(x=>x.getAttribute('aria-label').startsWith(e.key==='ArrowRight'?'Next':'Previous')); if(t) t.click(); }
+});
 
 /* ---------- gap engine ---------- */
 function computeGaps(){
@@ -690,8 +844,10 @@ function renderNav(){
     return `<button class="citem" data-comp="${c.id}" aria-current="${S.view==='comp'&&S.selected===c.id}">${avatarHtml(c)}<span><span class="u">@${esc(c.username)}${c.is_own?'<span class="own-dot" title="Muhra"></span>':''}</span><br><span class="s num">${fmtK(c.followers)} followers</span></span>${status}</button>`;
   }).join('') : `<p style="color:var(--muted);font-size:13px;padding:0 10px">No accounts yet.</p>`;
   const opts = S.comps.map(c=>`<option value="${c.id}" ${S.view==='comp'&&S.selected===c.id?'selected':''}>@${esc(c.username)}</option>`).join('');
-  $('mnav').innerHTML = items.map(([k,l])=>`<button class="btn btn-sm" data-go="${k}" ${S.view===k?'style="background:var(--ink);color:var(--surface)"':''}>${l}</button>`).join('')
-    + (S.comps.length ? `<select class="btn btn-sm" id="mselect"><option value="">Account…</option>${opts}</select>` : '');
+  const short = { overview:'Overview', gaps:'Gaps', report:'AI report', manage:'Manage' };
+  $('mnav').style.setProperty('--tabs', items.length);
+  $('mnav').innerHTML = items.map(([k])=>`<button class="mtab" data-go="${k}" aria-current="${S.view===k}">${short[k]}</button>`).join('')
+    + (S.comps.length ? `<select class="macct" id="mselect" aria-label="Open an account"><option value="">${S.view==='comp'?'':'Open an account…'}</option>${opts}</select>` : '');
   const ms = $('mselect'); if(ms) ms.onchange = () => ms.value && go('comp', Number(ms.value));
 }
 document.addEventListener('click', e => {
@@ -727,7 +883,7 @@ function viewOverview(){
   const bar = periodBar();
   const rows = S.comps.filter(c=>S.m[c.id].hasData).map(c=>({c, m:S.m[c.id]}));
   const k = S.sort.key, d = S.sort.dir;
-  const val = (r) => ({ followers:r.m.followers, g30:r.m.growth?r.m.growth.abs:null, n:r.m.n, pw:r.m.perWeek, er:r.m.er, likes:r.m.likes, comments:r.m.comments })[k];
+  const val = (r) => ({ followers:r.m.followers, g30:r.m.growth?r.m.growth.abs:null, n:r.m.n, pw:r.m.perWeek, er:r.m.er, views:r.m.views, likes:r.m.likes, comments:r.m.comments })[k];
   rows.sort((a,b)=> ((val(b)??-Infinity) - (val(a)??-Infinity)) * (d===-1?1:-1));
   const th = (key,l) => `<th data-sort="${key}" aria-sort="${S.sort.key===key?(S.sort.dir===-1?'descending':'ascending'):'none'}">${l}</th>`;
   const pending = S.comps.filter(c=>!S.m[c.id].hasData);
@@ -736,11 +892,11 @@ function viewOverview(){
   <div class="panel">
     <div class="panel-head"><div><h2>Leaderboard</h2><p class="hint">${esc(P.short)}. Engagement rate = average (likes + comments) ÷ followers across posts in the period. Click a row for the full breakdown.</p></div></div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Account</th>${th('followers','Followers')}${th('g30','Growth')}${th('n','Posts')}${th('pw','Posts / week')}${th('er','Eng. rate')}${th('likes','Avg likes')}${th('comments','Avg comments')}<th>Best format</th></tr></thead>
+      <thead><tr><th>Account</th>${th('followers','Followers')}${th('g30','Growth')}${th('n','Posts')}${th('pw','Posts / week')}${th('er','Eng. rate')}${th('views','Avg views')}${th('likes','Avg likes')}${th('comments','Avg comments')}<th>Best format</th></tr></thead>
       <tbody>${rows.map(({c,m})=>`<tr class="clickable ${c.is_own?'own':''}" data-comp="${c.id}">
         <td><span class="acct">${avatarHtml(c)}<span>@${esc(c.username)}${c.is_own?' <span class="pill brand">Muhra</span>':''}</span></span></td>
         <td class="num">${fmtInt(m.followers)}</td><td class="num">${growthCell(m.growth)}</td><td class="num">${fmtInt(m.n)}</td><td class="num">${fmt1(m.perWeek)}</td>
-        <td class="num"><b>${fmtPct(m.er)}</b></td><td class="num">${fmtInt(m.likes)}</td><td class="num">${fmtInt(m.comments)}</td><td>${m.best||'–'}</td></tr>`).join('')}</tbody>
+        <td class="num"><b>${fmtPct(m.er)}</b></td><td class="num">${fmtK(m.views)}</td><td class="num">${fmtInt(m.likes)}</td><td class="num">${fmtInt(m.comments)}</td><td>${m.best||'–'}</td></tr>`).join('')}</tbody>
     </table></div>${pendingNote}
   </div>
   <div class="grid2">
@@ -776,6 +932,7 @@ function viewComp(){
     ${k(fmtK(m.followers),'Followers', m.growth?`<span class="${cls(m.growth.abs)}">${signed(m.growth.abs)}</span> <span class="flat">in ${m.growth.days} day${m.growth.days===1?'':'s'}</span>`:'<span class="flat">needs 2+ snapshots in period</span>')}
     ${k(fmtPct(m.er),'Engagement rate',`<span class="flat">avg of ${fmtInt(m.n)} post${m.n===1?'':'s'}</span>`)}
     ${k(fmt1(m.perWeek),'Posts per week',`<span class="flat">${fmtInt(m.n)} in period</span>`)}
+    ${k(fmtK(m.views),'Avg views',`<span class="flat">${m.nViews?`${fmtInt(m.nViews)} post${m.nViews===1?'':'s'} with views`:'no view data'}</span>`)}
     ${k(fmtK(m.likes),'Avg likes','<span class="flat">per post</span>')}
     ${k(fmtK(m.comments),'Avg comments','<span class="flat">per post</span>')}</div>`;
 
@@ -788,20 +945,21 @@ function viewComp(){
   const ers = Object.values(cells).map(a=>avg(a)).filter(isNum); const maxER = Math.max(...ers, 0.0001);
   let heat = `<div class="heat"><span></span>${BLOCKS.map(b=>`<span class="hh">${b}</span>`).join('')}`;
   DAYS.forEach((d,di)=>{ heat += `<span class="hl">${d}</span>`; BLOCKS.forEach((b,bi)=>{ const a = cells[di+'-'+bi]; const e = a?avg(a):null; const alpha = a && isNum(e) ? 0.15+0.85*(e/maxER) : 0;
-    heat += `<span class="cell num" title="${d} ${b}:00 Cairo — ${a?a.length:0} posts${isNum(e)?', avg ER '+e.toFixed(2)+'%':''}" style="${a?`background:color-mix(in srgb, var(--brand) ${Math.round(alpha*100)}%, var(--paper))${alpha>0.6?';color:#fff':''}`:''}">${a?a.length:''}</span>`; }); });
+    heat += `<span class="cell num" title="${d} ${b}:00 Cairo — ${a?a.length:0} posts${isNum(e)?', avg ER '+e.toFixed(2)+'%':''}" style="${a?`background:color-mix(in srgb, var(--brand) ${Math.round(alpha*100)}%, var(--paper))${alpha>0.6?';color:var(--on-brand)':''}`:''}">${a?a.length:''}</span>`; }); });
   heat += '</div>';
 
   // posts
-  const sortFns = { er:(a,b)=>(b.engagement_rate??-1)-(a.engagement_rate??-1), likes:(a,b)=>(b.like_count??-1)-(a.like_count??-1), comments:(a,b)=>(b.comments_count??-1)-(a.comments_count??-1), recent:(a,b)=>new Date(b.posted_at)-new Date(a.posted_at) };
+  const sortFns = { views:(a,b)=>(b.view_count??-1)-(a.view_count??-1), er:(a,b)=>(b.engagement_rate??-1)-(a.engagement_rate??-1), likes:(a,b)=>(b.like_count??-1)-(a.like_count??-1), comments:(a,b)=>(b.comments_count??-1)-(a.comments_count??-1), recent:(a,b)=>new Date(b.posted_at)-new Date(a.posted_at) };
   const fmtAvail = FORMATS.filter(f=>m.fm[f].n);
   if(S.postFmt!=='all' && !fmtAvail.includes(S.postFmt)) S.postFmt = 'all';
   const pool = m.pR.filter(p=>S.postFmt==='all' || p.format===S.postFmt).slice().sort(sortFns[S.postSort]);
   const shown = pool.slice(0, S.postLimit);
-  const posts = shown.map(p=>{ const img = p.thumbnail_url || p.media_url; const d = new Date(p.posted_at);
-    return `<a class="post" href="${esc(postUrl(p))}" target="_blank" rel="noopener"><div class="img">${img?`<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<span class="ph">Preview expired<br>open on Instagram</span><span class="fmt">${esc(p.format)}</span></div>
-      <div class="body"><div class="stats num"><span><b>${fmtK(p.like_count)}</b> likes</span><span><b>${fmtK(p.comments_count)}</b> com.</span></div>
-      <div class="stats num" style="margin-top:2px"><span>${d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year: d.getFullYear()===new Date().getFullYear()?undefined:'2-digit'})}</span><span><b>${fmtPct(p.engagement_rate)}</b></span></div>
-      <div class="cap" dir="auto">${esc((p.caption||'').slice(0,160))}</div></div></a>`; }).join('');
+  S.postPool = pool.map(p=>String(p.id));
+  const posts = shown.map(p=>{ const img = p.thumbnail_url || p.media_url;
+    return `<button type="button" class="post" data-post="${esc(p.id)}" aria-label="Open details"><div class="img">${img?`<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<span class="ph">Preview expired</span><span class="fmt">${esc(p.format)}</span>${isNum(p.view_count)?`<span class="views num">${ICON.eye}${fmtK(p.view_count)}</span>`:''}</div>
+      <div class="body"><div class="stats num"><span title="Likes">${ICON.heart}<b>${fmtK(p.like_count)}</b></span><span title="Comments">${ICON.chat}<b>${fmtK(p.comments_count)}</b></span><span title="Engagement rate"><b>${fmtPct(p.engagement_rate)}</b></span></div>
+      <div class="stats num sub"><span>${shortDate(p.posted_at)}</span>${isNum(p.view_count)?`<span>${fmtK(p.view_count)} views</span>`:'<span>views hidden</span>'}</div>
+      <div class="cap" dir="auto">${esc((p.caption||'').slice(0,160))}</div></div></button>`; }).join('');
 
   const tagStats = {};
   for(const p of m.pR) for(const t of (p.hashtags||[])){ (tagStats[t] ||= []).push(p.engagement_rate); }
@@ -810,7 +968,7 @@ function viewComp(){
   const fmtFilter = fmtAvail.length>1 ? `<div class="fmt-filter seg" role="group" aria-label="Format">${[['all','All formats',m.n]].concat(fmtAvail.map(f=>[f,f+'s',m.fm[f].n])).map(([k,l,n])=>`<button data-pfmt="${k}" aria-pressed="${S.postFmt===k}">${l} <span class="num">${n}</span></button>`).join('')}</div>` : '';
   const left = pool.length - shown.length;
   const more = left>0 ? `<div class="more"><button class="btn" data-more="24">Show ${Math.min(24,left)} more</button><button class="btn" data-more="all">Show all ${fmtInt(pool.length)}</button></div>` : '';
-  const sortLabel = { er:'highest engagement', likes:'most likes', comments:'most comments', recent:'newest' }[S.postSort];
+  const sortLabel = { views:'most views', er:'highest engagement', likes:'most likes', comments:'most comments', recent:'newest' }[S.postSort];
 
   return banner + head + bar + kpis + `
   <div class="grid2">
@@ -822,7 +980,7 @@ function viewComp(){
     <div class="panel"><h2>Hashtags they use</h2><p class="hint">${esc(P.short)} · number of posts</p>${tags.length?`<div class="chips">${tags.map(x=>`<span class="chip">#${esc(x.t)}<b class="num">${x.n}</b></span>`).join('')}</div>`:'<p class="hint">No hashtags used.</p>'}</div>
   </div>
   <div class="panel" style="margin-top:18px"><div class="panel-head"><div><h2>Content</h2><p class="hint num">Showing ${fmtInt(shown.length)} of ${fmtInt(pool.length)} posts · ${esc(P.short)} · sorted by ${sortLabel}</p></div>
-    <div class="seg">${[['er','Engagement'],['likes','Likes'],['comments','Comments'],['recent','Recent']].map(([k,l])=>`<button data-psort="${k}" aria-pressed="${S.postSort===k}">${l}</button>`).join('')}</div></div>
+    <div class="seg">${[['views','Views'],['er','Engagement'],['likes','Likes'],['comments','Comments'],['recent','Recent']].map(([k,l])=>`<button data-psort="${k}" aria-pressed="${S.postSort===k}">${l}</button>`).join('')}</div></div>
     ${fmtFilter}<div class="posts">${posts || '<p class="hint">No posts in this period. Try a longer range above.</p>'}</div>${more}</div>`;
 }
 
