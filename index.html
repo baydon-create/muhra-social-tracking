@@ -279,6 +279,111 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
 .pd-note{font-size:12.5px;color:var(--muted);margin:8px 0 0}
 .pd .chart-box{height:200px}
 @media (max-width:760px){ .pd{width:100vw;max-width:100vw;max-height:100dvh;height:100dvh;border-radius:0;margin:0} .pd-body{grid-template-columns:1fr;padding:14px} .pd-head{padding:12px 14px;gap:8px} .pd-head .lbl{display:none} .pd-head .btn{padding:9px 11px} .pd-media{max-height:58vh} .mgrid{grid-template-columns:repeat(2,1fr)} }
+/* UGC creators */
+.nav-h{font-size:11.5px;color:var(--muted);font-weight:600;letter-spacing:.4px;text-transform:uppercase;padding:14px 10px 4px}
+.nav-h:first-child{padding-top:0}
+.badge{font-size:11px;background:var(--brand);color:var(--on-brand);border-radius:999px;padding:0 7px;line-height:18px;font-weight:600}
+.ugc-tabs{margin:-8px 0 18px;flex-wrap:wrap}
+.muted{color:var(--muted)}
+mark{background:var(--warn-soft);color:inherit;border-radius:3px;padding:0 2px}
+textarea.input{resize:vertical;line-height:1.6}
+select.input{padding:9px 10px}
+.filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 12px}
+.filters .field{margin:0}
+.filters .wide{grid-column:span 2}
+.filters .inl{display:inline-flex;gap:4px;align-items:center;margin-left:8px;font-size:12.5px}
+.kwrow{display:flex !important;gap:6px;margin:0 !important}
+.kwrow select{width:auto;flex-shrink:0}
+.f-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px}
+.f-l{font-size:12.5px;color:var(--muted);min-width:38px}
+.f-sort{display:inline-flex;align-items:center;gap:6px;margin-inline-start:auto;font-size:13px;color:var(--muted)}
+.f-sort select{width:auto;padding:5px 10px;border-radius:999px}
+.tog{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:4px 12px;font-size:13px;cursor:pointer;color:var(--ink)}
+.tog small{color:var(--muted);font-size:11.5px}
+.tog[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.tog[aria-pressed="true"] small{color:inherit;opacity:.8}
+.res-count{margin:0 0 10px}
+.clist2{display:flex;flex-direction:column;gap:10px;padding-bottom:70px}
+.ccard{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:14px 16px;cursor:pointer;text-align:start}
+.ccard:hover{border-color:var(--brand);box-shadow:0 4px 14px rgba(44,32,24,.08)}
+.cc-l{display:flex;flex-direction:column;align-items:center;gap:8px}
+.cc-h{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:15px}
+.cc-h .muted{font-size:13.5px}
+.cc-s{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:6px}
+.cc-s span{display:flex;flex-direction:column;line-height:1.25}
+.cc-s b{font-size:15px;font-weight:600}
+.cc-s small{font-size:11.5px;color:var(--muted)}
+.cc-bio{margin:8px 0 0;font-size:13px;color:var(--muted);white-space:pre-line;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cc-b{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.cc-r{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.cc-act{display:flex;align-items:center;gap:10px}
+.cmp{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;color:var(--muted);cursor:pointer}
+.thumbs{display:grid;grid-template-columns:repeat(4,64px);gap:5px}
+.th{position:relative;aspect-ratio:4/5;border-radius:6px;overflow:hidden;background:var(--paper)}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
+.th i{position:absolute;left:3px;bottom:3px;font-style:normal;font-size:10.5px;font-weight:600;background:rgba(44,32,24,.72);color:#FFF8EE;border-radius:999px;padding:0 5px}
+.pill.bad{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.pill.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.pill.st-shortlisted,.pill.st-replied{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.pill.st-contacted,.pill.st-negotiating{background:var(--brand-soft);color:var(--brand);border-color:transparent}
+.pill.st-booked,.pill.st-delivered{background:var(--good-soft);color:var(--good);border-color:transparent}
+.pill.st-rejected{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.score{--c:var(--muted);width:44px;height:44px;border-radius:50%;background:conic-gradient(var(--c) calc(var(--p)*1%), var(--line) 0);display:grid;place-items:center;font-weight:700;font-size:14px;position:relative;flex-shrink:0}
+.score::before{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--surface)}
+.score span{position:relative}
+.score.lg{width:64px;height:64px;font-size:20px}
+.score.lg::before{inset:6px}
+.score.hi{--c:var(--good)} .score.md{--c:var(--warn)}
+.fav{border:none;background:none;cursor:pointer;font-size:20px;line-height:1;color:var(--muted);padding:2px}
+.fav.on{color:var(--accent)}
+h2 .fav{font-size:18px;vertical-align:1px}
+.prof-act{display:flex;flex-direction:column;gap:8px;align-items:stretch;min-width:200px}
+.sb{padding:8px 0;border-bottom:1px solid var(--line)}
+.sb:last-child{border-bottom:none}
+.sb-h{display:flex;justify-content:space-between;font-size:14px;font-weight:500;margin-bottom:5px}
+.sb p{margin:5px 0 0;font-size:12.5px;color:var(--muted)}
+.sig{margin:0;padding-inline-start:18px;font-size:14px;line-height:1.7}
+.sig li{margin-bottom:6px}
+.crm{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.crm .wide{grid-column:1/-1}
+.crm-foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:space-between}
+.crm-foot.danger{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);justify-content:flex-start}
+.stars{display:inline-flex}
+.star{border:none;background:none;font-size:22px;line-height:1;cursor:pointer;color:var(--line);padding:0 1px}
+.star.on{color:var(--accent)}
+.star:disabled{cursor:default}
+h3.mini{font-size:12.5px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin:16px 0 8px}
+.olog{margin:0;padding-inline-start:18px;font-size:13.5px;line-height:1.8}
+.app{border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;background:var(--surface)}
+.app.new{border-color:var(--accent)}
+.app-h{font-size:14.5px}
+.app-d{font-size:13.5px;color:var(--muted);margin-top:3px}
+.app-d b{color:var(--ink)}
+.app-m{font-size:14px;white-space:pre-line;background:var(--paper);border-radius:var(--radius-sm);padding:8px 10px;margin:8px 0}
+.app .actions{margin-top:8px}
+.kanban{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(230px,1fr);gap:12px;overflow-x:auto;padding-bottom:10px}
+.kcol{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);padding:10px;min-height:220px;display:flex;flex-direction:column;gap:8px}
+.kcol-h{display:flex;justify-content:space-between;align-items:center;padding:2px 4px 4px}
+.kcard{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--paper);padding:8px}
+.kc-main{display:grid;grid-template-columns:32px 1fr auto;gap:8px;align-items:center;border:none;background:none;width:100%;text-align:start;cursor:pointer;padding:0;font-size:13.5px}
+.kc-main small{font-size:11.5px}
+.kc-main .score{width:34px;height:34px;font-size:12px}
+.kc-sel{margin-top:6px;padding:4px 8px;font-size:12.5px}
+.sug{display:flex;flex-direction:column}
+.sug-i{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.sug-i:last-child{border-bottom:none}
+.sug-i .btn{margin-inline-start:auto}
+a.chip{text-decoration:none;color:var(--ink)}
+a.chip:hover{border-color:var(--brand)}
+.cmp-tray{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--brand);border-radius:999px;padding:8px 10px 8px 18px;box-shadow:0 10px 30px rgba(28,18,10,.2);z-index:30;font-size:14px;white-space:nowrap}
+.cmp-t td,.cmp-t th{text-align:center}
+.cmp-t td:first-child{text-align:left;color:var(--muted)}
+.cmp-t td.best{background:var(--good-soft);color:var(--good);font-weight:600}
+.cmp-t .acct{display:inline-flex;gap:6px;align-items:center;text-decoration:none;color:var(--ink);font-weight:600}
+.pd-narrow{width:min(680px,calc(100vw - 32px))}
+.f-more{display:none}
+.composer{padding:18px}
+.composer .seg{margin-bottom:14px}
 @media print{
   .side,.mobile-head,.actions,.period,.report-meta,.toast{display:none!important}
   .shell{display:block} .main{padding:0} body{background:#fff}
@@ -311,6 +416,24 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
   .posts{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .report{font-size:15px}
 }
+@media (max-width:900px){
+  .filters{grid-template-columns:1fr 1fr}
+  .ccard{grid-template-columns:auto minmax(0,1fr);gap:12px;padding:12px}
+  .cc-r{grid-column:1/-1;flex-direction:row-reverse;justify-content:space-between;align-items:center}
+  .thumbs{grid-template-columns:repeat(4,52px)}
+  .cc-s{gap:4px 14px}
+  .prof-act{min-width:0;width:100%}
+  .crm{grid-template-columns:1fr}
+  .f-sort{margin-inline-start:0;width:100%}
+  .f-more{display:inline-flex;margin-top:10px}
+  .filters-panel{display:flex;flex-direction:column}
+  .filters-panel .f-more{order:2;align-self:flex-start}
+  .filters-panel:not(.open) .filters>:not(:first-child),.filters-panel:not(.open) .f-row:not(:last-child){display:none}
+  .filters-panel:not(.open) .f-row:last-child>:not(.f-sort){display:none}
+  .cmp-tray{width:calc(100vw - 32px);justify-content:space-between}
+  .pd-narrow{width:100vw}
+}
+@media (max-width:520px){ .filters{grid-template-columns:1fr} .filters .wide{grid-column:auto} .thumbs{grid-template-columns:repeat(3,52px)} .thumbs .th:nth-child(4){display:none} }
 </style>
 </head>
 <body>
@@ -342,7 +465,7 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
   <aside class="side">
     <div class="brand"><img class="logo logo-dark" src="assets/muhra-logo.png" alt="Muhra"><img class="logo logo-light" src="assets/muhra-logo-light.png" alt="Muhra"><small>Competitor Intel</small></div>
     <nav class="nav" id="nav"></nav>
-    <h3>Accounts</h3>
+    <h3 id="clistH">Accounts</h3>
     <div class="clist" id="clist"></div>
     <p class="credit">Created by <b>Dr. Mohamed Baydon</b> for Muhra</p>
   </aside>
@@ -360,6 +483,7 @@ tr.own.clickable:hover td{background:var(--brand-soft)}
 </div>
 
 <dialog id="postDlg" class="pd" aria-label="Post details"></dialog>
+<dialog id="ugcDlg" class="pd pd-narrow" aria-label="Invite creator"></dialog>
 <div id="toast" class="toast hidden" role="status"></div>
 
 <script>
@@ -564,29 +688,45 @@ async function fetchAll(build){
 }
 async function loadData(){
   // Full history; the period selector filters it client-side.
-  const [c, s, p, r, rl] = await Promise.all([
+  const [c, s, p, r, rl, u, o, ap, st] = await Promise.all([
     sb.from('ci_competitors').select('*').order('created_at'),
     fetchAll(() => sb.from('ci_snapshots').select('*').order('snap_date').order('competitor_id')),
     fetchAll(() => sb.from('ci_posts').select('id,competitor_id,caption,format,permalink,media_url,thumbnail_url,posted_at,like_count,comments_count,engagement_rate,hashtags,view_count,reach,saved,shares,total_interactions,avg_watch_ms,total_watch_ms,insights_at,reposts').order('posted_at',{ascending:false}).order('id')),
     sb.from('ci_reports').select('*').order('created_at',{ascending:false}).limit(1),
-    sb.from('ci_reports').select('id,created_at').neq('content','__NO_KEY__').order('created_at',{ascending:false}).limit(60)
+    sb.from('ci_reports').select('id,created_at').neq('content','__NO_KEY__').order('created_at',{ascending:false}).limit(60),
+    sb.from('ugc_creators').select('*'),
+    sb.from('ugc_outreach').select('id,account_id,channel,subject,created_at').order('created_at',{ascending:false}).limit(2000),
+    sb.from('ugc_applications').select('*').order('created_at',{ascending:false}).limit(500),
+    sb.from('ugc_settings').select('*')
   ]);
   if(c.error) throw c.error; if(r.error) throw r.error;
   S.reports = rl.error ? [] : rl.data;
-  S.comps = c.data.sort((a,b)=> (b.is_own-a.is_own) || ((b.followers||0)-(a.followers||0)));
-  S.snaps = s.map(x=>({...x, followers:toNum(x.followers), engagement_rate:toNum(x.engagement_rate), avg_likes:toNum(x.avg_likes), avg_comments:toNum(x.avg_comments)}));
-  S.posts = p.map(x=>{ const q = {...x, engagement_rate:toNum(x.engagement_rate)}; q.er = perView(publicInteractions(q), q); q.full = hasInsights(q); q.fullEr = q.full ? perView(fullInteractions(q), q) : null; q.fer = erFollowers(q); return q; });
+  // UGC creators share the Instagram pipeline but never appear in competitor views.
+  S.accounts = c.data;
+  S.comps = c.data.filter(a=>a.kind!=='creator').sort((a,b)=> (b.is_own-a.is_own) || ((b.followers||0)-(a.followers||0)));
+  S.creators = c.data.filter(a=>a.kind==='creator').sort((a,b)=> new Date(b.created_at)-new Date(a.created_at));
+  const creatorIds = new Set(S.creators.map(a=>a.id));
+  const snaps = s.map(x=>({...x, followers:toNum(x.followers), engagement_rate:toNum(x.engagement_rate), avg_likes:toNum(x.avg_likes), avg_comments:toNum(x.avg_comments)}));
+  S.allPosts = p.map(x=>{ const q = {...x, engagement_rate:toNum(x.engagement_rate)}; q.er = perView(publicInteractions(q), q); q.full = hasInsights(q); q.fullEr = q.full ? perView(fullInteractions(q), q) : null; q.fer = erFollowers(q); return q; });
+  S.snaps = snaps.filter(x=>!creatorIds.has(x.competitor_id));
+  S.posts = S.allPosts.filter(x=>!creatorIds.has(x.competitor_id));
+  S.ugcReady = !u.error;
+  S.ugc = {}; for(const x of (u.data||[])) S.ugc[x.account_id] = x;
+  S.outreach = o.data || []; S.apps = ap.data || [];
+  const cfg = (st.data||[]).find(x=>x.key==='config');
+  S.ugcCfg = { ...UGC_DEFAULTS, ...(cfg ? cfg.value : {}) };
   S.report = r.data[0] || null;
   S.latestReportId = S.report ? S.report.id : 0;
   S.postsBy = {}; S.snapsBy = {};
-  for(const x of S.posts) (S.postsBy[x.competitor_id] ||= []).push(x);
-  for(const x of S.snaps) (S.snapsBy[x.competitor_id] ||= []).push(x);
+  for(const x of S.allPosts) (S.postsBy[x.competitor_id] ||= []).push(x);
+  for(const x of snaps) (S.snapsBy[x.competitor_id] ||= []).push(x);
   recompute();
 }
 function recompute(){
   const P = period();
   S.m = {};
   for(const comp of S.comps) S.m[comp.id] = metrics(comp, P);
+  recomputeCreators();
 }
 
 // All metrics are scoped to the selected period P.
@@ -678,11 +818,12 @@ function vsAvg(v, base){
 }
 async function openPost(id){
   id = String(id);
-  const p = S.posts.find(x=>String(x.id)===id); if(!p) return;
-  const c = S.comps.find(x=>x.id===p.competitor_id);
+  const p = S.allPosts.find(x=>String(x.id)===id); if(!p) return;
+  const c = S.accounts.find(x=>x.id===p.competitor_id);
   const P = period();
-  // Baseline: same account, same format, selected period
-  const peers = (S.postsBy[c.id]||[]).filter(inPeriod(P)).filter(x=>x.format===p.format);
+  // Baseline: same account, same format, selected period (creators: all their tracked posts)
+  const creator = c.kind==='creator';
+  const peers = (S.postsBy[c.id]||[]).filter(creator ? ()=>true : inPeriod(P)).filter(x=>x.format===p.format);
   const base = (f) => avg(peers.map(f));
   const followers = c.followers;
   const byViews = peers.filter(x=>isNum(x.view_count)).sort((a,b)=>b.view_count-a.view_count);
@@ -728,7 +869,7 @@ async function openPost(id){
         ${tags?`<div class="chips" style="margin-top:10px">${tags}</div>`:''}</div>
       <div>
         <h3>Public performance</h3><div class="mgrid">${pub}</div>
-        <p class="pd-note">“× avg” compares with @${esc(c.username)}'s ${fmtInt(peers.length)} ${esc(p.format.toLowerCase())}s in ${esc(P.label)}. ${!isNum(p.er) ? '' : `ER = (likes ${fmtInt(p.like_count)} + comments ${fmtInt(p.comments_count||0)}) ÷ views ${fmtInt(p.view_count)} × 100 = ${fmtPct(p.er)}. The same formula is used for every account.`}${isNum(p.view_count)?'':' Instagram doesn\'t publish views for this post type, so only follower ER is available.'}${isNum(p.like_count)?'':' This account hides like counts, so ER can\'t be calculated.'}</p>
+        <p class="pd-note">“× avg” compares with @${esc(c.username)}'s ${fmtInt(peers.length)} ${esc(p.format.toLowerCase())}s in ${creator ? 'their latest tracked posts' : esc(P.label)}. ${!isNum(p.er) ? '' : `ER = (likes ${fmtInt(p.like_count)} + comments ${fmtInt(p.comments_count||0)}) ÷ views ${fmtInt(p.view_count)} × 100 = ${fmtPct(p.er)}. The same formula is used for every account.`}${isNum(p.view_count)?'':' Instagram doesn\'t publish views for this post type, so only follower ER is available.'}${isNum(p.like_count)?'':' This account hides like counts, so ER can\'t be calculated.'}</p>
         ${hasIns ? `<h3>Private insights · Muhra only</h3><div class="mgrid">${ins}</div><p class="pd-note">${isNum(p.fullEr)?`Full ER = (likes ${fmtInt(p.like_count)} + comments ${fmtInt(p.comments_count||0)} + saves ${fmtInt(p.saved||0)} + shares ${fmtInt(p.shares||0)} + reposts ${fmtInt(p.reposts||0)}) ÷ views ${fmtInt(p.view_count)} × 100 = ${fmtPct(p.fullEr)}. Muhra only: competitors' saves, shares and reposts are private, so this is never compared with them. `:''}Lifetime values from Instagram Insights${p.insights_at?', updated '+relTime(p.insights_at):''}.</p>` : c.is_own ? '<p class="pd-note">Private insights appear after the next fetch.</p>' : ''}
         <h3>Growth over time</h3><div id="pdHist"><p class="pd-note">Loading…</p></div>
       </div>
@@ -861,24 +1002,41 @@ function computeGaps(){
 
 /* ---------- rendering ---------- */
 function destroyCharts(){ for(const k in S.charts){ S.charts[k].destroy(); } S.charts = {}; }
-function go(view, id){ if(id !== S.selected){ S.postLimit = 24; S.postFmt = 'all'; } S.view = view; S.selected = id ?? null; render(); window.scrollTo(0,0); }
+function go(view, id){ if(view!==S.view) S.ugcAddMsg = ''; if(id !== S.selected){ S.postLimit = 24; S.postFmt = 'all'; } S.view = view; S.selected = id ?? null; render(); window.scrollTo(0,0); }
 
 function renderNav(){
   const admin = S.role === 'admin';
   const items = [['overview','Overview'],['gaps','Gaps'],['report','AI report']];
   if(admin) items.push(['manage','Manage accounts']);
-  $('nav').innerHTML = items.map(([k,l])=>`<button data-go="${k}" aria-current="${S.view===k}">${l}</button>`).join('') + `<button data-signout>Sign out</button>`;
-  $('clist').innerHTML = S.comps.length ? S.comps.map(c=>{
-    const m = S.m[c.id];
-    const status = c.last_error ? '<span class="dot err" title="Error"></span>' : c.status==='paused' ? '<span class="dot pause" title="Paused"></span>' : !c.last_fetched_at ? '<span class="dot wait" title="Waiting for first fetch"></span>' : `<span class="er num" title="Reel ER: likes + comments ÷ views">${fmtPct(m.reelER,1)}</span>`;
-    return `<button class="citem" data-comp="${c.id}" aria-current="${S.view==='comp'&&S.selected===c.id}">${avatarHtml(c)}<span><span class="u">@${esc(c.username)}${c.is_own?'<span class="own-dot" title="Muhra"></span>':''}</span><br><span class="s num">${fmtK(c.followers)} followers</span></span>${status}</button>`;
-  }).join('') : `<p style="color:var(--muted);font-size:13px;padding:0 10px">No accounts yet.</p>`;
-  const opts = S.comps.map(c=>`<option value="${c.id}" ${S.view==='comp'&&S.selected===c.id?'selected':''}>@${esc(c.username)}</option>`).join('');
-  const short = { overview:'Overview', gaps:'Gaps', report:'AI report', manage:'Manage' };
-  $('mnav').style.setProperty('--tabs', items.length);
-  $('mnav').innerHTML = items.map(([k])=>`<button class="mtab" data-go="${k}" aria-current="${S.view===k}">${short[k]}</button>`).join('')
-    + (S.comps.length ? `<select class="macct" id="mselect" aria-label="Open an account"><option value="">${S.view==='comp'?'':'Open an account…'}</option>${opts}</select>` : '');
-  const ms = $('mselect'); if(ms) ms.onchange = () => ms.value && go('comp', Number(ms.value));
+  const ugcItems = [['ugc','Find creators'],['ugcPipe','Pipeline'],['ugcInbox','Applications']];
+  if(admin) ugcItems.push(['ugcAdd','Add creators'],['ugcSettings','Settings']);
+  const curUgc = S.view==='creator' || S.view==='ugcCompare' ? 'ugc' : S.view;
+  const nNew = newApps();
+  $('nav').innerHTML = '<span class="nav-h">Competitors</span>' + items.map(([k,l])=>`<button data-go="${k}" aria-current="${S.view===k}">${l}</button>`).join('')
+    + '<span class="nav-h">UGC creators</span>' + ugcItems.map(([k,l])=>`<button data-go="${k}" aria-current="${curUgc===k}">${l}${k==='ugcInbox'&&nNew?`<span class="badge num" title="New applications">${nNew}</span>`:''}</button>`).join('')
+    + `<button data-signout>Sign out</button>`;
+  if(inUgc()){
+    const favs = S.creators.filter(c=>ugcOf(c.id).favorite);
+    const list = (favs.length ? favs : S.creators.slice()).sort((a,b)=>(S.cm[b.id].score??-1)-(S.cm[a.id].score??-1)).slice(0, 30);
+    $('clistH').textContent = favs.length ? 'Favorite creators' : 'Top creators';
+    $('clist').innerHTML = list.length ? list.map(c=>`<button class="citem" data-creator="${c.id}" aria-current="${S.view==='creator'&&S.selected===c.id}">${avatarHtml(c)}<span><span class="u">@${esc(c.username)}</span><br><span class="s num">${fmtK(c.followers)} followers</span></span><span class="er num" title="Muhra match score">${isNum(S.cm[c.id].score)?S.cm[c.id].score:'–'}</span></button>`).join('')
+      : `<p style="color:var(--muted);font-size:13px;padding:0 10px">No creators yet.</p>`;
+  } else {
+    $('clistH').textContent = 'Accounts';
+    $('clist').innerHTML = S.comps.length ? S.comps.map(c=>{
+      const m = S.m[c.id];
+      const status = c.last_error ? '<span class="dot err" title="Error"></span>' : c.status==='paused' ? '<span class="dot pause" title="Paused"></span>' : !c.last_fetched_at ? '<span class="dot wait" title="Waiting for first fetch"></span>' : `<span class="er num" title="Reel ER: likes + comments ÷ views">${fmtPct(m.reelER,1)}</span>`;
+      return `<button class="citem" data-comp="${c.id}" aria-current="${S.view==='comp'&&S.selected===c.id}">${avatarHtml(c)}<span><span class="u">@${esc(c.username)}${c.is_own?'<span class="own-dot" title="Muhra"></span>':''}</span><br><span class="s num">${fmtK(c.followers)} followers</span></span>${status}</button>`;
+    }).join('') : `<p style="color:var(--muted);font-size:13px;padding:0 10px">No accounts yet.</p>`;
+  }
+  const short = { overview:'Overview', gaps:'Gaps', report:'Report', manage:'Manage', ugc:'UGC' };
+  const tabs = items.map(([k])=>k).concat('ugc');
+  $('mnav').style.setProperty('--tabs', tabs.length);
+  let sel = '';
+  if(inUgc()) sel = `<select class="macct" id="mselect" aria-label="UGC section">${ugcItems.map(([k,l])=>`<option value="${k}" ${curUgc===k?'selected':''}>${l}</option>`).join('')}</select>`;
+  else if(S.comps.length) sel = `<select class="macct" id="mselect" aria-label="Open an account"><option value="">${S.view==='comp'?'':'Open an account…'}</option>${S.comps.map(c=>`<option value="${c.id}" ${S.view==='comp'&&S.selected===c.id?'selected':''}>@${esc(c.username)}</option>`).join('')}</select>`;
+  $('mnav').innerHTML = tabs.map(k=>`<button class="mtab" data-go="${k}" aria-current="${k==='ugc'?inUgc():S.view===k}">${short[k]}${k==='ugc'&&nNew?` <span class="num">·${nNew}</span>`:''}</button>`).join('') + sel;
+  const ms = $('mselect'); if(ms) ms.onchange = () => { if(!ms.value) return; inUgc() ? go(ms.value) : go('comp', Number(ms.value)); };
 }
 document.addEventListener('click', e => {
   const g = e.target.closest('[data-go]'); if(g){ go(g.dataset.go); return; }
@@ -889,11 +1047,22 @@ function render(){
   destroyCharts();
   renderNav();
   const v = $('view');
+  // Background fetches re-render the page; keep what the user is typing in forms on the same screen.
+  const same = render._at === S.view+':'+S.selected; render._at = S.view+':'+S.selected;
+  const drafts = same ? [...v.querySelectorAll('#ugcHandles,[id^="crm"]')].filter(el=>el.value!==el.defaultValue).map(el=>[el.id, el.value]) : [];
   if(S.view==='overview') v.innerHTML = viewOverview();
   else if(S.view==='comp') v.innerHTML = viewComp();
   else if(S.view==='gaps') v.innerHTML = viewGaps();
   else if(S.view==='report') v.innerHTML = viewReport();
   else if(S.view==='manage') v.innerHTML = S.role==='admin' ? viewManage() : '';
+  else if(S.view==='ugc') v.innerHTML = viewUgc();
+  else if(S.view==='creator') v.innerHTML = viewCreator();
+  else if(S.view==='ugcPipe') v.innerHTML = viewUgcPipe();
+  else if(S.view==='ugcInbox') v.innerHTML = viewUgcInbox();
+  else if(S.view==='ugcAdd') v.innerHTML = S.role==='admin' ? viewUgcAdd() : '';
+  else if(S.view==='ugcSettings') v.innerHTML = S.role==='admin' ? viewUgcSettings() : '';
+  else if(S.view==='ugcCompare') v.innerHTML = viewUgcCompare();
+  for(const [id, val] of drafts){ const el = $(id); if(el) el.value = val; }
   bindView();
 }
 
@@ -1173,7 +1342,7 @@ function bindView(){
       const handle = parseHandle($('addHandle').value);
       const box = $('addMsg');
       if(!handle){ box.innerHTML = '<div class="msg err">That doesn\'t look like an Instagram profile link or handle.</div>'; return; }
-      if(S.comps.some(c=>c.username===handle)){ box.innerHTML = `<div class="msg err">@${esc(handle)} is already tracked.</div>`; return; }
+      if(S.accounts.some(c=>c.username===handle)){ box.innerHTML = `<div class="msg err">@${esc(handle)} is already tracked${S.creators.some(c=>c.username===handle)?' as a UGC creator':''}.</div>`; return; }
       addBtn.disabled = true;
       try{
         const own = $('addOwn').checked;
@@ -1189,11 +1358,12 @@ function bindView(){
     addBtn.onclick = submit;
     $('addHandle').addEventListener('keydown', e=>{ if(e.key==='Enter') submit(); });
   }
+  bindUgc();
   drawCharts();
 }
 
 async function onAction(a, id){
-  const c = S.comps.find(x=>x.id===id);
+  const c = S.accounts.find(x=>x.id===id);
   try{
     if(a==='refresh-all') return refresh(null);
     if(a==='refresh-one') return refresh([id], `Fetching @${c.username}…`);
@@ -1258,6 +1428,14 @@ function drawCharts(){
   }
   drawRest();
   function drawRest(){
+  const cf = $('chCreatorF');
+  if(cf){
+    const c = S.creators.find(x=>x.id===S.selected); const ss = (S.snapsBy[c.id]||[]).filter(s=>isNum(s.followers));
+    if(ss.length < 2) cf.parentElement.outerHTML = `<div class="chart-empty"><b>${ss.length ? 'Only 1 day of follower data so far' : 'No follower data yet'}</b><p>Instagram doesn't share past follower counts, so a snapshot is recorded every day while tracking is on. The line appears from the second day.</p><div class="big num">${fmtInt(c.followers)} <span>followers now</span></div></div>`;
+    else S.charts.cf = new Chart(cf, { type:'line', data:{ labels: ss.map(s=>dateLabel(s.snap_date)),
+      datasets:[{ data: ss.map(s=>s.followers), borderColor: cssVar('--brand'), backgroundColor:'transparent', borderWidth:2.5, pointRadius: ss.length<15?3:0, tension:.25 }] },
+      options:{ maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:(x)=>fmtInt(x.parsed.y)+' followers' } } }, scales:{ y:{ ticks:{ callback:(v)=>fmtK(v) } }, x:{ grid:{display:false} } } } });
+  }
   const erc = $('chER');
   if(erc){
     const rows = S.comps.filter(c=>isNum(S.m[c.id].reelER) && S.m[c.id].hasData).sort((a,b)=>S.m[b.id].reelER-S.m[a.id].reelER);
@@ -1274,6 +1452,687 @@ function drawCharts(){
   }
   }
 }
+
+/* ---------- UGC creators ----------
+   Creators are Instagram accounts with kind = 'creator'. n8n fetches them exactly like
+   competitors (latest 50 posts, daily while active), so ER uses the same formula everywhere.
+   Everything below is computed from the creator's latest posts (last 90 days, or their latest
+   24 posts when they post less often), independent of the competitor period selector. */
+const STAGES = [['new','New'],['shortlisted','Shortlisted'],['contacted','Contacted'],['replied','Replied'],['negotiating','Negotiating'],['booked','Booked'],['delivered','Delivered'],['rejected','Rejected']];
+const stageLabel = (k) => (STAGES.find(s=>s[0]===k) || STAGES[0])[1];
+const TIERS = [['nano','Nano','< 10K',0,1e4],['micro','Micro','10K–50K',1e4,5e4],['mid','Mid','50K–250K',5e4,2.5e5],['macro','Macro','250K–1M',2.5e5,1e6],['mega','Mega','1M+',1e6,Infinity]];
+const tierOf = (f) => isNum(f) ? TIERS.find(t=>f>=t[3] && f<t[4]) : null;
+const UGC_VIEWS = ['ugc','ugcPipe','ugcInbox','ugcAdd','ugcSettings','creator','ugcCompare'];
+const inUgc = () => UGC_VIEWS.includes(S.view);
+const UGC_DEFAULTS = {
+  keywords: ['fashion','modest','hijab','hijabi','style','outfit','ootd','abaya','ugc','content creator','lifestyle','cairo','egypt','مودست','محجبات','حجاب','ستايل','فاشون','موضة','اوتفيت','لبس'],
+  signature: 'The Muhra team',
+  subject_en: 'Collaboration with Muhra ✨',
+  body_en: 'Hi {name},\n\nI\'m reaching out from Muhra (@muhra.egy), a women\'s fashion brand from Cairo. We love your content on Instagram (@{handle}) and think your style is a great fit for our pieces.\n\nWe\'d love to work with you on UGC content. If you\'re interested, please fill in this short form (about 2 minutes) with your rates and details:\n{form_link}\n\nLooking forward to hearing from you!\n{signature}',
+  subject_ar: 'تعاون مع مُهرة ✨',
+  body_ar: 'أهلاً {name}،\n\nبنتواصل معاكي من مُهرة (@muhra.egy)، براند أزياء نسائية من القاهرة. عجبنا جداً المحتوى بتاعك على إنستجرام (@{handle}) وحاسين إن ستايلك مناسب جداً لقطعنا.\n\nحابين نتعاون معاكي في محتوى UGC. لو مهتمة، ياريت تملي الفورم القصير ده (حوالي دقيقتين) بأسعارك وبياناتك:\n{form_link}\n\nمستنيين ردك!\n{signature}'
+};
+const UF_DEFAULT = { q:'', kw:'', kwMode:'any', inCaps:true, tiers:[], fMin:'', fMax:'', erMin:'', vMin:'', scoreMin:'', stage:'', active:'', lang:'', fav:false, email:false, brand:false, comp:false, video:false, sort:'score' };
+function loadUF(){ try{ const r = JSON.parse(localStorage.getItem('ugc.filters')); if(r) return { ...UF_DEFAULT, ...r }; }catch(e){} return { ...UF_DEFAULT }; }
+function saveUF(){ try{ localStorage.setItem('ugc.filters', JSON.stringify(S.uf)); }catch(e){} }
+Object.assign(S, { accounts:[], creators:[], allPosts:[], ugc:{}, cm:{}, outreach:[], apps:[], ugcReady:false, ugcCfg:{ ...UGC_DEFAULTS }, uf: loadUF(), cmp:[], cPostSort:'views', appFilter:'open' });
+
+const AR_RE = /[؀-ۿ]/;
+const EMAIL_RE = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
+const PHONE_RE = /(?:\+?20[\s-]?|0)1[0125][\s-]?\d{3,4}[\s-]?\d{4}|\+\d{1,3}[\s-]?\d{2,4}[\s-]?\d{3,4}[\s-]?\d{3,4}/;
+// Paid-partnership markers in captions: a creator who already makes brand content.
+const SPONSOR_RE = /#(?:ad|ads|sponsored|partner|partnership|paidpartnership|collab|gifted|pr)(?![\w])|\b(?:sponsored|in collaboration with|collab with|use (?:my )?code|discount code|promo code)\b|إعلان|اعلان|برعاية|بالتعاون مع|كود خصم|كود الخصم|استخدمي كود|استخدم كود/i;
+// Handles only: skip the domain part of emails (name@gmail.com).
+const MENTION_RE = /(?<![\w.])@([A-Za-z0-9._]{2,30})/g;
+const clamp01 = (v) => Math.max(0, Math.min(1, v));
+const ge = (v, t) => isNum(v) && v >= t;
+const le = (v, t) => isNum(v) && v <= t;
+const sleep = (ms) => new Promise(r=>setTimeout(r, ms));
+const kwList = (s) => String(s||'').split(/[,\n،]/).map(x=>x.trim().toLowerCase()).filter(Boolean);
+const kwHits = (text, kws) => { const t = String(text||'').toLowerCase(); return kws.filter(k=>t.includes(k)); };
+const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function hl(text, kws){
+  let h = esc(text);
+  const ks = kws.filter(Boolean).map(esc).sort((a,b)=>b.length-a.length);
+  if(ks.length) h = h.replace(new RegExp('('+ks.map(reEsc).join('|')+')','gi'), '<mark>$1</mark>');
+  return h;
+}
+const mentionsIn = (t) => [...String(t||'').matchAll(MENTION_RE)].map(m=>m[1].toLowerCase().replace(/\.+$/,'')).filter(h=>!/\.(com|net|org|eg)$/.test(h));
+const ugcOf = (id) => S.ugc[id] || { account_id:id, stage:'new', favorite:false, niches:[] };
+const formBase = () => location.origin + location.pathname.replace(/[^/]*$/, '') + 'collab.html';
+const formLink = (id, lang) => { const u = S.ugc[id]; return (u && u.invite_token ? formBase()+'?t='+u.invite_token : formBase()) + (lang ? (u && u.invite_token ? '&' : '?')+'l='+lang : ''); };
+const firstName = (c) => { const n = (c.display_name||'').replace(/[^\p{L}\s'-]/gu,' ').trim().split(/\s+/)[0]; return n || '@'+c.username; };
+const waDigits = (p) => { let d = String(p||'').replace(/\D/g,''); if(/^01\d{9}$/.test(d)) d = '2'+d; return d.length >= 10 ? d : null; };
+
+function creatorMetrics(c){
+  const all = S.postsBy[c.id] || [];
+  const now = Date.now();
+  const recent = all.filter(p => now - new Date(p.posted_at) <= 90*DAY);
+  const base = recent.length >= 6 ? recent : all.slice(0, 24);
+  const withViews = base.filter(p => isNum(p.view_count) && p.view_count > 0);
+  const vids = base.filter(p => p.format==='Reel' || p.format==='Video');
+  const followers = c.followers;
+  const er = pooledER(base);
+  const fer = avg(base.map(p=>p.fer));
+  const medViews = median(withViews.map(p=>p.view_count));
+  const avgViews = avg(withViews.map(p=>p.view_count));
+  const viewRate = isNum(medViews) && followers ? medViews/followers*100 : null;
+  const perWeek = all.filter(p => now - new Date(p.posted_at) <= 60*DAY).length / 60 * 7;
+  const daysSince = all[0] ? (now - new Date(all[0].posted_at))/DAY : null;
+  const liked = base.filter(p=>isNum(p.like_count));
+  const sumL = liked.reduce((s,p)=>s+p.like_count,0), sumC = liked.reduce((s,p)=>s+(p.comments_count||0),0);
+  const cpl = sumL > 0 ? sumC/sumL*100 : null;               // comments per 100 likes
+  const hiddenShare = base.length ? (base.length-liked.length)/base.length : 0;
+  const vs = withViews.map(p=>p.view_count);
+  const cv = vs.length >= 4 ? (()=>{ const mu = vs.reduce((a,b)=>a+b,0)/vs.length; return mu ? Math.sqrt(vs.reduce((a,b)=>a+(b-mu)**2,0)/vs.length)/mu : null; })() : null;
+  const caps = base.map(p=>p.caption||'').filter(x=>x.trim());
+  const arShare = caps.length ? caps.filter(x=>AR_RE.test(x)).length/caps.length : null;
+  const bio = c.biography || '';
+  const u = S.ugc[c.id] || {};
+  const bioEmail = (bio.match(EMAIL_RE)||[])[0] || null;
+  const bioPhone = (bio.match(PHONE_RE)||[])[0] || null;
+  const email = u.email || bioEmail;
+  const phone = u.phone || bioPhone;
+  const sponsoredPosts = all.filter(p=>SPONSOR_RE.test(p.caption||''));
+  const compSet = new Set(S.comps.filter(x=>!x.is_own).map(x=>x.username));
+  const own = S.comps.find(x=>x.is_own);
+  const mentioned = {};
+  for(const t of [bio, ...all.map(p=>p.caption)]) for(const h of mentionsIn(t)) if(compSet.has(h) || (own && h===own.username)) mentioned[h] = (mentioned[h]||0)+1;
+  const compMentions = Object.entries(mentioned).filter(([h])=>!own || h!==own.username).sort((a,b)=>b[1]-a[1]);
+  const mentionsMuhra = own ? mentioned[own.username] || 0 : 0;
+  const kws = S.ugcCfg.keywords;
+  const bioHits = kwHits(bio+' '+(c.display_name||''), kws);
+  const capHitPosts = base.filter(p=>kwHits(p.caption, kws).length).length;
+  const fitShare = base.length ? capHitPosts/base.length : 0;
+  const capHits = kwHits(caps.join('\n'), kws);
+  const vidShare = base.length ? vids.length/base.length : 0;
+
+  // Muhra match score: six signals, each 0..1, weighted to 100.
+  const rec = !isNum(daysSince) ? 0 : daysSince <= 7 ? 1 : daysSince <= 30 ? .6 : daysSince <= 90 ? .25 : 0;
+  const parts = [
+    { k:'Engagement', w:25, v: isNum(er) ? clamp01(er/8) : isNum(fer) ? clamp01(fer/5) : 0,
+      why: isNum(er) ? `${fmtPct(er)} ER (likes + comments ÷ views). 8%+ earns full marks.` : isNum(fer) ? `${fmtPct(fer)} follower ER (no public views).` : 'No engagement data yet.' },
+    { k:'Reach beyond followers', w:20, v: isNum(viewRate) && viewRate > 0 ? clamp01(Math.log10(viewRate)/2) : 0,
+      why: isNum(viewRate) ? `Median post reaches ${fmt1(viewRate)}% of their follower count in views. 100%+ earns full marks.` : 'No view data yet.' },
+    { k:'Fits Muhra', w:25, v: kws.length ? clamp01((bioHits.length ? .4 : 0) + Math.min(.6, fitShare*1.2) + (compMentions.length || mentionsMuhra ? .1 : 0)) : .5,
+      why: `${bioHits.length ? 'Bio matches '+bioHits.slice(0,4).map(k=>'“'+k+'”').join(', ') : 'No keyword in bio'} · ${pct0(fitShare)} of recent captions match your keywords${compMentions.length ? ' · mentions competitors' : ''}.` },
+    { k:'Active', w:10, v: rec*.6 + Math.min(1, perWeek/3)*.4,
+      why: isNum(daysSince) ? `Last post ${Math.round(daysSince)} day${Math.round(daysSince)===1?'':'s'} ago · ${fmt1(perWeek)} posts a week.` : 'No posts yet.' },
+    { k:'Video-first', w:10, v: vidShare, why: `${pct0(vidShare)} of recent posts are reels or videos, the core UGC format.` },
+    { k:'Authentic audience', w:10, v: hiddenShare > .5 || !isNum(cpl) ? .5 : cpl < .2 ? .2 : cpl < .5 ? .6 : cpl <= 15 ? 1 : .7,
+      why: hiddenShare > .5 ? 'Hides like counts, so this can\'t be checked.' : isNum(cpl) ? `${fmt1(cpl)} comments per 100 likes. Under 0.5 can signal bought likes; 0.5–15 is healthy.` : 'Not enough data.' }
+  ];
+  const hasData = !!c.last_fetched_at && !c.last_error && all.length > 0;
+  const score = hasData ? Math.round(parts.reduce((s,p)=>s+p.w*p.v,0)) : null;
+  return { all, base, er, fer, nEr: base.filter(p=>isNum(p.er)).length, medViews, avgViews, nViews: withViews.length, viewRate, perWeek, daysSince, cpl, hiddenShare, cv, arShare,
+    email, phone, bioEmail, bioPhone, sponsored: sponsoredPosts.length, sponsoredPosts, compMentions, mentionsMuhra, bioHits, capHits, fitShare, vidShare, parts, score, hasData };
+}
+function recomputeCreators(){ S.cm = {}; for(const c of S.creators) S.cm[c.id] = creatorMetrics(c); }
+
+function ugcFiltered(){
+  const f = S.uf, q = f.q.trim().toLowerCase(), kws = kwList(f.kw);
+  const num = (v) => v === '' || v == null || !isFinite(Number(v)) ? null : Number(v);
+  const rows = S.creators.filter(c=>{
+    const m = S.cm[c.id], u = ugcOf(c.id);
+    if(q && ![c.username, c.display_name, c.biography, u.notes, u.location, (u.niches||[]).join(' ')].join(' ').toLowerCase().includes(q)) return false;
+    if(kws.length){
+      const hay = [c.biography, c.display_name, ...(f.inCaps ? m.all.map(p=>p.caption) : [])].join(' \n ').toLowerCase();
+      if(f.kwMode==='all' ? !kws.every(k=>hay.includes(k)) : !kws.some(k=>hay.includes(k))) return false;
+    }
+    if(f.tiers.length){ const t = tierOf(c.followers); if(!t || !f.tiers.includes(t[0])) return false; }
+    if(num(f.fMin)!=null && !ge(c.followers, num(f.fMin))) return false;
+    if(num(f.fMax)!=null && !le(c.followers, num(f.fMax))) return false;
+    if(num(f.erMin)!=null && !ge(m.er, num(f.erMin))) return false;
+    if(num(f.vMin)!=null && !ge(m.medViews, num(f.vMin))) return false;
+    if(num(f.scoreMin)!=null && !ge(m.score, num(f.scoreMin))) return false;
+    if(f.stage && u.stage !== f.stage) return false;
+    if(f.active && !le(m.daysSince, Number(f.active))) return false;
+    if(f.lang==='ar' && !ge(m.arShare, .5)) return false;
+    if(f.lang==='en' && !(isNum(m.arShare) && m.arShare < .5)) return false;
+    if(f.fav && !u.favorite) return false;
+    if(f.email && !m.email) return false;
+    if(f.brand && !m.sponsored) return false;
+    if(f.comp && !m.compMentions.length) return false;
+    if(f.video && !ge(m.vidShare, .5)) return false;
+    return true;
+  });
+  const key = { score:(c)=>S.cm[c.id].score, followers:(c)=>c.followers, er:(c)=>S.cm[c.id].er, views:(c)=>S.cm[c.id].medViews, reach:(c)=>S.cm[c.id].viewRate,
+    pw:(c)=>S.cm[c.id].perWeek, recent:(c)=>isNum(S.cm[c.id].daysSince) ? -S.cm[c.id].daysSince : null, added:(c)=>new Date(c.created_at).getTime() }[f.sort] || ((c)=>S.cm[c.id].score);
+  return rows.sort((a,b)=> (key(b) ?? -Infinity) - (key(a) ?? -Infinity));
+}
+
+/* ---- shared bits ---- */
+function scoreRing(s, big){
+  const band = !isNum(s) ? '' : s >= 70 ? 'hi' : s >= 45 ? 'md' : '';
+  return `<span class="score ${band}${big?' lg':''}" style="--p:${isNum(s)?s:0}" title="Muhra match score (0–100)"><span class="num">${isNum(s)?s:'–'}</span></span>`;
+}
+const stagePill = (k) => `<span class="pill st-${esc(k)}">${esc(stageLabel(k))}</span>`;
+function favBtn(id){
+  const on = ugcOf(id).favorite;
+  if(S.role!=='admin') return on ? '<span class="fav on" title="Favorite">★</span>' : '';
+  return `<button class="fav${on?' on':''}" data-ugc="fav" data-id="${id}" aria-pressed="${on}" aria-label="${on?'Remove from favorites':'Add to favorites'}" title="${on?'Remove from favorites':'Add to favorites'}">${on?'★':'☆'}</button>`;
+}
+function ugcHead(title, sub, actions){
+  const admin = S.role==='admin';
+  const tabs = [['ugc','Find'],['ugcPipe','Pipeline'],['ugcInbox','Applications']].concat(admin?[['ugcAdd','Add'],['ugcSettings','Settings']]:[]);
+  const cur = S.view==='creator'||S.view==='ugcCompare' ? 'ugc' : S.view;
+  return `<div class="topbar"><div><h1>${title}</h1><div class="sub">${sub}</div></div><div class="actions">${actions||''}</div></div>
+    <div class="seg ugc-tabs" role="group" aria-label="UGC sections">${tabs.map(([k,l])=>`<button data-go="${k}" aria-pressed="${cur===k}">${l}${k==='ugcInbox'&&newApps()?` <span class="num">${newApps()}</span>`:''}</button>`).join('')}</div>`;
+}
+const newApps = () => S.apps.filter(a=>a.status==='new').length;
+function ugcMissing(){
+  return `<div class="panel empty"><h2>UGC tables are not installed</h2><p>Run <code>supabase/migrations/20261015_ugc_creators.sql</code> on the Supabase project, then reload.</p></div>`;
+}
+
+/* ---- Find ---- */
+function viewUgc(){
+  const admin = S.role==='admin';
+  const head = ugcHead('Find UGC creators', `${fmtInt(S.creators.length)} creators researched · scored for Muhra from their latest posts`,
+    `${S.creators.length?'<button class="btn" data-ugc="csv">Export CSV</button>':''}${admin?'<button class="btn btn-primary" data-go="ugcAdd">Add creators</button>':''}`);
+  if(!S.ugcReady) return head + ugcMissing();
+  if(!S.creators.length) return head + `<div class="panel empty"><h2>No creators yet</h2><p>Add Instagram creators by handle, pick from creators your competitors already mention, or share the open application form so creators come to you.</p>${admin?'<button class="btn btn-primary" data-go="ugcAdd">Add creators</button>':''}</div>`;
+  const f = S.uf;
+  const counts = {}; for(const c of S.creators){ const s = ugcOf(c.id).stage; counts[s] = (counts[s]||0)+1; }
+  const sel = (id, opts, v, label) => `<label class="field"><span>${label}</span><select id="${id}" class="input">${opts.map(([k,l])=>`<option value="${k}" ${String(v)===String(k)?'selected':''}>${l}</option>`).join('')}</select></label>`;
+  const inp = (id, v, label, ph, type) => `<label class="field"><span>${label}</span><input id="${id}" class="input" ${type?`type="${type}" min="0" step="any" inputmode="decimal"`:''} value="${esc(v)}" placeholder="${esc(ph||'')}"></label>`;
+  const tog = (k, l, title) => `<button class="tog" data-uf="${k}" aria-pressed="${!!f[k]}" ${title?`title="${esc(title)}"`:''}>${l}</button>`;
+  const nActive = Object.keys(UF_DEFAULT).filter(k=>!['q','sort','inCaps','kwMode'].includes(k) && JSON.stringify(f[k])!==JSON.stringify(UF_DEFAULT[k])).length;
+  return head + `
+  <div class="panel filters-panel${S.ufOpen?' open':''}">
+    <button class="btn btn-sm f-more" data-ugc="filters">${S.ufOpen?'Hide filters':'Filters'}${nActive?` · ${nActive} on`:''}</button>
+    <div class="filters">
+      <div class="wide">${inp('ufQ', f.q, 'Search', 'Handle, name, notes, location…')}</div>
+      <div class="wide"><label class="field"><span>Keywords in bio <label class="inl"><input type="checkbox" id="ufCaps" ${f.inCaps?'checked':''}> and captions</label></span>
+        <span class="kwrow"><input id="ufKw" class="input" value="${esc(f.kw)}" placeholder="modest, hijab, ستايل, mom…"><select id="ufKwMode" class="input" aria-label="Match"><option value="any" ${f.kwMode==='any'?'selected':''}>Any</option><option value="all" ${f.kwMode==='all'?'selected':''}>All</option></select></span></label></div>
+      ${inp('ufFMin', f.fMin, 'Min followers', 'Any', 'number')}
+      ${inp('ufFMax', f.fMax, 'Max followers', 'Any', 'number')}
+      ${inp('ufEr', f.erMin, 'Min ER %', 'Any', 'number')}
+      ${inp('ufV', f.vMin, 'Min median views', 'Any', 'number')}
+      ${inp('ufScore', f.scoreMin, 'Min match score', '0–100', 'number')}
+      ${sel('ufStage', [['','Any stage'], ...STAGES.map(([k,l])=>[k, l+(counts[k]?` (${counts[k]})`:'')])], f.stage, 'Stage')}
+      ${sel('ufActive', [['','Any time'],['7','Posted in last 7 days'],['30','Posted in last 30 days'],['90','Posted in last 90 days']], f.active, 'Activity')}
+      ${sel('ufLang', [['','Any language'],['ar','Mostly Arabic captions'],['en','Mostly non-Arabic captions']], f.lang, 'Caption language')}
+    </div>
+    <div class="f-row"><span class="f-l">Size</span>${TIERS.map(t=>`<button class="tog" data-tier="${t[0]}" aria-pressed="${f.tiers.includes(t[0])}" title="${t[2]} followers">${t[1]} <small>${t[2]}</small></button>`).join('')}</div>
+    <div class="f-row"><span class="f-l">Only</span>${tog('fav','★ Favorites')}${tog('email','✉ Has email','Email in bio or saved on the profile')}${tog('brand','Brand experience','Has captions with #ad, sponsored, discount codes, إعلان…')}${tog('comp','Mentions competitors','Tagged a tracked competitor in a caption or bio')}${tog('video','Video-first','At least half of recent posts are reels or videos')}
+      <span class="f-sort"><label for="ufSort">Sort</label><select id="ufSort" class="input">${[['score','Match score'],['followers','Followers'],['er','Engagement rate'],['views','Median views'],['reach','Views ÷ followers'],['pw','Posts per week'],['recent','Most recently active'],['added','Recently added']].map(([k,l])=>`<option value="${k}" ${f.sort===k?'selected':''}>${l}</option>`).join('')}</select></span>
+      <button class="linkbtn" data-ugc="reset">Reset filters</button></div>
+  </div>
+  <div id="ugcResults">${ugcResultsHtml()}</div>${cmpTray()}`;
+}
+function ugcResultsHtml(){
+  const rows = ugcFiltered();
+  const kws = [...kwList(S.uf.kw), ...S.ugcCfg.keywords];
+  return `<p class="hint num res-count">${fmtInt(rows.length)} of ${fmtInt(S.creators.length)} creators match</p>` +
+    (rows.length ? `<div class="clist2">${rows.map(c=>creatorCard(c, kws)).join('')}</div>` : `<div class="panel empty"><h2>No creators match</h2><p>Loosen a filter or reset them.</p></div>`);
+}
+function creatorCard(c, kws){
+  const m = S.cm[c.id], u = ugcOf(c.id), t = tierOf(c.followers);
+  const thumbs = m.all.filter(p=>p.thumbnail_url||p.media_url).sort((a,b)=>(b.view_count??-1)-(a.view_count??-1)).slice(0,4);
+  const state = c.last_error ? `<span class="pill bad" title="${esc(c.last_error)}">Fetch failed</span>` : !c.last_fetched_at ? '<span class="pill">Analyzing…</span>' : '';
+  const badges = [
+    m.email ? '<span class="pill" title="Email found">✉ Email</span>' : '',
+    m.sponsored ? `<span class="pill" title="${m.sponsored} captions look like brand partnerships">Brand exp · ${m.sponsored}</span>` : '',
+    m.compMentions.length ? `<span class="pill warn" title="Mentions ${m.compMentions.map(([h,n])=>'@'+h+' ×'+n).join(', ')}">Works with @${esc(m.compMentions[0][0])}${m.compMentions.length>1?' +'+(m.compMentions.length-1):''}</span>` : '',
+    m.mentionsMuhra ? '<span class="pill brand">Mentioned Muhra</span>' : '',
+    isNum(m.arShare) && m.arShare >= .5 ? '<span class="pill">Arabic</span>' : ''
+  ].join('');
+  const st = (v, l) => `<span><b class="num">${v}</b><small>${l}</small></span>`;
+  return `<div class="ccard" data-creator="${c.id}" role="button" tabindex="0" aria-label="Open @${esc(c.username)}">
+    <div class="cc-l">${avatarHtml(c, true)}${scoreRing(m.score)}</div>
+    <div class="cc-m">
+      <div class="cc-h"><b>@${esc(c.username)}</b>${c.display_name?`<span class="muted">${esc(c.display_name)}</span>`:''}${t?`<span class="pill">${t[1]}</span>`:''}${stagePill(u.stage)}${state}</div>
+      <div class="cc-s">${st(fmtK(c.followers),'followers')}${st(fmtPct(m.er,1),'ER')}${st(fmtK(m.medViews),'median views')}${st(isNum(m.viewRate)?fmt1(m.viewRate)+'%':'–','views ÷ followers')}${st(fmt1(m.perWeek),'posts / wk')}${st(isNum(m.daysSince)?Math.round(m.daysSince)+'d':'–','since last post')}</div>
+      ${c.biography?`<p class="cc-bio" dir="auto">${hl(c.biography.slice(0,220), kws)}</p>`:''}
+      ${badges?`<div class="cc-b">${badges}</div>`:''}
+    </div>
+    <div class="cc-r">
+      <div class="cc-act">${favBtn(c.id)}<label class="cmp" title="Compare"><input type="checkbox" data-cmp="${c.id}" ${S.cmp.includes(c.id)?'checked':''}> Compare</label></div>
+      <div class="thumbs">${thumbs.map(p=>`<span class="th"><img src="${esc(p.thumbnail_url||p.media_url)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">${isNum(p.view_count)?`<i class="num">${fmtK(p.view_count)}</i>`:''}</span>`).join('')}</div>
+    </div></div>`;
+}
+function cmpTray(){
+  if(!S.cmp.length) return '';
+  return `<div class="cmp-tray" role="region" aria-label="Compare"><span class="num">${S.cmp.length} selected</span>${S.cmp.length>=2?'<button class="btn btn-sm btn-primary" data-go="ugcCompare">Compare</button>':'<span class="muted">pick at least 2</span>'}<button class="linkbtn" data-ugc="cmp-clear">Clear</button></div>`;
+}
+function bindUgcFind(){
+  const f = S.uf;
+  const upd = () => { saveUF(); const r = $('ugcResults'); if(r) r.innerHTML = ugcResultsHtml(); };
+  const map = { ufQ:'q', ufKw:'kw', ufFMin:'fMin', ufFMax:'fMax', ufEr:'erMin', ufV:'vMin', ufScore:'scoreMin' };
+  for(const [id,k] of Object.entries(map)){ const el = $(id); if(el) el.oninput = () => { f[k] = el.value; upd(); }; }
+  const smap = { ufStage:'stage', ufActive:'active', ufLang:'lang', ufSort:'sort', ufKwMode:'kwMode' };
+  for(const [id,k] of Object.entries(smap)){ const el = $(id); if(el) el.onchange = () => { f[k] = el.value; upd(); }; }
+  const cap = $('ufCaps'); if(cap) cap.onchange = () => { f.inCaps = cap.checked; upd(); };
+  document.querySelectorAll('[data-uf]').forEach(b=>b.onclick=()=>{ const k = b.dataset.uf; f[k] = !f[k]; b.setAttribute('aria-pressed', f[k]); upd(); });
+  document.querySelectorAll('[data-tier]').forEach(b=>b.onclick=()=>{ const k = b.dataset.tier; f.tiers = f.tiers.includes(k) ? f.tiers.filter(x=>x!==k) : [...f.tiers, k]; b.setAttribute('aria-pressed', f.tiers.includes(k)); upd(); });
+}
+
+/* ---- Creator detail ---- */
+function viewCreator(){
+  const c = S.creators.find(x=>x.id===S.selected);
+  if(!c) return ugcHead('Creator', '') + '<div class="panel empty"><h2>Creator not found</h2></div>';
+  const m = S.cm[c.id], u = ugcOf(c.id), admin = S.role==='admin', busy = S.busy[String(c.id)];
+  const kws = S.ugcCfg.keywords, t = tierOf(c.followers);
+  let banner = '';
+  if(c.last_error) banner = `<div class="banner err"><b>Last fetch failed:</b> ${esc(c.last_error)}. Instagram only shares public Business or Creator accounts.</div>`;
+  else if(!c.last_fetched_at) banner = `<div class="banner wait">Analyzing this creator. It takes about a minute after adding.</div>`;
+  else if(c.status==='paused') banner = `<div class="banner wait">Daily tracking is paused for this creator. Data shown is from ${relTime(c.last_fetched_at)}.</div>`;
+  const contact = [
+    m.email ? `<a href="mailto:${esc(m.email)}">✉ ${esc(m.email)}</a>` : '',
+    m.phone ? `<span>☎ ${esc(m.phone)}</span>` : '',
+    c.website ? `<a href="${esc(c.website)}" target="_blank" rel="noopener">${esc(c.website.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>` : ''
+  ].filter(Boolean).join(' · ');
+  const head = `<div class="panel"><div class="profile">${avatarHtml(c,true)}<div class="meta">
+      <h2>${esc(c.display_name || c.username)} ${t?`<span class="pill">${t[1]} · ${t[2]}</span>`:''} ${favBtn(c.id)}</h2>
+      <div><a href="https://instagram.com/${esc(c.username)}" target="_blank" rel="noopener">@${esc(c.username)}</a>${contact?' · '+contact:''}</div>
+      ${c.biography?`<p class="bio" dir="auto">${hl(c.biography, kws)}</p>`:''}
+      <p style="font-size:13px;color:var(--muted);margin:8px 0 0">${c.last_fetched_at?`Updated ${relTime(c.last_fetched_at)} · `:''}${fmtInt(c.media_count)} posts total · added ${relTime(c.created_at)}${u.source&&u.source!=='manual'?' from '+esc(u.source):''}</p>
+    </div>
+    <div class="prof-act">${admin?`<select class="input" data-ugc-stage="${c.id}" aria-label="Stage">${STAGES.map(([k,l])=>`<option value="${k}" ${u.stage===k?'selected':''}>${l}</option>`).join('')}</select>
+      <button class="btn btn-primary" data-ugc="email" data-id="${c.id}">✉ Invite to collaborate</button>
+      <button class="btn" data-action="refresh-one" data-id="${c.id}" ${busy?'disabled':''}>${busy?'<span class="spinner"></span> Fetching…':'Refresh'}</button>`:stagePill(u.stage)}</div></div></div>`;
+  if(!m.hasData) return ugcHead('Creator', '@'+esc(c.username)) + banner + head + (admin ? crmPanel(c, m, u) : '');
+  const k = (v,l,d) => `<div class="kpi"><div class="v num">${v}</div><div class="l">${l}</div>${d?`<div class="d num">${d}</div>`:''}</div>`;
+  const kpis = `<div class="kpis">
+    ${k(fmtK(c.followers),'Followers', (()=>{ const ss = (S.snapsBy[c.id]||[]).filter(x=>isNum(x.followers)); if(ss.length<2) return '<span class="flat">tracked daily from now</span>'; const d = ss[ss.length-1].followers-ss[0].followers; return `<span class="${cls(d)}">${signed(d)}</span> <span class="flat">since ${fmtDate(parseYmd(ss[0].snap_date))}</span>`; })())}
+    ${k(fmtPct(m.er),'Engagement rate',`<span class="flat">likes + comments ÷ views · ${fmtInt(m.nEr)} posts</span>`)}
+    ${k(fmtK(m.medViews),'Median views',`<span class="flat">avg ${fmtK(m.avgViews)} · ${fmtInt(m.nViews)} posts</span>`)}
+    ${k(isNum(m.viewRate)?fmt1(m.viewRate)+'%':'–','Views ÷ followers','<span class="flat">median post reach</span>')}
+    ${k(fmt1(m.perWeek),'Posts per week',`<span class="flat">last post ${isNum(m.daysSince)?Math.round(m.daysSince)+' days ago':'–'}</span>`)}
+    ${k(fmtPct(m.fer,2),'Follower ER',`<span class="flat">${isNum(m.cpl)?fmt1(m.cpl)+' comments / 100 likes':'÷ followers'}</span>`)}</div>`;
+  const parts = m.parts.map(p=>`<div class="sb"><div class="sb-h"><span>${p.k}</span><span class="num">${Math.round(p.v*p.w)} / ${p.w}</span></div><span class="bar"><i style="width:${p.v*100}%"></i></span><p>${esc(p.why)}</p></div>`).join('');
+  const own = S.comps.find(x=>x.is_own);
+  const signals = [
+    `<li><b>Brand experience:</b> ${m.sponsored ? `${m.sponsored} caption${m.sponsored>1?'s':''} look like paid partnerships (#ad, sponsored, discount codes, إعلان…).` : 'no paid-partnership markers in captions.'}</li>`,
+    `<li><b>Competitors mentioned:</b> ${m.compMentions.length ? m.compMentions.map(([h,n])=>`<button class="linkbtn" data-comp="${(S.comps.find(x=>x.username===h)||{}).id}">@${esc(h)}</button> ×${n}`).join(', ') + '. Already makes content for your market — check for exclusivity.' : 'none of your tracked competitors.'}${m.mentionsMuhra && own ? ` Mentioned @${esc(own.username)} ${m.mentionsMuhra}×.` : ''}</li>`,
+    `<li><b>Your keywords:</b> ${m.bioHits.length ? 'bio: '+m.bioHits.map(x=>'<mark>'+esc(x)+'</mark>').join(' ') : 'none in bio'}${m.capHits.length ? ' · captions: '+m.capHits.slice(0,10).map(x=>'<mark>'+esc(x)+'</mark>').join(' ') : ''}</li>`,
+    `<li><b>Caption language:</b> ${isNum(m.arShare) ? pct0(m.arShare)+' Arabic' : '–'} · <b>Video share:</b> ${pct0(m.vidShare)} · <b>View consistency:</b> ${isNum(m.cv) ? (m.cv < .6 ? 'steady' : m.cv < 1.2 ? 'mixed' : 'spiky (a few viral posts)') : '–'}</li>`
+  ].join('');
+  // posts
+  const sortFns = { views:(a,b)=>(b.view_count??-1)-(a.view_count??-1), er:(a,b)=>(b.er??-1)-(a.er??-1), recent:(a,b)=>new Date(b.posted_at)-new Date(a.posted_at), brand:(a,b)=>(SPONSOR_RE.test(b.caption||'')-SPONSOR_RE.test(a.caption||'')) || new Date(b.posted_at)-new Date(a.posted_at) };
+  const pool = m.all.slice().sort(sortFns[S.cPostSort] || sortFns.views);
+  const shown = pool.slice(0, S.postLimit);
+  S.postPool = pool.map(p=>String(p.id));
+  const posts = shown.map(p=>{ const img = p.thumbnail_url || p.media_url; const spon = SPONSOR_RE.test(p.caption||'');
+    return `<button type="button" class="post" data-post="${esc(p.id)}" aria-label="Open details"><div class="img">${img?`<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<span class="ph">Preview expired</span><span class="fmt">${esc(p.format)}${spon?' · Ad':''}</span>${isNum(p.view_count)?`<span class="views num">${ICON.eye}${fmtK(p.view_count)}</span>`:''}</div>
+      <div class="body"><div class="stats num"><span title="Likes">${ICON.heart}<b>${isNum(p.like_count)?fmtK(p.like_count):'hidden'}</b></span><span title="Comments">${ICON.chat}<b>${fmtK(p.comments_count)}</b></span><span title="ER: (likes + comments) ÷ views"><b>${fmtPct(p.er)}</b></span></div>
+      <div class="stats num sub"><span>${shortDate(p.posted_at)}</span></div>
+      <div class="cap" dir="auto">${esc((p.caption||'').slice(0,160))}</div></div></button>`; }).join('');
+  const left = pool.length - shown.length;
+  const more = left>0 ? `<div class="more"><button class="btn" data-more="24">Show ${Math.min(24,left)} more</button><button class="btn" data-more="all">Show all ${fmtInt(pool.length)}</button></div>` : '';
+  return ugcHead('Creator', '@'+esc(c.username)+' · Muhra match '+(isNum(m.score)?m.score+'/100':'–')) + banner + head + kpis + `
+  <div class="grid2">
+    <div class="panel"><div class="panel-head"><div><h2>Why this match score</h2><p class="hint">From their ${fmtInt(m.base.length)} latest posts. Edit your keywords in Settings to tune “Fits Muhra”.</p></div>${scoreRing(m.score, true)}</div>${parts}</div>
+    <div class="stack">
+      <div class="panel"><h2>Signals</h2><ul class="sig">${signals}</ul></div>
+      <div class="panel"><h2>Follower growth</h2><p class="hint">Daily snapshots while tracking is on</p><div class="chart-box sm"><canvas id="chCreatorF"></canvas></div></div>
+    </div>
+  </div>
+  <div class="grid2" style="margin-top:18px">${crmPanel(c, m, u)}${outreachPanel(c, m, u)}</div>
+  <div class="panel" style="margin-top:18px"><div class="panel-head"><div><h2>Content</h2><p class="hint num">${fmtInt(pool.length)} tracked posts · open one for the full breakdown</p></div>
+    <div class="seg">${[['views','Views'],['er','Engagement'],['recent','Recent'],['brand','Brand posts']].map(([k,l])=>`<button data-cpsort="${k}" aria-pressed="${S.cPostSort===k}">${l}</button>`).join('')}</div></div>
+    <div class="posts">${posts || '<p class="hint">No posts yet.</p>'}</div>${more}</div>`;
+}
+function crmPanel(c, m, u){
+  const admin = S.role==='admin';
+  const dis = admin ? '' : 'disabled';
+  const cpm = isNum(Number(u.rate_egp)) && u.rate_egp != null && isNum(m.medViews) && m.medViews > 0 ? Number(u.rate_egp)/m.medViews*1000 : null;
+  const stars = [1,2,3,4,5].map(n=>`<button class="star${(u.rating||0)>=n?' on':''}" ${admin?`data-ugc="rate" data-id="${c.id}" data-n="${n}"`:'disabled'} aria-label="${n} star${n>1?'s':''}">★</button>`).join('');
+  return `<div class="panel"><h2>Creator profile</h2><p class="hint">Private to your team.${m.bioEmail&&!u.email?' Email pre-filled from their bio.':''}</p>
+    <div class="crm">
+      <label class="field"><span>Email</span><input id="crmEmail" class="input" type="email" value="${esc(u.email||m.bioEmail||'')}" ${dis}></label>
+      <label class="field"><span>Phone / WhatsApp</span><input id="crmPhone" class="input" value="${esc(u.phone||m.bioPhone||'')}" ${dis}></label>
+      <label class="field"><span>Location</span><input id="crmLoc" class="input" value="${esc(u.location||'')}" placeholder="e.g. Cairo" ${dis}></label>
+      <label class="field"><span>Rate per reel (EGP)</span><input id="crmRate" class="input" type="number" min="0" step="any" inputmode="decimal" value="${esc(u.rate_egp??'')}" ${dis}></label>
+      <label class="field wide"><span>Niches / tags</span><input id="crmNiches" class="input" value="${esc((u.niches||[]).join(', '))}" placeholder="modest, mom, workwear, unboxing" ${dis}></label>
+      <label class="field wide"><span>Notes</span><textarea id="crmNotes" class="input" rows="3" ${dis} placeholder="Content quality, tone, audience, past collabs…">${esc(u.notes||'')}</textarea></label>
+    </div>
+    <div class="crm-foot"><span class="stars" aria-label="Your rating">${stars}</span>
+      <span class="muted num">${isNum(cpm)?`≈ ${fmtInt(cpm)} EGP per 1K median views`:'Add a rate to see cost per 1K views'}</span>
+      ${admin?`<button class="btn btn-primary btn-sm" data-ugc="save" data-id="${c.id}">Save</button>`:''}</div>
+    ${admin?`<div class="crm-foot danger"><button class="btn btn-sm" data-ugc="track" data-id="${c.id}">${c.status==='active'?'Pause daily tracking':'Resume daily tracking'}</button><button class="btn btn-sm btn-danger" data-ugc="remove" data-id="${c.id}">Remove creator</button></div>`:''}
+  </div>`;
+}
+function outreachPanel(c, m, u){
+  const admin = S.role==='admin';
+  const log = S.outreach.filter(o=>o.account_id===c.id);
+  const apps = S.apps.filter(a=>a.account_id===c.id);
+  const ch = { email:'✉ Email', whatsapp:'WhatsApp', instagram:'Instagram DM' };
+  const wa = waDigits(u.phone || m.phone);
+  return `<div class="panel"><h2>Outreach</h2><p class="hint">The invite links to a short form; replies land in Applications and move the creator to “Replied”.</p>
+    ${admin?`<div class="actions" style="margin-bottom:14px"><button class="btn btn-primary btn-sm" data-ugc="email" data-id="${c.id}">✉ Email invite</button>
+      ${wa?`<button class="btn btn-sm" data-ugc="wa" data-id="${c.id}">WhatsApp</button>`:''}
+      <button class="btn btn-sm" data-ugc="dm" data-id="${c.id}" title="Copies the message and opens their Instagram DMs">Instagram DM</button>
+      <button class="btn btn-sm" data-ugc="copy-link" data-id="${c.id}">Copy form link</button></div>`:''}
+    ${apps.length?`<h3 class="mini">Applications</h3>${apps.map(appRow).join('')}`:''}
+    <h3 class="mini">History</h3>
+    ${log.length ? `<ul class="olog">${log.map(o=>`<li><b>${ch[o.channel]||esc(o.channel)}</b> ${o.subject?'· '+esc(o.subject):''}<span class="muted"> · ${new Date(o.created_at).toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'})}</span></li>`).join('')}</ul>` : '<p class="hint">No outreach yet.</p>'}
+  </div>`;
+}
+
+/* ---- Outreach composer ---- */
+function fillTpl(t, c, lang){
+  return String(t||'').replace(/\{name\}/g, firstName(c)).replace(/\{handle\}/g, c.username).replace(/\{form_link\}/g, formLink(c.id, lang)).replace(/\{signature\}/g, S.ugcCfg.signature || '');
+}
+function openComposer(id, lang){
+  const c = S.creators.find(x=>x.id===id); if(!c) return;
+  const m = S.cm[c.id], u = ugcOf(id);
+  lang = lang || (isNum(m.arShare) && m.arShare >= .5 ? 'ar' : 'en');
+  const cfg = S.ugcCfg;
+  const dlg = $('ugcDlg');
+  dlg.innerHTML = `<div class="pd-head">${avatarHtml(c)}<div class="t">Invite @${esc(c.username)}<small>Opens in your own email app, so replies come straight to you</small></div><button class="iconbtn" data-dclose aria-label="Close">✕</button></div>
+    <div class="composer">
+      <div class="seg" role="group" aria-label="Language"><button data-clang="en" aria-pressed="${lang==='en'}">English</button><button data-clang="ar" aria-pressed="${lang==='ar'}">العربية</button></div>
+      <label class="field"><span>To</span><input id="cmpTo" class="input" type="email" value="${esc(u.email||m.email||'')}" placeholder="creator@email.com"></label>
+      <label class="field"><span>Subject</span><input id="cmpSubj" class="input" dir="auto" value="${esc(fillTpl(cfg['subject_'+lang], c, lang))}"></label>
+      <label class="field"><span>Message</span><textarea id="cmpBody" class="input" rows="12" dir="${lang==='ar'?'rtl':'ltr'}">${esc(fillTpl(cfg['body_'+lang], c, lang))}</textarea></label>
+      <p class="hint">Form link for this creator: <a href="${esc(formLink(id, lang))}" target="_blank" rel="noopener">${esc(formLink(id, lang))}</a></p>
+      <div class="actions"><button class="btn btn-primary" data-send="mailto" data-id="${id}">Open in email app</button><button class="btn" data-send="gmail" data-id="${id}">Open in Gmail</button><button class="btn" data-send="copy" data-id="${id}">Copy message</button></div>
+    </div>`;
+  dlg.querySelectorAll('[data-clang]').forEach(b=>b.onclick=()=>openComposer(id, b.dataset.clang));
+  if(!dlg.open) dlg.showModal();
+}
+async function logOutreach(id, channel, subject, body, extra){
+  const u = ugcOf(id);
+  const { data, error } = await sb.from('ugc_outreach').insert({ account_id:id, channel, subject: subject || null, body: body || null }).select().single();
+  if(error){ toast(error.message); return; }
+  S.outreach.unshift(data);
+  const patch = { contacted_at: new Date().toISOString(), ...(extra||{}) };
+  if(['new','shortlisted'].includes(u.stage)) patch.stage = 'contacted';
+  await updateCreator(id, patch, true);
+}
+async function updateCreator(id, patch, quiet){
+  const { data, error } = await sb.from('ugc_creators').update(patch).eq('account_id', id).select().single();
+  if(error){ toast(error.message); return false; }
+  S.ugc[id] = data; recomputeCreators(); render();
+  if(!quiet) toast('Saved.');
+  return true;
+}
+async function copyText(t){ try{ await navigator.clipboard.writeText(t); return true; }catch(e){ return false; } }
+async function onSend(kind, id){
+  const c = S.creators.find(x=>x.id===id); if(!c) return;
+  const to = $('cmpTo').value.trim(), subj = $('cmpSubj').value, body = $('cmpBody').value;
+  if(kind==='copy'){ const ok = await copyText(`${subj}\n\n${body}`); toast(ok ? 'Message copied.' : 'Copy failed. Select the text and copy it.'); if(ok) await logOutreach(id, 'email', subj, body); return; }
+  if(to && !EMAIL_RE.test(to)){ toast('That email address doesn\'t look right.'); return; }
+  const url = kind==='gmail'
+    ? `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`
+    : `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+  window.open(url, kind==='gmail' ? '_blank' : '_self');
+  $('ugcDlg').close();
+  await logOutreach(id, 'email', subj, body, to ? { email: to } : null);
+  toast('Logged. The creator moved to “Contacted”.');
+}
+function dmText(c){ const lang = isNum(S.cm[c.id].arShare) && S.cm[c.id].arShare >= .5 ? 'ar' : 'en'; return fillTpl(S.ugcCfg['body_'+lang], c, lang); }
+
+/* ---- Pipeline ---- */
+function viewUgcPipe(){
+  const head = ugcHead('Pipeline', 'Every creator by collaboration stage');
+  if(!S.ugcReady) return head + ugcMissing();
+  const admin = S.role==='admin';
+  const cols = STAGES.map(([k,l])=>{
+    const cs = S.creators.filter(c=>ugcOf(c.id).stage===k).sort((a,b)=>(S.cm[b.id].score??-1)-(S.cm[a.id].score??-1));
+    return `<div class="kcol"><div class="kcol-h">${stagePill(k)}<span class="num muted">${cs.length}</span></div>
+      ${cs.map(c=>{ const m = S.cm[c.id], u = ugcOf(c.id); const days = Math.round((Date.now()-new Date(u.stage_at||c.created_at))/DAY);
+        return `<div class="kcard"><button class="kc-main" data-creator="${c.id}">${avatarHtml(c)}<span><b>@${esc(c.username)}</b><br><small class="num muted">${fmtK(c.followers)} · ER ${fmtPct(m.er,1)} · ${days}d here</small></span>${scoreRing(m.score)}</button>
+        ${admin?`<select class="input kc-sel" data-ugc-stage="${c.id}" aria-label="Move @${esc(c.username)}">${STAGES.map(([s,sl])=>`<option value="${s}" ${s===k?'selected':''}>${sl}</option>`).join('')}</select>`:''}</div>`; }).join('') || '<p class="hint" style="margin:6px 2px">Empty</p>'}
+    </div>`;
+  }).join('');
+  return head + `<div class="kanban">${cols}</div>`;
+}
+
+/* ---- Applications ---- */
+function appRow(a){
+  const admin = S.role==='admin';
+  const c = a.account_id ? S.creators.find(x=>x.id===a.account_id) : null;
+  const ig = a.instagram ? `<a href="https://instagram.com/${esc(a.instagram)}" target="_blank" rel="noopener">@${esc(a.instagram)}</a>` : '';
+  const wa = waDigits(a.phone);
+  return `<div class="app ${a.status==='new'?'new':''}">
+    <div class="app-h"><b>${esc(a.name)}</b> ${ig} ${a.status==='new'?'<span class="pill brand">New</span>':a.status==='archived'?'<span class="pill">Archived</span>':''}<span class="muted num"> · ${new Date(a.created_at).toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'})}</span></div>
+    <div class="app-d"><a href="mailto:${esc(a.email)}">${esc(a.email)}</a>${a.phone?` · ${wa?`<a href="https://wa.me/${wa}" target="_blank" rel="noopener">${esc(a.phone)}</a>`:esc(a.phone)}`:''}${a.city?' · '+esc(a.city):''}${a.portfolio_url?` · <a href="${esc(a.portfolio_url)}" target="_blank" rel="noopener">Portfolio</a>`:''}</div>
+    <div class="app-d">${isNum(Number(a.rate_reel))&&a.rate_reel!=null?`Reel: <b class="num">${fmtInt(Number(a.rate_reel))} EGP</b>`:''}${a.rate_photo!=null?` · Photo: <b class="num">${fmtInt(Number(a.rate_photo))} EGP</b>`:''}${(a.content_types||[]).length?' · '+a.content_types.map(esc).join(', '):''}</div>
+    ${a.message?`<p class="app-m" dir="auto">${esc(a.message)}</p>`:''}
+    ${admin?`<div class="actions">${c?`<button class="btn btn-sm" data-creator="${c.id}">Open @${esc(c.username)}</button>`:a.instagram?`<button class="btn btn-sm btn-primary" data-ugc="app-add" data-id="${a.id}">Add &amp; analyze @${esc(a.instagram)}</button>`:''}
+      ${a.status!=='reviewed'?`<button class="btn btn-sm" data-ugc="app-status" data-id="${a.id}" data-st="reviewed">Mark reviewed</button>`:''}${a.status!=='archived'?`<button class="btn btn-sm" data-ugc="app-status" data-id="${a.id}" data-st="archived">Archive</button>`:`<button class="btn btn-sm" data-ugc="app-status" data-id="${a.id}" data-st="new">Restore</button>`}</div>`:''}
+  </div>`;
+}
+function viewUgcInbox(){
+  const head = ugcHead('Applications', 'Creators who filled in the collaboration form',
+    `<button class="btn" data-ugc="copy-open">Copy open application link</button>`);
+  if(!S.ugcReady) return head + ugcMissing();
+  const show = S.appFilter || 'open';
+  const list = S.apps.filter(a=> show==='all' ? true : show==='archived' ? a.status==='archived' : a.status!=='archived');
+  return head + `<div class="panel"><div class="panel-head"><div><h2>Inbox</h2><p class="hint">Post the open link in your bio or stories to collect creators; invites you send carry a personal link that matches the reply to the creator.</p></div>
+      <div class="seg">${[['open','Open'],['archived','Archived'],['all','All']].map(([k,l])=>`<button data-appf="${k}" aria-pressed="${show===k}">${l}</button>`).join('')}</div></div>
+    ${list.length ? list.map(appRow).join('') : '<p class="hint">No applications yet.</p>'}</div>`;
+}
+
+/* ---- Add / discover ---- */
+function suggestions(){
+  const known = new Set(S.accounts.map(a=>a.username));
+  const own = S.comps.find(x=>x.is_own);
+  const seen = {};
+  const add = (h, src, kind) => { if(known.has(h) || h.length < 3) return; const s = (seen[h] ||= { h, n:0, src:new Set(), kinds:new Set() }); s.n++; s.src.add(src); s.kinds.add(kind); };
+  for(const p of S.allPosts){ const a = S.accounts.find(x=>x.id===p.competitor_id); if(!a) continue; for(const h of mentionsIn(p.caption)) add(h, a.username, a.kind==='creator' ? 'creator' : a.is_own ? 'muhra' : 'competitor'); }
+  for(const a of S.accounts) for(const h of mentionsIn(a.biography)) add(h, a.username, 'bio');
+  return Object.values(seen).sort((a,b)=> (b.kinds.has('muhra')-a.kinds.has('muhra')) || (b.src.size-a.src.size) || (b.n-a.n)).slice(0, 40)
+    .map(s=>({ ...s, why: [...s.src].slice(0,3).map(x=>'@'+x).join(', ') + (s.src.size>3?` +${s.src.size-3}`:''), muhra: own && s.src.has(own.username) }));
+}
+function viewUgcAdd(){
+  const head = ugcHead('Add creators', 'Research creators by Instagram handle');
+  if(!S.ugcReady) return head + ugcMissing();
+  const busy = S.busy.ugcAdd;
+  const sug = suggestions();
+  const tags = [...new Set([...S.ugcCfg.keywords.filter(k=>!/\s/.test(k)), ...topHashtags()])].slice(0, 24);
+  return head + `
+  <div class="panel"><h2>Add by handle</h2><p class="hint">Paste Instagram links or @handles, one per line or comma-separated (up to 30 at a time). Each must be a public Business or Creator account — most creators are. Analysis takes about a minute.</p>
+    <div id="ugcAddMsg">${S.ugcAddMsg||''}</div>
+    <textarea id="ugcHandles" class="input" rows="5" placeholder="@creator.one&#10;https://instagram.com/creator.two&#10;creator_three"></textarea>
+    <div class="actions" style="margin-top:10px"><button class="btn btn-primary" id="ugcAddBtn" ${busy?'disabled':''}>${busy?'<span class="spinner"></span> Analyzing…':'Add and analyze'}</button></div>
+  </div>
+  <div class="panel"><h2>Suggested from your data</h2><p class="hint">Accounts tagged in captions or bios of Muhra, your competitors and creators you already track. Creators competitors tag have worked in your market; Muhra's tags may be past collaborators.</p>
+    ${sug.length ? `<div class="sug">${sug.map(s=>`<div class="sug-i"><a href="https://instagram.com/${esc(s.h)}" target="_blank" rel="noopener"><b>@${esc(s.h)}</b></a><span class="muted"> · tagged ${s.n}× by ${esc(s.why)}</span>${s.muhra?' <span class="pill brand">Muhra tagged</span>':''}
+      ${S.role==='admin'?`<button class="btn btn-sm" data-ugc="add-one" data-h="${esc(s.h)}">Add</button>`:''}</div>`).join('')}</div>` : '<p class="hint">No new handles found in tracked captions yet.</p>'}
+  </div>
+  <div class="panel"><h2>Explore on Instagram</h2><p class="hint">Hashtags from your keywords and from your competitors' best posts. Open one, spot creators whose content fits, then paste their handles above.</p>
+    <div class="chips">${tags.map(t=>`<a class="chip" href="https://www.instagram.com/explore/tags/${encodeURIComponent(t.replace(/^#/,''))}/" target="_blank" rel="noopener">#${esc(t.replace(/^#/,''))}</a>`).join('')}</div>
+  </div>`;
+}
+function topHashtags(){
+  const cnt = {};
+  for(const c of S.comps){ const ps = (S.postsBy[c.id]||[]).filter(p=>isNum(p.er)).sort((a,b)=>b.er-a.er).slice(0, 10); for(const p of ps) for(const t of (p.hashtags||[])) cnt[t] = (cnt[t]||0)+1; }
+  return Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0, 14).map(([t])=>t);
+}
+async function addCreators(handles, source, extra){
+  const known = new Map(S.accounts.map(a=>[a.username, a]));
+  const fresh = [...new Set(handles)].filter(h=>!known.has(h));
+  const skipped = handles.filter(h=>known.has(h)).map(h=>'@'+h+(known.get(h).kind==='creator'?'':' (tracked as competitor)'));
+  if(!fresh.length) return { ids:[], skipped };
+  const { data, error } = await sb.from('ci_competitors').insert(fresh.map(username=>({ username, kind:'creator' }))).select('id');
+  if(error) throw error;
+  const ids = data.map(x=>x.id);
+  if(source || extra) await sb.from('ugc_creators').update({ ...(source?{ source }:{}), ...(extra||{}) }).in('account_id', ids);
+  return { ids, skipped };
+}
+// ci_request_job allows 20 jobs a minute, so per-creator fetches are spaced out.
+async function fetchCreators(ids){
+  if(!ids.length) return;
+  S.busy.ugcAdd = true; render();
+  const startedAt = new Date(Date.now()-2000);
+  try{
+    for(let i=0;i<ids.length;i++){
+      await triggerJob('track', ids[i]);
+      toast(ids.length>1 ? `Analyzing creators… ${i+1} of ${ids.length} requested` : 'Analyzing creator…');
+      if(i < ids.length-1) await sleep(3500);
+    }
+    const ok = await waitForFetch(ids, startedAt, 150000 + ids.length*4000);
+    toast(ok ? 'Creators analyzed.' : 'Still analyzing in the background. Reload in a minute.');
+  }catch(e){ toast(e.message || 'Could not start the analysis.'); }
+  finally{ await loadData().catch(()=>{}); delete S.busy.ugcAdd; render(); }
+}
+
+/* ---- Settings ---- */
+function viewUgcSettings(){
+  const head = ugcHead('UGC settings', 'Shared with everyone on the dashboard');
+  if(!S.ugcReady) return head + ugcMissing();
+  const g = S.ugcCfg;
+  return head + `<div class="panel"><h2>Match keywords</h2><p class="hint">Words that describe the creators Muhra wants, in English and Arabic. They drive the “Fits Muhra” part of the match score and are highlighted in bios. Separate with commas.</p>
+    <textarea id="setKw" class="input" rows="3" dir="auto">${esc(g.keywords.join(', '))}</textarea></div>
+  <div class="panel"><h2>Invite email</h2><p class="hint">Placeholders: <code>{name}</code> <code>{handle}</code> <code>{form_link}</code> <code>{signature}</code>. The language is picked from the creator's captions and can be switched before sending.</p>
+    <label class="field"><span>Signature</span><input id="setSig" class="input" value="${esc(g.signature)}"></label>
+    <div class="grid2">
+      <div><label class="field"><span>English subject</span><input id="setSubEn" class="input" value="${esc(g.subject_en)}"></label>
+        <label class="field"><span>English message</span><textarea id="setBodyEn" class="input" rows="12">${esc(g.body_en)}</textarea></label></div>
+      <div><label class="field"><span>Arabic subject</span><input id="setSubAr" class="input" dir="rtl" value="${esc(g.subject_ar)}"></label>
+        <label class="field"><span>Arabic message</span><textarea id="setBodyAr" class="input" rows="12" dir="rtl">${esc(g.body_ar)}</textarea></label></div>
+    </div>
+    <div class="actions"><button class="btn btn-primary" data-ugc="save-settings">Save settings</button><button class="btn" data-ugc="reset-settings">Restore defaults</button></div></div>
+  <div class="panel"><h2>Collaboration form</h2><p class="hint">A public page where creators send their rates and details. No sign-in needed.</p>
+    <p><a href="${esc(formBase())}" target="_blank" rel="noopener">${esc(formBase())}</a></p><button class="btn btn-sm" data-ugc="copy-open">Copy link</button></div>`;
+}
+
+/* ---- Compare ---- */
+function viewUgcCompare(){
+  const cs = S.cmp.map(id=>S.creators.find(c=>c.id===id)).filter(Boolean);
+  const head = ugcHead('Compare creators', `${cs.length} creators side by side`, '<button class="btn" data-go="ugc">Back to results</button>');
+  if(cs.length < 2) return head + '<div class="panel empty"><h2>Pick at least two creators</h2><p>Tick “Compare” on the creator cards.</p></div>';
+  const rows = [
+    ['Match score', c=>S.cm[c.id].score, v=>isNum(v)?v+' / 100':'–', 1],
+    ['Followers', c=>c.followers, fmtK, 0],
+    ['Engagement rate', c=>S.cm[c.id].er, v=>fmtPct(v), 1],
+    ['Median views', c=>S.cm[c.id].medViews, fmtK, 1],
+    ['Views ÷ followers', c=>S.cm[c.id].viewRate, v=>isNum(v)?fmt1(v)+'%':'–', 1],
+    ['Follower ER', c=>S.cm[c.id].fer, v=>fmtPct(v), 1],
+    ['Posts per week', c=>S.cm[c.id].perWeek, fmt1, 1],
+    ['Days since last post', c=>S.cm[c.id].daysSince, v=>isNum(v)?Math.round(v):'–', -1],
+    ['Video share', c=>S.cm[c.id].vidShare, pct0, 1],
+    ['Brand posts', c=>S.cm[c.id].sponsored, fmtInt, 0],
+    ['Rate per reel (EGP)', c=>{ const r = ugcOf(c.id).rate_egp; return r==null ? null : Number(r); }, fmtInt, -1],
+    ['EGP per 1K views', c=>{ const r = ugcOf(c.id).rate_egp, v = S.cm[c.id].medViews; return r!=null && isNum(v) && v>0 ? Number(r)/v*1000 : null; }, fmtInt, -1]
+  ];
+  const body = rows.map(([l, f, fmt, dir])=>{
+    const vals = cs.map(f); const nums = vals.filter(isNum);
+    const best = dir && nums.length > 1 ? (dir > 0 ? Math.max(...nums) : Math.min(...nums)) : null;
+    return `<tr><td>${l}</td>${vals.map(v=>`<td class="num${isNum(best)&&v===best?' best':''}">${fmt(v)}</td>`).join('')}</tr>`;
+  }).join('');
+  return head + `<div class="panel"><div class="table-wrap"><table class="cmp-t"><thead><tr><th></th>${cs.map(c=>`<th><button class="linkbtn acct" data-creator="${c.id}">${avatarHtml(c)} @${esc(c.username)}</button></th>`).join('')}</tr></thead>
+    <tbody>${body}<tr><td>Stage</td>${cs.map(c=>`<td>${stagePill(ugcOf(c.id).stage)}</td>`).join('')}</tr></tbody></table></div><p class="hint" style="margin-top:12px">Best value in each row is highlighted.</p></div>`;
+}
+
+/* ---- CSV ---- */
+function exportCsv(){
+  const rows = ugcFiltered();
+  const q = (v) => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; };
+  const r2 = (v) => isNum(v) ? Math.round(v*100)/100 : '';
+  const head = ['handle','name','profile','followers','tier','match_score','er_pct','follower_er_pct','median_views','views_per_follower_pct','posts_per_week','days_since_last_post','arabic_share','brand_posts','competitors_mentioned','email','phone','stage','favorite','rating','rate_egp','location','niches','notes'];
+  const lines = rows.map(c=>{ const m = S.cm[c.id], u = ugcOf(c.id), t = tierOf(c.followers);
+    return [c.username, c.display_name, 'https://instagram.com/'+c.username, c.followers, t?t[1]:'', m.score, r2(m.er), r2(m.fer), m.medViews, r2(m.viewRate), r2(m.perWeek), isNum(m.daysSince)?Math.round(m.daysSince):'', isNum(m.arShare)?Math.round(m.arShare*100)+'%':'', m.sponsored, m.compMentions.map(x=>'@'+x[0]).join(' '), m.email, m.phone, stageLabel(u.stage), u.favorite?'yes':'', u.rating||'', u.rate_egp??'', u.location, (u.niches||[]).join(', '), u.notes].map(q).join(','); });
+  const blob = new Blob(['﻿'+[head.join(','), ...lines].join('\n')], { type:'text/csv;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `muhra-ugc-creators-${ymd(new Date())}.csv`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+}
+
+/* ---- events ---- */
+function bindUgc(){
+  if(S.view==='ugc') bindUgcFind();
+  document.querySelectorAll('[data-cpsort]').forEach(b=>b.onclick=()=>{ S.cPostSort = b.dataset.cpsort; S.postLimit = 24; render(); });
+  document.querySelectorAll('[data-appf]').forEach(b=>b.onclick=()=>{ S.appFilter = b.dataset.appf; render(); });
+  document.querySelectorAll('[data-ugc-stage]').forEach(s=>s.onchange=async()=>{
+    const id = Number(s.dataset.ugcStage), stage = s.value, c = S.creators.find(x=>x.id===id);
+    await updateCreator(id, { stage }, true);
+    // Rejected creators stop costing API calls; bringing one back resumes tracking.
+    if(c && stage==='rejected' && c.status==='active'){ const { error } = await sb.from('ci_competitors').update({ status:'paused' }).eq('id', id); if(!error){ c.status = 'paused'; render(); } }
+    toast(`@${c?c.username:''} moved to ${stageLabel(stage)}.`);
+  });
+  const addBtn = $('ugcAddBtn');
+  if(addBtn) addBtn.onclick = async () => {
+    const box = $('ugcAddMsg');
+    const parts = $('ugcHandles').value.split(/[\n,;\s]+/).filter(Boolean);
+    const handles = parts.map(parseHandle).filter(Boolean);
+    const bad = parts.filter(p=>!parseHandle(p));
+    if(!handles.length){ box.innerHTML = '<div class="msg err">Paste at least one Instagram handle or profile link.</div>'; return; }
+    if(handles.length > 30){ box.innerHTML = '<div class="msg err">Add up to 30 creators at a time to stay inside Instagram\'s limits.</div>'; return; }
+    addBtn.disabled = true;
+    try{
+      const { ids, skipped } = await addCreators(handles, 'manual');
+      S.ugcAddMsg = box.innerHTML = `<div class="msg ${ids.length?'ok':'err'}">${ids.length?`Added ${ids.length} creator${ids.length>1?'s':''}. Analyzing now…`:'Nothing new to add.'}${skipped.length?` Already tracked: ${esc(skipped.join(', '))}.`:''}${bad.length?` Not a handle: ${esc(bad.slice(0,5).join(', '))}.`:''}</div>`;
+      if(ids.length){ $('ugcHandles').value = ''; await loadData(); render(); fetchCreators(ids); }
+    }catch(e){ box.innerHTML = `<div class="msg err">${esc(e.message)}</div>`; }
+    finally{ const b = $('ugcAddBtn'); if(b && !S.busy.ugcAdd) b.disabled = false; }
+  };
+}
+async function onUgc(a, el){
+  const id = Number(el.dataset.id);
+  const c = S.creators.find(x=>x.id===id);
+  try{
+    if(a==='filters'){ S.ufOpen = !S.ufOpen; render(); return; }
+    if(a==='reset'){ S.uf = { ...UF_DEFAULT }; saveUF(); render(); return; }
+    if(a==='csv') return exportCsv();
+    if(a==='cmp-clear'){ S.cmp = []; render(); return; }
+    if(a==='fav') return updateCreator(id, { favorite: !ugcOf(id).favorite }, true);
+    if(a==='rate') return updateCreator(id, { rating: ugcOf(id).rating === Number(el.dataset.n) ? null : Number(el.dataset.n) }, true);
+    if(a==='email') return openComposer(id);
+    if(a==='save'){
+      const rate = $('crmRate').value.trim();
+      const email = $('crmEmail').value.trim();
+      if(email && !EMAIL_RE.test(email)){ toast('That email address doesn\'t look right.'); return; }
+      return updateCreator(id, { email: email || null, phone: $('crmPhone').value.trim() || null, location: $('crmLoc').value.trim() || null,
+        rate_egp: rate === '' ? null : Math.max(0, Number(rate)) || 0, niches: kwList($('crmNiches').value), notes: $('crmNotes').value.trim() || null });
+    }
+    if(a==='wa'){ const d = waDigits(ugcOf(id).phone || S.cm[id].phone); if(!d) return; window.open(`https://wa.me/${d}?text=${encodeURIComponent(dmText(c))}`, '_blank'); return logOutreach(id, 'whatsapp', null, dmText(c)); }
+    if(a==='dm'){ const ok = await copyText(dmText(c)); window.open(`https://ig.me/m/${encodeURIComponent(c.username)}`, '_blank'); toast(ok ? 'Message copied. Paste it in the DM.' : 'Opened DMs.'); return logOutreach(id, 'instagram', null, dmText(c)); }
+    if(a==='copy-link'){ toast(await copyText(formLink(id)) ? 'Personal form link copied.' : formLink(id)); return; }
+    if(a==='copy-open'){ toast(await copyText(formBase()) ? 'Open application link copied.' : formBase()); return; }
+    if(a==='track'){
+      const status = c.status==='active' ? 'paused' : 'active';
+      const { error } = await sb.from('ci_competitors').update({ status }).eq('id', id); if(error) throw error;
+      c.status = status; render(); toast(status==='paused' ? 'Daily tracking paused. Data is kept.' : 'Daily tracking resumed.');
+      if(status==='active') refresh([id], `Fetching @${c.username}…`);
+      return;
+    }
+    if(a==='remove'){
+      if(!confirm(`Remove @${c.username} and all of their research, notes and outreach history? This can't be undone.`)) return;
+      const { error } = await sb.from('ci_competitors').delete().eq('id', id); if(error) throw error;
+      S.cmp = S.cmp.filter(x=>x!==id); await loadData(); go('ugc'); toast(`Removed @${c.username}.`); return;
+    }
+    if(a==='add-one'){
+      const h = el.dataset.h; el.disabled = true;
+      const { ids } = await addCreators([h], 'suggested');
+      await loadData(); render(); toast(`Added @${h}. Analyzing…`); fetchCreators(ids); return;
+    }
+    if(a==='app-status'){
+      const { error } = await sb.from('ugc_applications').update({ status: el.dataset.st }).eq('id', id); if(error) throw error;
+      const ap = S.apps.find(x=>x.id===id); if(ap) ap.status = el.dataset.st; render(); return;
+    }
+    if(a==='app-add'){
+      const ap = S.apps.find(x=>x.id===id); if(!ap || !ap.instagram) return;
+      el.disabled = true;
+      const { ids } = await addCreators([ap.instagram], 'application', { stage:'replied', email: ap.email, phone: ap.phone, rate_egp: ap.rate_reel, location: ap.city });
+      if(ids[0]){ await sb.from('ugc_applications').update({ account_id: ids[0], status: ap.status==='new' ? 'reviewed' : ap.status }).eq('id', id); }
+      await loadData(); render(); toast(`Added @${ap.instagram}. Analyzing…`); fetchCreators(ids); return;
+    }
+    if(a==='save-settings' || a==='reset-settings'){
+      const value = a==='reset-settings' ? { ...UGC_DEFAULTS } : { keywords: kwList($('setKw').value), signature: $('setSig').value.trim(),
+        subject_en: $('setSubEn').value, body_en: $('setBodyEn').value, subject_ar: $('setSubAr').value, body_ar: $('setBodyAr').value };
+      if(a==='reset-settings' && !confirm('Restore the default keywords and email templates?')) return;
+      const { error } = await sb.from('ugc_settings').upsert({ key:'config', value, updated_at: new Date().toISOString() }); if(error) throw error;
+      S.ugcCfg = { ...UGC_DEFAULTS, ...value }; recomputeCreators(); render(); toast('Settings saved.'); return;
+    }
+  }catch(e){ toast(e.message || 'Action failed.'); }
+}
+document.addEventListener('click', e => {
+  const u = e.target.closest('[data-ugc]'); if(u){ e.stopPropagation(); onUgc(u.dataset.ugc, u); return; }
+  const s = e.target.closest('[data-send]'); if(s){ onSend(s.dataset.send, Number(s.dataset.id)); return; }
+  const dlg = $('ugcDlg'); if(e.target.closest('[data-dclose]') || e.target === dlg){ dlg.close(); return; }
+  if(e.target.closest('[data-cmp]') || e.target.closest('.cmp')) return;
+  const cr = e.target.closest('[data-creator]'); if(cr && !e.target.closest('a')){ go('creator', Number(cr.dataset.creator)); }
+}, true);
+document.addEventListener('change', e => {
+  const cb = e.target.closest('[data-cmp]'); if(!cb) return;
+  const id = Number(cb.dataset.cmp);
+  if(cb.checked){ if(S.cmp.length >= 4){ cb.checked = false; toast('Compare up to 4 creators.'); return; } S.cmp.push(id); } else S.cmp = S.cmp.filter(x=>x!==id);
+  const old = document.querySelector('.cmp-tray'); const html = cmpTray();
+  if(old) old.outerHTML = html || ''; else if(html) $('view').insertAdjacentHTML('beforeend', html);
+});
+document.addEventListener('keydown', e => { if(e.key==='Enter' && e.target.matches && e.target.matches('.ccard')) go('creator', Number(e.target.dataset.creator)); });
 
 /* ---------- boot ---------- */
 async function boot(){
