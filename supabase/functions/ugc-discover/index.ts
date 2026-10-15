@@ -73,6 +73,7 @@ function normalize(p: Any) {
       video, likes, comments: num(first(x.commentsCount, x.comments_count, x.comments) as number), views,
       ts: first(x.timestamp, x.taken_at_timestamp ? new Date(x.taken_at_timestamp * 1000).toISOString() : null),
       caption: String(first(x.caption, x.text) ?? '').slice(0, 300),
+      location: (first(x.locationName, x.location?.name, x.location_name) as string) ?? null,
     };
   });
   let num_ = 0, den = 0; const fers: number[] = []; const vs: number[] = [];
@@ -96,6 +97,7 @@ function normalize(p: Any) {
     verified: (first(p.verified, p.is_verified) as boolean) ?? null,
     private: (first(p.private, p.is_private) as boolean) ?? null,
     external_url: (first(p.externalUrl, p.external_url) as string) ?? null,
+    city: (first(p.businessAddress?.city_name, p.businessAddress?.cityName, p.city_name, p.cityName, parseCity(p.businessAddressJson ?? p.business_address_json)) as string) ?? null,
     profile_pic_url: (first(p.profilePicUrlHD, p.profilePicUrl, p.profile_pic_url_hd, p.profile_pic_url) as string) ?? null,
     email: ((first(p.businessEmail, p.public_email, p.email) as string) || (bio.match(EMAIL_RE) || [])[0]) ?? null,
     phone: ((first(p.businessPhoneNumber, p.public_phone_number, p.contact_phone_number) as string) || (bio.match(PHONE_RE) || [])[0]) ?? null,
@@ -110,6 +112,11 @@ function normalize(p: Any) {
     sponsored_posts: posts.filter((x) => SPONSOR_RE.test(x.caption)).length,
     recent_posts: posts,
   };
+}
+// Business accounts may carry their address as a JSON string.
+function parseCity(v: unknown) {
+  if (!v) return null;
+  try { const o = typeof v === 'string' ? JSON.parse(v) : v; return (o as Any)?.city_name || null; } catch { return null; }
 }
 const hasDetails = (p: Any) => num(first(p.followersCount, p.followers_count, p.edge_followed_by?.count) as number) != null;
 
