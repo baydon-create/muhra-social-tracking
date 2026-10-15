@@ -56,3 +56,6 @@ create policy ugc_discover_read on public.ugc_discover for select to authenticat
 create policy ugc_discover_upd on public.ugc_discover for update to authenticated using (public.ci_is_admin()) with check (public.ci_is_admin());
 create policy ugc_discover_del on public.ugc_discover for delete to authenticated using (public.ci_is_admin());
 create policy ugc_searches_read on public.ugc_searches for select to authenticated using (public.ci_is_member());
+
+-- Business-address city from the profile (a strong country signal for the Egypt filter).
+alter table public.ugc_discover add column if not exists city text;

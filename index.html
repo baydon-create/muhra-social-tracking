@@ -388,6 +388,12 @@ a.chip:hover{border-color:var(--brand)}
 .ds-hint{margin:12px 0 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .ds-run{margin:12px 0 0;font-size:14px;display:flex;gap:8px;align-items:center;color:var(--brand)}
 .ds-setup{margin:14px 0 0}
+.ds-eg{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-top:12px;font-size:14px}
+.ds-eg .hint{margin:0;font-size:12.5px}
+.ds-tags{display:flex;flex-wrap:wrap;gap:6px;width:100%}
+.country-f{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:end}
+.country-f .hint{margin:0 0 10px;font-size:12.5px}
+.pill.good{background:var(--good-soft);color:var(--good);border-color:transparent}
 .ds-setup ol{margin:8px 0 0;padding-inline-start:20px;line-height:1.8}
 a.post{text-decoration:none}
 .composer{padding:18px}
@@ -433,6 +439,7 @@ a.post{text-decoration:none}
   .prof-act{min-width:0;width:100%}
   .crm{grid-template-columns:1fr}
   .f-sort{margin-inline-start:0;width:100%}
+  .country-f{grid-template-columns:1fr}
   .f-more{display:inline-flex;margin-top:10px}
   .filters-panel{display:flex;flex-direction:column}
   .filters-panel .f-more{order:2;align-self:flex-start}
@@ -1482,7 +1489,7 @@ const UGC_DEFAULTS = {
   subject_ar: 'تعاون مع مُهرة ✨',
   body_ar: 'أهلاً {name}،\n\nبنتواصل معاكي من مُهرة (@muhra.egy)، براند أزياء نسائية من القاهرة. عجبنا جداً المحتوى بتاعك على إنستجرام (@{handle}) وحاسين إن ستايلك مناسب جداً لقطعنا.\n\nحابين نتعاون معاكي في محتوى UGC. لو مهتمة، ياريت تملي الفورم القصير ده (حوالي دقيقتين) بأسعارك وبياناتك:\n{form_link}\n\nمستنيين ردك!\n{signature}'
 };
-const UF_DEFAULT = { q:'', kw:'', kwMode:'any', inCaps:true, tiers:[], fMin:'', fMax:'', erMin:'', vMin:'', scoreMin:'', stage:'', active:'', lang:'', fav:false, email:false, brand:false, comp:false, video:false, sort:'score' };
+const UF_DEFAULT = { q:'', kw:'', kwMode:'any', inCaps:true, country:'', tiers:[], fMin:'', fMax:'', erMin:'', vMin:'', scoreMin:'', stage:'', active:'', lang:'', fav:false, email:false, brand:false, comp:false, video:false, sort:'score' };
 function loadUF(){ try{ const r = JSON.parse(localStorage.getItem('ugc.filters')); if(r) return { ...UF_DEFAULT, ...r }; }catch(e){} return { ...UF_DEFAULT }; }
 function saveUF(){ try{ localStorage.setItem('ugc.filters', JSON.stringify(S.uf)); }catch(e){} }
 Object.assign(S, { accounts:[], creators:[], allPosts:[], ugc:{}, cm:{}, outreach:[], apps:[], ugcReady:false, ugcCfg:{ ...UGC_DEFAULTS }, uf: loadUF(), cmp:[], cPostSort:'views', appFilter:'open' });
@@ -1572,10 +1579,11 @@ function creatorMetrics(c){
     { k:'Authentic audience', w:10, v: hiddenShare > .5 || !isNum(cpl) ? .5 : cpl < .2 ? .2 : cpl < .5 ? .6 : cpl <= 15 ? 1 : .7,
       why: hiddenShare > .5 ? 'Hides like counts, so this can\'t be checked.' : isNum(cpl) ? `${fmt1(cpl)} comments per 100 likes. Under 0.5 can signal bought likes; 0.5–15 is healthy.` : 'Not enough data.' }
   ];
+  const country = countryOf({ username:c.username, name:c.display_name, bio, website:c.website, phone, captions: all.slice(0, 24).map(p=>p.caption), locations: [] });
   const hasData = !!c.last_fetched_at && !c.last_error && all.length > 0;
   const score = hasData ? Math.round(parts.reduce((s,p)=>s+p.w*p.v,0)) : null;
   return { all, base, er, fer, nEr: base.filter(p=>isNum(p.er)).length, medViews, avgViews, nViews: withViews.length, viewRate, perWeek, daysSince, cpl, hiddenShare, cv, arShare,
-    email, phone, bioEmail, bioPhone, sponsored: sponsoredPosts.length, sponsoredPosts, compMentions, mentionsMuhra, bioHits, capHits, fitShare, vidShare, parts, score, hasData };
+    email, phone, bioEmail, bioPhone, country, sponsored: sponsoredPosts.length, sponsoredPosts, compMentions, mentionsMuhra, bioHits, capHits, fitShare, vidShare, parts, score, hasData };
 }
 function recomputeCreators(){ S.cm = {}; for(const c of S.creators) S.cm[c.id] = creatorMetrics(c); }
 
@@ -1595,6 +1603,7 @@ function ugcFiltered(){
     if(num(f.erMin)!=null && !ge(m.er, num(f.erMin))) return false;
     if(num(f.vMin)!=null && !ge(m.medViews, num(f.vMin))) return false;
     if(num(f.scoreMin)!=null && !ge(m.score, num(f.scoreMin))) return false;
+    if(!countryPass(m.country.code, f.country)) return false;
     if(f.stage && u.stage !== f.stage) return false;
     if(f.active && !le(m.daysSince, Number(f.active))) return false;
     if(f.lang==='ar' && !ge(m.arShare, .5)) return false;
@@ -1662,6 +1671,7 @@ function viewUgc(){
       ${sel('ufStage', [['','Any stage'], ...STAGES.map(([k,l])=>[k, l+(counts[k]?` (${counts[k]})`:'')])], f.stage, 'Stage')}
       ${sel('ufActive', [['','Any time'],['7','Posted in last 7 days'],['30','Posted in last 30 days'],['90','Posted in last 90 days']], f.active, 'Activity')}
       ${sel('ufLang', [['','Any language'],['ar','Mostly Arabic captions'],['en','Mostly non-Arabic captions']], f.lang, 'Caption language')}
+      ${sel('ufCountry', [['','Any country'], ...COUNTRY_FILTERS.filter(x=>x[0])], f.country, 'Country')}
     </div>
     <div class="f-row"><span class="f-l">Size</span>${TIERS.map(t=>`<button class="tog" data-tier="${t[0]}" aria-pressed="${f.tiers.includes(t[0])}" title="${t[2]} followers">${t[1]} <small>${t[2]}</small></button>`).join('')}</div>
     <div class="f-row"><span class="f-l">Only</span>${tog('fav','★ Favorites')}${tog('email','✉ Has email','Email in bio or saved on the profile')}${tog('brand','Brand experience','Has captions with #ad, sponsored, discount codes, إعلان…')}${tog('comp','Mentions competitors','Tagged a tracked competitor in a caption or bio')}${tog('video','Video-first','At least half of recent posts are reels or videos')}
@@ -1685,7 +1695,8 @@ function creatorCard(c, kws){
     m.sponsored ? `<span class="pill" title="${m.sponsored} captions look like brand partnerships">Brand exp · ${m.sponsored}</span>` : '',
     m.compMentions.length ? `<span class="pill warn" title="Mentions ${m.compMentions.map(([h,n])=>'@'+h+' ×'+n).join(', ')}">Works with @${esc(m.compMentions[0][0])}${m.compMentions.length>1?' +'+(m.compMentions.length-1):''}</span>` : '',
     m.mentionsMuhra ? '<span class="pill brand">Mentioned Muhra</span>' : '',
-    isNum(m.arShare) && m.arShare >= .5 ? '<span class="pill">Arabic</span>' : ''
+    isNum(m.arShare) && m.arShare >= .5 ? '<span class="pill">Arabic</span>' : '',
+    m.hasData ? countryBadge(m.country) : ''
   ].join('');
   const st = (v, l) => `<span><b class="num">${v}</b><small>${l}</small></span>`;
   return `<div class="ccard" data-creator="${c.id}" role="button" tabindex="0" aria-label="Open @${esc(c.username)}">
@@ -1710,7 +1721,7 @@ function bindUgcFind(){
   const upd = () => { saveUF(); const r = $('ugcResults'); if(r) r.innerHTML = ugcResultsHtml(); };
   const map = { ufQ:'q', ufKw:'kw', ufFMin:'fMin', ufFMax:'fMax', ufEr:'erMin', ufV:'vMin', ufScore:'scoreMin' };
   for(const [id,k] of Object.entries(map)){ const el = $(id); if(el) el.oninput = () => { f[k] = el.value; upd(); }; }
-  const smap = { ufStage:'stage', ufActive:'active', ufLang:'lang', ufSort:'sort', ufKwMode:'kwMode' };
+  const smap = { ufStage:'stage', ufActive:'active', ufLang:'lang', ufSort:'sort', ufKwMode:'kwMode', ufCountry:'country' };
   for(const [id,k] of Object.entries(smap)){ const el = $(id); if(el) el.onchange = () => { f[k] = el.value; upd(); }; }
   const cap = $('ufCaps'); if(cap) cap.onchange = () => { f.inCaps = cap.checked; upd(); };
   document.querySelectorAll('[data-uf]').forEach(b=>b.onclick=()=>{ const k = b.dataset.uf; f[k] = !f[k]; b.setAttribute('aria-pressed', f[k]); upd(); });
@@ -2158,11 +2169,55 @@ document.addEventListener('keydown', e => { if(e.key!=='Enter' || !e.target.matc
 /* ---- Discover: search Instagram first, then filter ----
    Searches run in the ugc-discover Edge Function (Apify). Every creator found is kept in
    ugc_discover, so the filters work across all past searches without paying again. */
-const DF_DEFAULT = { q:'', kw:'', kwMode:'any', tiers:[], fMin:'', fMax:'', erMin:'', vMin:'', scoreMin:'', active:'', lang:'', email:false, egypt:false, business:false, brand:false, video:false, hideSaved:true, dismissed:false, found:'', sort:'score' };
+const DF_DEFAULT = { q:'', kw:'', kwMode:'any', tiers:[], fMin:'', fMax:'', erMin:'', vMin:'', scoreMin:'', active:'', lang:'', email:false, country:'eg+', business:false, brand:false, video:false, hideSaved:true, dismissed:false, found:'', sort:'score' };
 function loadDF(){ try{ const r = JSON.parse(localStorage.getItem('ugc.dfilters')); if(r) return { ...DF_DEFAULT, ...r }; }catch(e){} return { ...DF_DEFAULT }; }
 function saveDF(){ try{ localStorage.setItem('ugc.dfilters', JSON.stringify(S.df)); }catch(e){} }
-Object.assign(S, { disc:[], dm:{}, searches:[], df: loadDF(), dfOpen:false, dsearch:{ kind:'user', limit:30, q:'' }, discRun:null, discNoToken:false });
-const EGYPT_RE = /egypt|cairo|alex|giza|mansoura|sahel|zayed|tagamo|maadi|zamalek|heliopolis|new cairo|🇪🇬|مصر|القاهرة|القاهره|اسكندرية|الإسكندرية|اسكندريه|الجيزة|المنصورة|الساحل|التجمع|المعادي|الشيخ زايد/i;
+Object.assign(S, { disc:[], dm:{}, searches:[], df: loadDF(), dfOpen:false, dsearch:{ kind:'user', limit:30, q:'', egypt: (()=>{ try{ return localStorage.getItem('ugc.dsEgypt')!=='0'; }catch(e){ return true; } })() }, discRun:null, discNoToken:false });
+/* ---- Country: Instagram has no country field, so it is inferred from public signals ----
+   Egypt        = Egyptian place or 🇪🇬 in bio/name/business city/post locations, an Egyptian
+                  phone number, or a .eg website.
+   Likely Egypt = Egyptian dialect in captions (Arabic or Franco), or Egypt in the handle.
+   Outside      = another country's flag or place, a foreign phone code, or mostly
+                  Cyrillic/Indian/East-Asian script, with no Egyptian signal.
+   Unknown      = nothing either way (common for English-only accounts). */
+const UL = (words) => new RegExp('(?<![\\p{L}\\p{N}])(?:' + words + ')(?![\\p{L}\\p{N}])', 'iu');
+const EG_PLACE = UL('egypt|egyptian|cairo|giza|alexandria|mansoura|north coast|sahel|sheikh zayed|new cairo|tagamo3?a?|maadi|zamalek|heliopolis|nasr city|6th of october|october city|hurghada|sharm el sheikh|sharm|el gouna|gouna|tanta|zagazig|ismailia|port said|suez|luxor|aswan|damietta|masr|misr|مصر|مصرية|مصري|المصرية|القاهرة|القاهره|الجيزة|الجيزه|الإسكندرية|الاسكندرية|اسكندرية|اسكندريه|إسكندرية|المنصورة|الساحل الشمالي|الساحل|التجمع|التجمع الخامس|المعادي|الزمالك|مصر الجديدة|الشيخ زايد|مدينة نصر|الغردقة|شرم الشيخ|الجونة|طنطا|الزقازيق|الإسماعيلية|الاسماعيلية|بورسعيد|السويس|الأقصر|الاقصر|أسوان|اسوان|دمياط');
+const FOREIGN_PLACE = UL('dubai|abu dhabi|uae|emirates|saudi|saudi arabia|ksa|riyadh|jeddah|kuwait|qatar|doha|bahrain|oman|muscat|jordan|amman|lebanon|beirut|morocco|casablanca|marrakech|algeria|tunisia|libya|iraq|baghdad|syria|turkey|istanbul|london|uk|united kingdom|england|usa|united states|new york|nyc|los angeles|miami|california|chicago|texas|canada|toronto|paris|france|milan|italy|spain|madrid|barcelona|germany|berlin|netherlands|amsterdam|cyprus|greece|india|bangalore|bengaluru|mumbai|delhi|pakistan|karachi|lahore|indonesia|jakarta|philippines|manila|malaysia|russia|moscow|ukraine|kyiv|kiev|poland|warsaw|norway|oslo|sweden|australia|sydney|brazil|mexico|uzbekistan|tashkent|kazakhstan|دبي|أبوظبي|ابوظبي|الإمارات|الامارات|السعودية|الرياض|جدة|الكويت|قطر|الدوحة|البحرين|سلطنة عمان|مسقط|الأردن|الاردن|لبنان|بيروت|المغرب|الدار البيضاء|الجزائر|تونس|ليبيا|العراق|بغداد|سوريا|دمشق|تركيا|اسطنبول|إسطنبول');
+const EG_DIALECT = new RegExp(UL('ده|كده|كدا|عشان|علشان|ازاي|إزاي|اوي|أوي|بتاعي|بتاعتي|بتاعة|بتاعه|بتاعك|النهارده|النهاردة|دلوقتي|دلوقت|برضه|برضو|مفيش|عايزة|عايز|عاوزة|عاوز|حاجة|حاجه|خالص|فين|بجد|awi|awy|keda|kda|3shan|3ashan|ezay|ezzay|delwa2ty|dlw2ty|7aga|mafeesh|ennaharda|elnaharda').source, 'giu');
+const OTHER_SCRIPT = /[Ѐ-ӿऀ-ॿ฀-๿぀-ヿ一-鿿가-힯֐-׿]/;
+const FLAG_RE = /[\u{1F1E6}-\u{1F1FF}]{2}/gu;
+const EG_PHONE_RE = /(?:\+|00)20[\s-]?1\d|(?<!\d)01[0125][\s-]?\d{3,4}[\s-]?\d{4}(?!\d)/;
+const FOREIGN_PHONE_RE = /(?:\+|00)(?!20)\d{1,3}[\s-]?\d{2,}/;
+function countryOf(x){
+  const eg = [], likely = [], other = [];
+  const where = [x.bio, x.name, x.category, x.city].filter(Boolean).join(' \n ');
+  const locs = (x.locations||[]).filter(Boolean);
+  const m1 = where.match(EG_PLACE); if(m1) eg.push(`“${m1[0]}” in profile`);
+  const egLoc = locs.find(l=>EG_PLACE.test(l)); if(egLoc) eg.push(`posted from ${egLoc}`);
+  if(/🇪🇬/u.test(where)) eg.push('🇪🇬 in bio');
+  if(EG_PHONE_RE.test([x.phone, x.bio].join(' '))) eg.push('Egyptian phone number');
+  if(/\.eg(?:[/:?#]|$)/i.test(x.website||'')) eg.push('.eg website');
+  const flags = (where.match(FLAG_RE)||[]).filter(f=>f!=='🇪🇬'); if(flags.length) other.push(`${flags.slice(0,3).join(' ')} in bio`);
+  const m2 = where.match(FOREIGN_PLACE); if(m2) other.push(`“${m2[0]}” in profile`);
+  const fLoc = locs.filter(l=>FOREIGN_PLACE.test(l) && !EG_PLACE.test(l)); if(fLoc.length && fLoc.length >= locs.filter(l=>EG_PLACE.test(l)).length) other.push(`posted from ${fLoc[0]}`);
+  if(x.phone && !EG_PHONE_RE.test(x.phone) && FOREIGN_PHONE_RE.test(x.phone)) other.push('foreign phone code');
+  const caps = (x.captions||[]).filter(c=>c && c.trim());
+  const scriptShare = caps.length ? caps.filter(c=>OTHER_SCRIPT.test(c)).length/caps.length : 0;
+  if(OTHER_SCRIPT.test(x.bio||'') || scriptShare >= .3) other.push(/[Ѐ-ӿ]/.test((x.bio||'')+caps.join(' ')) ? 'writes in Cyrillic (Russian/Ukrainian…)' : 'writes in a non-Arabic, non-Latin script');
+  const dialect = new Set(); for(const c of [x.bio, ...caps]) for(const m of String(c||'').matchAll(EG_DIALECT)) dialect.add(m[0].toLowerCase());
+  if(dialect.size >= 2) likely.push(`Egyptian dialect (${[...dialect].slice(0,3).join(', ')})`);
+  if(/(?:^|[._])(?:egy|egypt|eg|masr|misr|cairo)(?:[._]|$)|egypt|cairo/i.test(x.username||'')) likely.push('Egypt in the handle');
+  const code = eg.length ? 'eg' : other.length ? 'other' : likely.length ? 'likely' : 'unknown';
+  return { code, why: code==='eg' ? eg.concat(other.length?['also: '+other[0]]:[]) : code==='other' ? other : code==='likely' ? likely : [] };
+}
+const COUNTRY_LABEL = { eg:'🇪🇬 Egypt', likely:'🇪🇬 Likely Egypt', other:'🌍 Outside Egypt', unknown:'Country unknown' };
+const COUNTRY_FILTERS = [['eg+','Egypt + likely Egypt'],['eg','Egypt (clear signals only)'],['notother','Hide only outside Egypt'],['other','Outside Egypt only'],['','Any country']];
+const countryPass = (code, f) => !f || (f==='eg' ? code==='eg' : f==='eg+' ? code==='eg' || code==='likely' : f==='notother' ? code!=='other' : f==='other' ? code==='other' : true);
+function countryBadge(c){
+  if(!c || c.code==='unknown') return '<span class="pill" title="No location signal in bio, captions or post locations">Country unknown</span>';
+  return `<span class="pill${c.code==='other'?' bad':c.code==='eg'?' good':''}" title="${esc(c.why.join(' · '))}">${COUNTRY_LABEL[c.code]}</span>`;
+}
+const EG_HASHTAGS = ['ootdegypt','egyptianblogger','egyptianfashion','fashionegypt','cairoblogger','modestfashionegypt','ugcegypt','egyptiangirl','محجبات_مصر','فاشون_مصر','مودست_مصر','بلوجر_مصرية'];
 
 function discMetrics(d){
   const kws = S.ugcCfg.keywords;
@@ -2190,7 +2245,9 @@ function discMetrics(d){
   ];
   const hasData = isNum(followers) && posts.length > 0;
   return { posts, followers, er, fer, mv, viewRate, daysSince, perWeek, cpl, bioHits, fitShare, parts, score: hasData ? Math.round(parts.reduce((s,p)=>s+p.w*p.v,0)) : null,
-    saved: S.accounts.find(a=>a.username===d.username) || null, egypt: EGYPT_RE.test([d.biography, d.full_name, d.category].join(' ')) };
+    saved: S.accounts.find(a=>a.username===d.username) || null,
+    country: countryOf({ username:d.username, name:d.full_name, bio:d.biography, category:d.category, city:d.city, website:d.external_url, phone:d.phone,
+      captions: posts.map(p=>p.caption), locations: posts.map(p=>p.location) }) };
 }
 function recomputeDisc(){ S.dm = {}; for(const d of S.disc) S.dm[d.username] = discMetrics(d); }
 
@@ -2215,7 +2272,7 @@ function discFiltered(){
     if(f.lang==='ar' && !ge(toNum(d.ar_share), .5)) return false;
     if(f.lang==='en' && !(isNum(toNum(d.ar_share)) && toNum(d.ar_share) < .5)) return false;
     if(f.email && !d.email) return false;
-    if(f.egypt && !m.egypt) return false;
+    if(!countryPass(m.country.code, f.country)) return false;
     if(f.business && !d.is_business) return false;
     if(f.brand && !(d.sponsored_posts > 0)) return false;
     if(f.video && !ge(toNum(d.video_share), .5)) return false;
@@ -2226,6 +2283,11 @@ function discFiltered(){
   return rows.sort((a,b)=> (key(b) ?? -Infinity) - (key(a) ?? -Infinity));
 }
 
+function countrySummary(){
+  const n = { eg:0, likely:0, other:0, unknown:0 };
+  for(const d of S.disc) if(!d.dismissed) n[S.dm[d.username].country.code]++;
+  return `Found so far: 🇪🇬 ${n.eg} Egypt · ${n.likely} likely Egypt · ${n.unknown} unknown · ${n.other} outside Egypt`;
+}
 function viewUgcDiscover(){
   const admin = S.role==='admin';
   const head = ugcHead('Discover creators', `Search Instagram, filter, save the best. ${fmtInt(S.disc.length)} creators found so far.`,
@@ -2240,8 +2302,11 @@ function viewUgcDiscover(){
       <select id="dsLimit" class="input ds-lim" aria-label="How many creators">${[20,30,50,100].map(n=>`<option value="${n}" ${ds.limit===n?'selected':''}>${n} creators</option>`).join('')}</select>
       <button class="btn btn-primary" data-ugc="disc-search" ${run?'disabled':''}>${run?'<span class="spinner"></span> Searching…':'Search Instagram'}</button>
     </div>
+    <div class="ds-eg"><label class="inl"><input type="checkbox" id="dsEgypt" ${ds.egypt?'checked':''}> 🇪🇬 Egypt only</label>
+      <span class="hint">${ds.kind==='user' ? (ds.egypt ? 'Adds “egypt” (or “مصر” for Arabic) to your words. Instagram has no country search, so hashtags below find Egyptian creators more reliably.' : 'Searches worldwide.') : 'Egyptian hashtags give the most Egyptian results.'}</span>
+      ${ds.egypt ? `<span class="ds-tags">${EG_HASHTAGS.map(t=>`<button class="tog" data-dtag="${esc(t)}">#<bdi dir="${AR_RE.test(t)?'rtl':'ltr'}">${esc(t)}</bdi></button>`).join('')}</span>` : ''}</div>
     ${run ? `<p class="ds-run"><span class="spinner"></span> Searching Instagram for <b>${esc(run.kind==='hashtag'?'#'+run.query:run.query)}</b> — ${run.stage==='profiles'?'step 2 of 2: reading profiles and recent posts':'step 1 of 2: finding accounts'}. Usually 1–3 minutes; you can keep working.</p>`
-      : `<p class="hint ds-hint">${ds.kind==='user'?'Finds Instagram accounts whose name or bio matches your words.':'Finds creators who recently posted with this hashtag.'} Each search costs about $0.10–0.30 on Apify. ${recent.length?'Recent:':''} ${recent.map(s=>`<button class="tog" data-dre="${esc(s.kind)}|${esc(s.query)}" title="Show creators from this search">${s.kind==='hashtag'?'#':''}${esc(s.query)} <small>${fmtInt(s.found)}</small></button>`).join(' ')}</p>`}
+      : `<p class="hint ds-hint">${ds.kind==='user'?'Finds Instagram accounts whose name or bio matches your words.':'Finds creators who recently posted with this hashtag.'} Each search costs about $0.10–0.30 on Apify. ${recent.length?'Recent:':''} ${recent.map(s=>`<button class="tog" data-dre="${esc(s.kind)}|${esc(s.query)}" title="Show creators from this search">${s.kind==='hashtag'?'#':''}<bdi dir="${AR_RE.test(s.query)?'rtl':'ltr'}">${esc(s.query)}</bdi> <small>${fmtInt(s.found)}</small></button>`).join(' ')}</p>`}
     ${S.discNoToken ? discSetup() : ''}
   </div>` : '';
   if(!S.disc.length) return head + searchBox + `<div class="panel empty"><h2>Start with a search</h2><p>Try “modest fashion egypt”, “محجبات”, “mom blogger cairo” or a hashtag like #ootdegypt. Every creator found stays here, ready to filter by followers, engagement, views, email and more.</p></div>`;
@@ -2266,9 +2331,10 @@ function viewUgcDiscover(){
       ${sel('dfActive', [['','Any time'],['7','Posted in last 7 days'],['30','Posted in last 30 days'],['90','Posted in last 90 days']], f.active, 'Activity')}
       ${sel('dfLang', [['','Any language'],['ar','Mostly Arabic captions'],['en','Mostly non-Arabic captions']], f.lang, 'Caption language')}
       ${sel('dfFound', [['','All searches'], ...tags.map(t=>[t, t])], f.found, 'Found by')}
+      <div class="wide country-f">${sel('dfCountry', COUNTRY_FILTERS, f.country, 'Country')}<p class="hint">${countrySummary()}</p></div>
     </div>
     <div class="f-row"><span class="f-l">Size</span>${TIERS.map(t=>`<button class="tog" data-dtier="${t[0]}" aria-pressed="${f.tiers.includes(t[0])}" title="${t[2]} followers">${t[1]} <small>${t[2]}</small></button>`).join('')}</div>
-    <div class="f-row"><span class="f-l">Only</span>${tog('egypt','🇪🇬 Egypt','Bio or name mentions Egypt or an Egyptian city')}${tog('email','✉ Has email')}${tog('business','Business / creator account','Can be tracked daily after saving')}${tog('brand','Brand experience','Recent captions with #ad, sponsored, discount codes, إعلان…')}${tog('video','Video-first')}${tog('hideSaved','Hide saved')}${tog('dismissed','Show dismissed')}
+    <div class="f-row"><span class="f-l">Only</span>${tog('email','✉ Has email')}${tog('business','Business / creator account','Can be tracked daily after saving')}${tog('brand','Brand experience','Recent captions with #ad, sponsored, discount codes, إعلان…')}${tog('video','Video-first')}${tog('hideSaved','Hide saved')}${tog('dismissed','Show dismissed')}
       <span class="f-sort"><label for="dfSort">Sort</label><select id="dfSort" class="input">${[['score','Match score'],['followers','Followers'],['er','Engagement rate'],['views','Median views'],['reach','Views ÷ followers'],['recent','Most recently active'],['newest','Newest found']].map(([k,l])=>`<option value="${k}" ${f.sort===k?'selected':''}>${l}</option>`).join('')}</select></span>
       <button class="linkbtn" data-ugc="dreset">Reset filters</button></div>
   </div>
@@ -2286,7 +2352,8 @@ function discResultsHtml(){
   const kws = [...kwList(S.df.kw), ...S.ugcCfg.keywords];
   const shown = rows.slice(0, S.discLimit || 40);
   const more = rows.length > shown.length ? `<div class="more"><button class="btn" data-ugc="disc-more">Show ${Math.min(40, rows.length-shown.length)} more</button></div>` : '';
-  return `<p class="hint num res-count">${fmtInt(rows.length)} of ${fmtInt(S.disc.length)} discovered creators match</p>` +
+  const hiddenOther = S.df.country ? S.disc.filter(d=>!d.dismissed && !countryPass(S.dm[d.username].country.code, S.df.country)).length : 0;
+  return `<p class="hint num res-count">${fmtInt(rows.length)} of ${fmtInt(S.disc.length)} discovered creators match${hiddenOther?` · ${fmtInt(hiddenOther)} hidden by the Country filter`:''}</p>` +
     (rows.length ? `<div class="clist2">${shown.map(d=>discCard(d, kws)).join('')}</div>${more}` : `<div class="panel empty"><h2>No creators match</h2><p>Loosen a filter, or run a new search above.</p></div>`);
 }
 function discAvatar(d, lg){
@@ -2299,7 +2366,7 @@ function discCard(d, kws){
   const st = (v, l) => `<span><b class="num">${v}</b><small>${l}</small></span>`;
   const badges = [
     d.email ? `<span class="pill" title="${esc(d.email)}">✉ Email</span>` : '',
-    m.egypt ? '<span class="pill">🇪🇬 Egypt</span>' : '',
+    countryBadge(m.country),
     d.sponsored_posts > 0 ? `<span class="pill" title="Recent captions that look like brand partnerships">Brand exp · ${d.sponsored_posts}</span>` : '',
     isNum(toNum(d.ar_share)) && d.ar_share >= .5 ? '<span class="pill">Arabic</span>' : '',
     d.is_business === false ? '<span class="pill warn" title="Personal account: Instagram\'s API can\'t track it daily after saving">Personal account</span>' : '',
@@ -2335,6 +2402,7 @@ function openDiscPreview(u){
     <div class="pd-body">
       <div>${d.biography?`<p class="pd-cap" dir="auto" style="margin-top:0">${hl(d.biography, kws)}</p>`:''}
         <p class="pd-note">${[d.email?`✉ <a href="mailto:${esc(d.email)}">${esc(d.email)}</a>`:'', d.phone?`☎ ${esc(d.phone)}`:'', d.external_url?`<a href="${esc(d.external_url)}" target="_blank" rel="noopener">${esc(d.external_url.replace(/^https?:\/\//,'').slice(0,40))}</a>`:''].filter(Boolean).join(' · ')}</p>
+        <p class="pd-note">${countryBadge(m.country)} ${m.country.why.length ? esc(m.country.why.join(' · ')) : 'No location signal in bio, captions or post locations.'}</p>
         <h3>Muhra match ${isNum(m.score)?m.score+' / 100':''}</h3>${parts}</div>
       <div><h3>Recent posts</h3><div class="posts">${posts || '<p class="hint">No recent posts found.</p>'}</div>
         <p class="pd-note">From their latest ${fmtInt(m.posts.length)} posts when found${d.updated_at?' ('+relTime(d.updated_at)+')':''}. Save the creator to track them daily and get the full analysis.</p></div>
@@ -2358,9 +2426,11 @@ async function discSearch(){
   S.dsearch.q = q; S.dsearch.limit = Number($('dsLimit').value) || 30;
   if(q.length < 2){ toast('Type what you are looking for first.'); return; }
   try{
-    const { id } = await discInvoke({ action:'start', query:q, kind:S.dsearch.kind, limit:S.dsearch.limit });
+    // Instagram's account search has no country option; adding the country word biases it to Egypt.
+    const scoped = S.dsearch.kind==='user' && S.dsearch.egypt && !EG_PLACE.test(q) ? q + (AR_RE.test(q) ? ' مصر' : ' egypt') : q;
+    const { id } = await discInvoke({ action:'start', query:scoped, kind:S.dsearch.kind, limit:S.dsearch.limit });
     S.discNoToken = false;
-    S.discRun = { id, query: S.dsearch.kind==='hashtag' ? q.replace(/^#/,'').replace(/\s+/g,'') : q, kind:S.dsearch.kind, stage:'search' };
+    S.discRun = { id, query: S.dsearch.kind==='hashtag' ? scoped.replace(/^#/,'').replace(/\s+/g,'') : scoped, kind:S.dsearch.kind, stage:'search' };
     render(); pollDisc();
   }catch(e){
     if(e.code==='no_token'){ S.discNoToken = true; render(); return; }
@@ -2418,21 +2488,23 @@ function bindDisc(){
   const upd = () => { saveDF(); S.discLimit = 40; const r = $('discResults'); if(r) r.innerHTML = discResultsHtml(); };
   const map = { dfQ:'q', dfKw:'kw', dfFMin:'fMin', dfFMax:'fMax', dfEr:'erMin', dfV:'vMin', dfScore:'scoreMin' };
   for(const [id,k] of Object.entries(map)){ const el = $(id); if(el) el.oninput = () => { f[k] = el.value; upd(); }; }
-  const smap = { dfActive:'active', dfLang:'lang', dfSort:'sort', dfKwMode:'kwMode', dfFound:'found' };
+  const smap = { dfActive:'active', dfLang:'lang', dfSort:'sort', dfKwMode:'kwMode', dfFound:'found', dfCountry:'country' };
   for(const [id,k] of Object.entries(smap)){ const el = $(id); if(el) el.onchange = () => { f[k] = el.value; upd(); }; }
   document.querySelectorAll('[data-df]').forEach(b=>b.onclick=()=>{ const k = b.dataset.df; f[k] = !f[k]; b.setAttribute('aria-pressed', f[k]); upd(); });
   document.querySelectorAll('[data-dtier]').forEach(b=>b.onclick=()=>{ const k = b.dataset.dtier; f.tiers = f.tiers.includes(k) ? f.tiers.filter(x=>x!==k) : [...f.tiers, k]; b.setAttribute('aria-pressed', f.tiers.includes(k)); upd(); });
   document.querySelectorAll('[data-dkind]').forEach(b=>b.onclick=()=>{ S.dsearch.kind = b.dataset.dkind; const q = $('dsQ'); if(q) S.dsearch.q = q.value; render(); });
   document.querySelectorAll('[data-dre]').forEach(b=>b.onclick=()=>{ const [k, q] = b.dataset.dre.split('|'); f.found = (k==='hashtag'?'#':'')+q; saveDF(); render(); });
   const q = $('dsQ'); if(q){ q.oninput = () => { S.dsearch.q = q.value; }; q.onkeydown = (e) => { if(e.key==='Enter') discSearch(); }; }
+  const eg = $('dsEgypt'); if(eg) eg.onchange = () => { S.dsearch.egypt = eg.checked; try{ localStorage.setItem('ugc.dsEgypt', eg.checked ? '1' : '0'); }catch(e){} if(q) S.dsearch.q = q.value; render(); };
+  document.querySelectorAll('[data-dtag]').forEach(b=>b.onclick=()=>{ S.dsearch.kind = 'hashtag'; S.dsearch.q = b.dataset.dtag; render(); const i = $('dsQ'); if(i) i.focus(); });
   const lim = $('dsLimit'); if(lim) lim.onchange = () => { S.dsearch.limit = Number(lim.value); };
 }
 function exportDiscCsv(){
   const rows = discFiltered();
   const q = (v) => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; };
-  const head = ['handle','name','profile','followers','tier','match_score','er_pct','median_views','views_per_follower_pct','days_since_last_post','email','phone','category','business_account','egypt','arabic_share','brand_posts','found_by','saved'];
+  const head = ['handle','name','profile','followers','tier','match_score','er_pct','median_views','views_per_follower_pct','days_since_last_post','email','phone','category','business_account','country','country_signals','arabic_share','brand_posts','found_by','saved'];
   const lines = rows.map(d=>{ const m = S.dm[d.username], t = tierOf(m.followers);
-    return [d.username, d.full_name, 'https://instagram.com/'+d.username, m.followers, t?t[1]:'', m.score, m.er, m.mv, isNum(m.viewRate)?Math.round(m.viewRate*10)/10:'', isNum(m.daysSince)?Math.round(m.daysSince):'', d.email, d.phone, d.category, d.is_business==null?'':d.is_business?'yes':'no', m.egypt?'yes':'', isNum(toNum(d.ar_share))?Math.round(d.ar_share*100)+'%':'', d.sponsored_posts, (d.found_by||[]).join(' '), m.saved?'yes':''].map(q).join(','); });
+    return [d.username, d.full_name, 'https://instagram.com/'+d.username, m.followers, t?t[1]:'', m.score, m.er, m.mv, isNum(m.viewRate)?Math.round(m.viewRate*10)/10:'', isNum(m.daysSince)?Math.round(m.daysSince):'', d.email, d.phone, d.category, d.is_business==null?'':d.is_business?'yes':'no', COUNTRY_LABEL[m.country.code].replace(/^\S+ /,''), m.country.why.join('; '), isNum(toNum(d.ar_share))?Math.round(d.ar_share*100)+'%':'', d.sponsored_posts, (d.found_by||[]).join(' '), m.saved?'yes':''].map(q).join(','); });
   const blob = new Blob(['﻿'+[head.join(','), ...lines].join('\n')], { type:'text/csv;charset=utf-8' });
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `muhra-discovered-creators-${ymd(new Date())}.csv`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
 }
