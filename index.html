@@ -382,6 +382,14 @@ a.chip:hover{border-color:var(--brand)}
 .cmp-t .acct{display:inline-flex;gap:6px;align-items:center;text-decoration:none;color:var(--ink);font-weight:600}
 .pd-narrow{width:min(680px,calc(100vw - 32px))}
 .f-more{display:none}
+.ds-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ds-q{flex:1;min-width:220px;font-size:15.5px;padding:11px 14px}
+.ds-lim{width:auto}
+.ds-hint{margin:12px 0 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ds-run{margin:12px 0 0;font-size:14px;display:flex;gap:8px;align-items:center;color:var(--brand)}
+.ds-setup{margin:14px 0 0}
+.ds-setup ol{margin:8px 0 0;padding-inline-start:20px;line-height:1.8}
+a.post{text-decoration:none}
 .composer{padding:18px}
 .composer .seg{margin-bottom:14px}
 @media print{
@@ -585,7 +593,7 @@ const pct0 = (v) => isNum(v) ? Math.round(v*100)+'%' : '–';
 const signed = (v, f=fmtK) => !isNum(v) ? '–' : (v>0?'+':v<0?'−':'') + f(Math.abs(v));
 const cls = (v) => !isNum(v) || v===0 ? 'flat' : v>0 ? 'up' : 'down';
 const initials = (u) => (u||'?').replace(/[^a-z0-9]/gi,'').slice(0,2).toUpperCase();
-const relTime = (iso) => { if(!iso) return 'never'; const m=(Date.now()-new Date(iso))/6e4; if(m<1) return 'just now'; if(m<60) return Math.round(m)+' min ago'; const h=m/60; if(h<24) return Math.round(h)+' h ago'; return Math.round(h/24)+' days ago'; };
+const relTime = (iso) => { if(!iso) return 'never'; const m=(Date.now()-new Date(iso))/6e4; if(m<1) return 'just now'; if(m<60) return Math.round(m)+' min ago'; const h=m/60; if(h<24) return Math.round(h)+' h ago'; const d=Math.round(h/24); return d+(d===1?' day ago':' days ago'); };
 const cssVar = (n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const cairoFmt = new Intl.DateTimeFormat('en-GB',{timeZone:'Africa/Cairo',weekday:'short',hour:'2-digit',hour12:false});
 function cairoParts(iso){
@@ -715,6 +723,7 @@ async function loadData(){
   S.outreach = o.data || []; S.apps = ap.data || [];
   const cfg = (st.data||[]).find(x=>x.key==='config');
   S.ugcCfg = { ...UGC_DEFAULTS, ...(cfg ? cfg.value : {}) };
+  await loadDisc().catch(()=>{ S.discReady = false; });
   S.report = r.data[0] || null;
   S.latestReportId = S.report ? S.report.id : 0;
   S.postsBy = {}; S.snapsBy = {};
@@ -726,7 +735,7 @@ function recompute(){
   const P = period();
   S.m = {};
   for(const comp of S.comps) S.m[comp.id] = metrics(comp, P);
-  recomputeCreators();
+  recomputeCreators(); recomputeDisc();
 }
 
 // All metrics are scoped to the selected period P.
@@ -1008,8 +1017,8 @@ function renderNav(){
   const admin = S.role === 'admin';
   const items = [['overview','Overview'],['gaps','Gaps'],['report','AI report']];
   if(admin) items.push(['manage','Manage accounts']);
-  const ugcItems = [['ugc','Find creators'],['ugcPipe','Pipeline'],['ugcInbox','Applications']];
-  if(admin) ugcItems.push(['ugcAdd','Add creators'],['ugcSettings','Settings']);
+  const ugcItems = [['ugcDiscover','Discover'],['ugc','My creators'],['ugcPipe','Pipeline'],['ugcInbox','Applications']];
+  if(admin) ugcItems.push(['ugcAdd','Add by handle'],['ugcSettings','Settings']);
   const curUgc = S.view==='creator' || S.view==='ugcCompare' ? 'ugc' : S.view;
   const nNew = newApps();
   $('nav').innerHTML = '<span class="nav-h">Competitors</span>' + items.map(([k,l])=>`<button data-go="${k}" aria-current="${S.view===k}">${l}</button>`).join('')
@@ -1029,13 +1038,13 @@ function renderNav(){
       return `<button class="citem" data-comp="${c.id}" aria-current="${S.view==='comp'&&S.selected===c.id}">${avatarHtml(c)}<span><span class="u">@${esc(c.username)}${c.is_own?'<span class="own-dot" title="Muhra"></span>':''}</span><br><span class="s num">${fmtK(c.followers)} followers</span></span>${status}</button>`;
     }).join('') : `<p style="color:var(--muted);font-size:13px;padding:0 10px">No accounts yet.</p>`;
   }
-  const short = { overview:'Overview', gaps:'Gaps', report:'Report', manage:'Manage', ugc:'UGC' };
-  const tabs = items.map(([k])=>k).concat('ugc');
+  const short = { overview:'Overview', gaps:'Gaps', report:'Report', manage:'Manage', ugcDiscover:'UGC' };
+  const tabs = items.map(([k])=>k).concat('ugcDiscover');
   $('mnav').style.setProperty('--tabs', tabs.length);
   let sel = '';
   if(inUgc()) sel = `<select class="macct" id="mselect" aria-label="UGC section">${ugcItems.map(([k,l])=>`<option value="${k}" ${curUgc===k?'selected':''}>${l}</option>`).join('')}</select>`;
   else if(S.comps.length) sel = `<select class="macct" id="mselect" aria-label="Open an account"><option value="">${S.view==='comp'?'':'Open an account…'}</option>${S.comps.map(c=>`<option value="${c.id}" ${S.view==='comp'&&S.selected===c.id?'selected':''}>@${esc(c.username)}</option>`).join('')}</select>`;
-  $('mnav').innerHTML = tabs.map(k=>`<button class="mtab" data-go="${k}" aria-current="${k==='ugc'?inUgc():S.view===k}">${short[k]}${k==='ugc'&&nNew?` <span class="num">·${nNew}</span>`:''}</button>`).join('') + sel;
+  $('mnav').innerHTML = tabs.map(k=>`<button class="mtab" data-go="${k}" aria-current="${k==='ugcDiscover'?inUgc():S.view===k}">${short[k]}${k==='ugcDiscover'&&nNew?` <span class="num">·${nNew}</span>`:''}</button>`).join('') + sel;
   const ms = $('mselect'); if(ms) ms.onchange = () => { if(!ms.value) return; inUgc() ? go(ms.value) : go('comp', Number(ms.value)); };
 }
 document.addEventListener('click', e => {
@@ -1055,6 +1064,7 @@ function render(){
   else if(S.view==='gaps') v.innerHTML = viewGaps();
   else if(S.view==='report') v.innerHTML = viewReport();
   else if(S.view==='manage') v.innerHTML = S.role==='admin' ? viewManage() : '';
+  else if(S.view==='ugcDiscover') v.innerHTML = viewUgcDiscover();
   else if(S.view==='ugc') v.innerHTML = viewUgc();
   else if(S.view==='creator') v.innerHTML = viewCreator();
   else if(S.view==='ugcPipe') v.innerHTML = viewUgcPipe();
@@ -1462,7 +1472,7 @@ const STAGES = [['new','New'],['shortlisted','Shortlisted'],['contacted','Contac
 const stageLabel = (k) => (STAGES.find(s=>s[0]===k) || STAGES[0])[1];
 const TIERS = [['nano','Nano','< 10K',0,1e4],['micro','Micro','10K–50K',1e4,5e4],['mid','Mid','50K–250K',5e4,2.5e5],['macro','Macro','250K–1M',2.5e5,1e6],['mega','Mega','1M+',1e6,Infinity]];
 const tierOf = (f) => isNum(f) ? TIERS.find(t=>f>=t[3] && f<t[4]) : null;
-const UGC_VIEWS = ['ugc','ugcPipe','ugcInbox','ugcAdd','ugcSettings','creator','ugcCompare'];
+const UGC_VIEWS = ['ugcDiscover','ugc','ugcPipe','ugcInbox','ugcAdd','ugcSettings','creator','ugcCompare'];
 const inUgc = () => UGC_VIEWS.includes(S.view);
 const UGC_DEFAULTS = {
   keywords: ['fashion','modest','hijab','hijabi','style','outfit','ootd','abaya','ugc','content creator','lifestyle','cairo','egypt','مودست','محجبات','حجاب','ستايل','فاشون','موضة','اوتفيت','لبس'],
@@ -1614,7 +1624,7 @@ function favBtn(id){
 }
 function ugcHead(title, sub, actions){
   const admin = S.role==='admin';
-  const tabs = [['ugc','Find'],['ugcPipe','Pipeline'],['ugcInbox','Applications']].concat(admin?[['ugcAdd','Add'],['ugcSettings','Settings']]:[]);
+  const tabs = [['ugcDiscover','Discover'],['ugc','My creators'],['ugcPipe','Pipeline'],['ugcInbox','Applications']].concat(admin?[['ugcAdd','Add by handle'],['ugcSettings','Settings']]:[]);
   const cur = S.view==='creator'||S.view==='ugcCompare' ? 'ugc' : S.view;
   return `<div class="topbar"><div><h1>${title}</h1><div class="sub">${sub}</div></div><div class="actions">${actions||''}</div></div>
     <div class="seg ugc-tabs" role="group" aria-label="UGC sections">${tabs.map(([k,l])=>`<button data-go="${k}" aria-pressed="${cur===k}">${l}${k==='ugcInbox'&&newApps()?` <span class="num">${newApps()}</span>`:''}</button>`).join('')}</div>`;
@@ -1627,10 +1637,10 @@ function ugcMissing(){
 /* ---- Find ---- */
 function viewUgc(){
   const admin = S.role==='admin';
-  const head = ugcHead('Find UGC creators', `${fmtInt(S.creators.length)} creators researched · scored for Muhra from their latest posts`,
-    `${S.creators.length?'<button class="btn" data-ugc="csv">Export CSV</button>':''}${admin?'<button class="btn btn-primary" data-go="ugcAdd">Add creators</button>':''}`);
+  const head = ugcHead('My creators', `${fmtInt(S.creators.length)} saved creators · tracked daily and scored for Muhra`,
+    `${S.creators.length?'<button class="btn" data-ugc="csv">Export CSV</button>':''}<button class="btn btn-primary" data-go="ugcDiscover">Discover more</button>`);
   if(!S.ugcReady) return head + ugcMissing();
-  if(!S.creators.length) return head + `<div class="panel empty"><h2>No creators yet</h2><p>Add Instagram creators by handle, pick from creators your competitors already mention, or share the open application form so creators come to you.</p>${admin?'<button class="btn btn-primary" data-go="ugcAdd">Add creators</button>':''}</div>`;
+  if(!S.creators.length) return head + `<div class="panel empty"><h2>No saved creators yet</h2><p>Search Instagram in Discover and save the creators you like. They land here with daily tracking, notes and outreach.</p><button class="btn btn-primary" data-go="ugcDiscover">Go to Discover</button></div>`;
   const f = S.uf;
   const counts = {}; for(const c of S.creators){ const s = ugcOf(c.id).stage; counts[s] = (counts[s]||0)+1; }
   const sel = (id, opts, v, label) => `<label class="field"><span>${label}</span><select id="${id}" class="input">${opts.map(([k,l])=>`<option value="${k}" ${String(v)===String(k)?'selected':''}>${l}</option>`).join('')}</select></label>`;
@@ -1918,7 +1928,7 @@ function suggestions(){
     .map(s=>({ ...s, why: [...s.src].slice(0,3).map(x=>'@'+x).join(', ') + (s.src.size>3?` +${s.src.size-3}`:''), muhra: own && s.src.has(own.username) }));
 }
 function viewUgcAdd(){
-  const head = ugcHead('Add creators', 'Research creators by Instagram handle');
+  const head = ugcHead('Add by handle', 'Already know a creator? Add them directly');
   if(!S.ugcReady) return head + ugcMissing();
   const busy = S.busy.ugcAdd;
   const sug = suggestions();
@@ -2033,6 +2043,7 @@ function exportCsv(){
 /* ---- events ---- */
 function bindUgc(){
   if(S.view==='ugc') bindUgcFind();
+  if(S.view==='ugcDiscover') bindDisc();
   document.querySelectorAll('[data-cpsort]').forEach(b=>b.onclick=()=>{ S.cPostSort = b.dataset.cpsort; S.postLimit = 24; render(); });
   document.querySelectorAll('[data-appf]').forEach(b=>b.onclick=()=>{ S.appFilter = b.dataset.appf; render(); });
   document.querySelectorAll('[data-ugc-stage]').forEach(s=>s.onchange=async()=>{
@@ -2064,6 +2075,15 @@ async function onUgc(a, el){
   const c = S.creators.find(x=>x.id===id);
   try{
     if(a==='filters'){ S.ufOpen = !S.ufOpen; render(); return; }
+    if(a==='disc-search') return discSearch();
+    if(a==='disc-save') return discSave(el.dataset.u, el);
+    if(a==='disc-dismiss'){ const d = S.disc.find(x=>x.username===el.dataset.u); if(!d) return;
+      const { error } = await sb.from('ugc_discover').update({ dismissed: !d.dismissed }).eq('username', d.username); if(error) throw error;
+      d.dismissed = !d.dismissed; const r = $('discResults'); if(r) r.innerHTML = discResultsHtml(); return; }
+    if(a==='dfilters'){ S.dfOpen = !S.dfOpen; render(); return; }
+    if(a==='dreset'){ S.df = { ...DF_DEFAULT }; saveDF(); render(); return; }
+    if(a==='disc-more'){ S.discLimit = (S.discLimit||40) + 40; const r = $('discResults'); if(r) r.innerHTML = discResultsHtml(); return; }
+    if(a==='disc-csv') return exportDiscCsv();
     if(a==='reset'){ S.uf = { ...UF_DEFAULT }; saveUF(); render(); return; }
     if(a==='csv') return exportCsv();
     if(a==='cmp-clear'){ S.cmp = []; render(); return; }
@@ -2123,7 +2143,8 @@ document.addEventListener('click', e => {
   const s = e.target.closest('[data-send]'); if(s){ onSend(s.dataset.send, Number(s.dataset.id)); return; }
   const dlg = $('ugcDlg'); if(e.target.closest('[data-dclose]') || e.target === dlg){ dlg.close(); return; }
   if(e.target.closest('[data-cmp]') || e.target.closest('.cmp')) return;
-  const cr = e.target.closest('[data-creator]'); if(cr && !e.target.closest('a')){ go('creator', Number(cr.dataset.creator)); }
+  const cr = e.target.closest('[data-creator]'); if(cr && !e.target.closest('a')){ if(dlg.open) dlg.close(); go('creator', Number(cr.dataset.creator)); return; }
+  const dp = e.target.closest('[data-dprev]'); if(dp && !e.target.closest('a,button')){ openDiscPreview(dp.dataset.dprev); }
 }, true);
 document.addEventListener('change', e => {
   const cb = e.target.closest('[data-cmp]'); if(!cb) return;
@@ -2132,7 +2153,289 @@ document.addEventListener('change', e => {
   const old = document.querySelector('.cmp-tray'); const html = cmpTray();
   if(old) old.outerHTML = html || ''; else if(html) $('view').insertAdjacentHTML('beforeend', html);
 });
-document.addEventListener('keydown', e => { if(e.key==='Enter' && e.target.matches && e.target.matches('.ccard')) go('creator', Number(e.target.dataset.creator)); });
+document.addEventListener('keydown', e => { if(e.key!=='Enter' || !e.target.matches || !e.target.matches('.ccard')) return; if(e.target.dataset.dprev) openDiscPreview(e.target.dataset.dprev); else go('creator', Number(e.target.dataset.creator)); });
+
+/* ---- Discover: search Instagram first, then filter ----
+   Searches run in the ugc-discover Edge Function (Apify). Every creator found is kept in
+   ugc_discover, so the filters work across all past searches without paying again. */
+const DF_DEFAULT = { q:'', kw:'', kwMode:'any', tiers:[], fMin:'', fMax:'', erMin:'', vMin:'', scoreMin:'', active:'', lang:'', email:false, egypt:false, business:false, brand:false, video:false, hideSaved:true, dismissed:false, found:'', sort:'score' };
+function loadDF(){ try{ const r = JSON.parse(localStorage.getItem('ugc.dfilters')); if(r) return { ...DF_DEFAULT, ...r }; }catch(e){} return { ...DF_DEFAULT }; }
+function saveDF(){ try{ localStorage.setItem('ugc.dfilters', JSON.stringify(S.df)); }catch(e){} }
+Object.assign(S, { disc:[], dm:{}, searches:[], df: loadDF(), dfOpen:false, dsearch:{ kind:'user', limit:30, q:'' }, discRun:null, discNoToken:false });
+const EGYPT_RE = /egypt|cairo|alex|giza|mansoura|sahel|zayed|tagamo|maadi|zamalek|heliopolis|new cairo|🇪🇬|مصر|القاهرة|القاهره|اسكندرية|الإسكندرية|اسكندريه|الجيزة|المنصورة|الساحل|التجمع|المعادي|الشيخ زايد/i;
+
+function discMetrics(d){
+  const kws = S.ugcCfg.keywords;
+  const posts = Array.isArray(d.recent_posts) ? d.recent_posts : [];
+  const followers = toNum(d.followers), er = toNum(d.er), fer = toNum(d.fer), mv = toNum(d.median_views);
+  const viewRate = isNum(mv) && followers ? mv/followers*100 : null;
+  const daysSince = d.last_post_at ? (Date.now()-new Date(d.last_post_at))/DAY : null;
+  const times = posts.map(p=>Date.parse(p.ts)).filter(t=>!isNaN(t)).sort((a,b)=>b-a);
+  const span = times.length > 1 ? (times[0]-times[times.length-1])/DAY : null;
+  const perWeek = span && span > 0 ? (times.length-1)/span*7 : null;
+  const al = toNum(d.avg_likes), ac = toNum(d.avg_comments);
+  const cpl = isNum(al) && al > 0 && isNum(ac) ? ac/al*100 : null;
+  const bioHits = kwHits((d.biography||'')+' '+(d.full_name||'')+' '+(d.category||''), kws);
+  const capPosts = posts.filter(p=>kwHits(p.caption, kws).length).length;
+  const fitShare = posts.length ? capPosts/posts.length : 0;
+  const vid = toNum(d.video_share) ?? 0;
+  const rec = !isNum(daysSince) ? 0 : daysSince <= 7 ? 1 : daysSince <= 30 ? .6 : daysSince <= 90 ? .25 : 0;
+  const parts = [
+    { k:'Engagement', w:25, v: isNum(er) ? clamp01(er/8) : isNum(fer) ? clamp01(fer/5) : 0, why: isNum(er) ? `${fmtPct(er)} ER (likes + comments ÷ views) on recent videos.` : isNum(fer) ? `${fmtPct(fer)} follower ER (no public views).` : 'No engagement data.' },
+    { k:'Reach beyond followers', w:20, v: isNum(viewRate) && viewRate > 0 ? clamp01(Math.log10(viewRate)/2) : 0, why: isNum(viewRate) ? `Median video reaches ${fmt1(viewRate)}% of their follower count.` : 'No view data.' },
+    { k:'Fits Muhra', w:25, v: kws.length ? clamp01((bioHits.length ? .4 : 0) + Math.min(.6, fitShare*1.2)) : .5, why: `${bioHits.length ? 'Bio matches '+bioHits.slice(0,4).map(k=>'“'+k+'”').join(', ') : 'No keyword in bio'} · ${pct0(fitShare)} of recent captions match.` },
+    { k:'Active', w:10, v: rec*.6 + Math.min(1, (perWeek||0)/3)*.4, why: isNum(daysSince) ? `Last post ${Math.round(daysSince)} day${Math.round(daysSince)===1?'':'s'} ago${isNum(perWeek)?` · ~${fmt1(perWeek)} posts a week`:''}.` : 'No recent posts.' },
+    { k:'Video-first', w:10, v: vid, why: `${pct0(vid)} of recent posts are reels or videos.` },
+    { k:'Authentic audience', w:10, v: !isNum(cpl) ? .5 : cpl < .2 ? .2 : cpl < .5 ? .6 : cpl <= 15 ? 1 : .7, why: isNum(cpl) ? `${fmt1(cpl)} comments per 100 likes. Under 0.5 can signal bought likes.` : 'Likes hidden or no data.' }
+  ];
+  const hasData = isNum(followers) && posts.length > 0;
+  return { posts, followers, er, fer, mv, viewRate, daysSince, perWeek, cpl, bioHits, fitShare, parts, score: hasData ? Math.round(parts.reduce((s,p)=>s+p.w*p.v,0)) : null,
+    saved: S.accounts.find(a=>a.username===d.username) || null, egypt: EGYPT_RE.test([d.biography, d.full_name, d.category].join(' ')) };
+}
+function recomputeDisc(){ S.dm = {}; for(const d of S.disc) S.dm[d.username] = discMetrics(d); }
+
+function discFiltered(){
+  const f = S.df, q = f.q.trim().toLowerCase(), kws = kwList(f.kw);
+  const num = (v) => v === '' || v == null || !isFinite(Number(v)) ? null : Number(v);
+  const rows = S.disc.filter(d=>{
+    const m = S.dm[d.username];
+    if(!f.dismissed && d.dismissed) return false;
+    if(f.dismissed && !d.dismissed) return false;
+    if(f.hideSaved && m.saved) return false;
+    if(f.found && !(d.found_by||[]).includes(f.found)) return false;
+    if(q && ![d.username, d.full_name, d.biography, d.category].join(' ').toLowerCase().includes(q)) return false;
+    if(kws.length){ const hay = [d.biography, d.full_name, d.category, ...m.posts.map(p=>p.caption)].join(' \n ').toLowerCase(); if(f.kwMode==='all' ? !kws.every(k=>hay.includes(k)) : !kws.some(k=>hay.includes(k))) return false; }
+    if(f.tiers.length){ const t = tierOf(m.followers); if(!t || !f.tiers.includes(t[0])) return false; }
+    if(num(f.fMin)!=null && !ge(m.followers, num(f.fMin))) return false;
+    if(num(f.fMax)!=null && !le(m.followers, num(f.fMax))) return false;
+    if(num(f.erMin)!=null && !ge(m.er, num(f.erMin))) return false;
+    if(num(f.vMin)!=null && !ge(m.mv, num(f.vMin))) return false;
+    if(num(f.scoreMin)!=null && !ge(m.score, num(f.scoreMin))) return false;
+    if(f.active && !le(m.daysSince, Number(f.active))) return false;
+    if(f.lang==='ar' && !ge(toNum(d.ar_share), .5)) return false;
+    if(f.lang==='en' && !(isNum(toNum(d.ar_share)) && toNum(d.ar_share) < .5)) return false;
+    if(f.email && !d.email) return false;
+    if(f.egypt && !m.egypt) return false;
+    if(f.business && !d.is_business) return false;
+    if(f.brand && !(d.sponsored_posts > 0)) return false;
+    if(f.video && !ge(toNum(d.video_share), .5)) return false;
+    return true;
+  });
+  const key = { score:(d)=>S.dm[d.username].score, followers:(d)=>S.dm[d.username].followers, er:(d)=>S.dm[d.username].er, views:(d)=>S.dm[d.username].mv,
+    reach:(d)=>S.dm[d.username].viewRate, recent:(d)=>isNum(S.dm[d.username].daysSince) ? -S.dm[d.username].daysSince : null, newest:(d)=>new Date(d.first_seen).getTime() }[f.sort] || ((d)=>S.dm[d.username].score);
+  return rows.sort((a,b)=> (key(b) ?? -Infinity) - (key(a) ?? -Infinity));
+}
+
+function viewUgcDiscover(){
+  const admin = S.role==='admin';
+  const head = ugcHead('Discover creators', `Search Instagram, filter, save the best. ${fmtInt(S.disc.length)} creators found so far.`,
+    S.disc.length ? '<button class="btn" data-ugc="disc-csv">Export CSV</button>' : '');
+  if(!S.discReady) return head + `<div class="panel empty"><h2>Discovery tables are not installed</h2><p>Run <code>supabase/migrations/20261016_ugc_discover.sql</code>, then reload.</p></div>`;
+  const ds = S.dsearch, run = S.discRun;
+  const recent = [...new Map(S.searches.filter(s=>s.status==='done').map(s=>[s.kind+':'+s.query, s])).values()].slice(0, 8);
+  const searchBox = admin ? `<div class="panel dsearch">
+    <div class="ds-row">
+      <div class="seg" role="group" aria-label="Search by"><button data-dkind="user" aria-pressed="${ds.kind==='user'}">Keywords</button><button data-dkind="hashtag" aria-pressed="${ds.kind==='hashtag'}">Hashtag</button></div>
+      <input id="dsQ" class="input ds-q" dir="auto" value="${esc(ds.q)}" placeholder="${ds.kind==='user'?'e.g. modest fashion cairo, محجبات, mom blogger egypt':'e.g. modestfashion, ootdegypt, محجبات'}" ${run?'disabled':''}>
+      <select id="dsLimit" class="input ds-lim" aria-label="How many creators">${[20,30,50,100].map(n=>`<option value="${n}" ${ds.limit===n?'selected':''}>${n} creators</option>`).join('')}</select>
+      <button class="btn btn-primary" data-ugc="disc-search" ${run?'disabled':''}>${run?'<span class="spinner"></span> Searching…':'Search Instagram'}</button>
+    </div>
+    ${run ? `<p class="ds-run"><span class="spinner"></span> Searching Instagram for <b>${esc(run.kind==='hashtag'?'#'+run.query:run.query)}</b> — ${run.stage==='profiles'?'step 2 of 2: reading profiles and recent posts':'step 1 of 2: finding accounts'}. Usually 1–3 minutes; you can keep working.</p>`
+      : `<p class="hint ds-hint">${ds.kind==='user'?'Finds Instagram accounts whose name or bio matches your words.':'Finds creators who recently posted with this hashtag.'} Each search costs about $0.10–0.30 on Apify. ${recent.length?'Recent:':''} ${recent.map(s=>`<button class="tog" data-dre="${esc(s.kind)}|${esc(s.query)}" title="Show creators from this search">${s.kind==='hashtag'?'#':''}${esc(s.query)} <small>${fmtInt(s.found)}</small></button>`).join(' ')}</p>`}
+    ${S.discNoToken ? discSetup() : ''}
+  </div>` : '';
+  if(!S.disc.length) return head + searchBox + `<div class="panel empty"><h2>Start with a search</h2><p>Try “modest fashion egypt”, “محجبات”, “mom blogger cairo” or a hashtag like #ootdegypt. Every creator found stays here, ready to filter by followers, engagement, views, email and more.</p></div>`;
+  const f = S.df;
+  const sel = (id, opts, v, label) => `<label class="field"><span>${label}</span><select id="${id}" class="input">${opts.map(([k,l])=>`<option value="${esc(k)}" ${String(v)===String(k)?'selected':''}>${esc(l)}</option>`).join('')}</select></label>`;
+  const inp = (id, v, label, ph, type) => `<label class="field"><span>${label}</span><input id="${id}" class="input" ${type?`type="${type}" min="0" step="any" inputmode="decimal"`:''} value="${esc(v)}" placeholder="${esc(ph||'')}"></label>`;
+  const tog = (k, l, title) => `<button class="tog" data-df="${k}" aria-pressed="${!!f[k]}" ${title?`title="${esc(title)}"`:''}>${l}</button>`;
+  const tags = [...new Set(S.disc.flatMap(d=>d.found_by||[]))];
+  const nActive = Object.keys(DF_DEFAULT).filter(k=>!['q','sort','kwMode'].includes(k) && JSON.stringify(f[k])!==JSON.stringify(DF_DEFAULT[k])).length;
+  return head + searchBox + `
+  <div class="panel filters-panel${S.dfOpen?' open':''}">
+    <button class="btn btn-sm f-more" data-ugc="dfilters">${S.dfOpen?'Hide filters':'Filters'}${nActive?` · ${nActive} on`:''}</button>
+    <div class="filters">
+      <div class="wide">${inp('dfQ', f.q, 'Search results', 'Handle, name, bio, category…')}</div>
+      <div class="wide"><label class="field"><span>Keywords in bio or captions</span>
+        <span class="kwrow"><input id="dfKw" class="input" dir="auto" value="${esc(f.kw)}" placeholder="modest, hijab, ستايل, mom…"><select id="dfKwMode" class="input" aria-label="Match"><option value="any" ${f.kwMode==='any'?'selected':''}>Any</option><option value="all" ${f.kwMode==='all'?'selected':''}>All</option></select></span></label></div>
+      ${inp('dfFMin', f.fMin, 'Min followers', 'Any', 'number')}
+      ${inp('dfFMax', f.fMax, 'Max followers', 'Any', 'number')}
+      ${inp('dfEr', f.erMin, 'Min ER %', 'Any', 'number')}
+      ${inp('dfV', f.vMin, 'Min median views', 'Any', 'number')}
+      ${inp('dfScore', f.scoreMin, 'Min match score', '0–100', 'number')}
+      ${sel('dfActive', [['','Any time'],['7','Posted in last 7 days'],['30','Posted in last 30 days'],['90','Posted in last 90 days']], f.active, 'Activity')}
+      ${sel('dfLang', [['','Any language'],['ar','Mostly Arabic captions'],['en','Mostly non-Arabic captions']], f.lang, 'Caption language')}
+      ${sel('dfFound', [['','All searches'], ...tags.map(t=>[t, t])], f.found, 'Found by')}
+    </div>
+    <div class="f-row"><span class="f-l">Size</span>${TIERS.map(t=>`<button class="tog" data-dtier="${t[0]}" aria-pressed="${f.tiers.includes(t[0])}" title="${t[2]} followers">${t[1]} <small>${t[2]}</small></button>`).join('')}</div>
+    <div class="f-row"><span class="f-l">Only</span>${tog('egypt','🇪🇬 Egypt','Bio or name mentions Egypt or an Egyptian city')}${tog('email','✉ Has email')}${tog('business','Business / creator account','Can be tracked daily after saving')}${tog('brand','Brand experience','Recent captions with #ad, sponsored, discount codes, إعلان…')}${tog('video','Video-first')}${tog('hideSaved','Hide saved')}${tog('dismissed','Show dismissed')}
+      <span class="f-sort"><label for="dfSort">Sort</label><select id="dfSort" class="input">${[['score','Match score'],['followers','Followers'],['er','Engagement rate'],['views','Median views'],['reach','Views ÷ followers'],['recent','Most recently active'],['newest','Newest found']].map(([k,l])=>`<option value="${k}" ${f.sort===k?'selected':''}>${l}</option>`).join('')}</select></span>
+      <button class="linkbtn" data-ugc="dreset">Reset filters</button></div>
+  </div>
+  <div id="discResults">${discResultsHtml()}</div>`;
+}
+function discSetup(){
+  return `<div class="banner wait ds-setup"><b>Connect creator search (one-time, about 5 minutes):</b>
+    <ol><li>Create a free account at <a href="https://apify.com" target="_blank" rel="noopener">apify.com</a> (the free plan includes about $5 of searches a month).</li>
+    <li>In Apify, open <b>Settings → API &amp; Integrations</b> and copy your <b>Personal API token</b>.</li>
+    <li>In Supabase, open <b>Edge Functions → Secrets</b>, add <code>APIFY_TOKEN</code> with that token, and save.</li>
+    <li>Come back and press <b>Search Instagram</b>.</li></ol></div>`;
+}
+function discResultsHtml(){
+  const rows = discFiltered();
+  const kws = [...kwList(S.df.kw), ...S.ugcCfg.keywords];
+  const shown = rows.slice(0, S.discLimit || 40);
+  const more = rows.length > shown.length ? `<div class="more"><button class="btn" data-ugc="disc-more">Show ${Math.min(40, rows.length-shown.length)} more</button></div>` : '';
+  return `<p class="hint num res-count">${fmtInt(rows.length)} of ${fmtInt(S.disc.length)} discovered creators match</p>` +
+    (rows.length ? `<div class="clist2">${shown.map(d=>discCard(d, kws)).join('')}</div>${more}` : `<div class="panel empty"><h2>No creators match</h2><p>Loosen a filter, or run a new search above.</p></div>`);
+}
+function discAvatar(d, lg){
+  const k = lg ? 'avatar lg' : 'avatar';
+  return d.profile_pic_url ? `<img class="${k}" src="${esc(d.profile_pic_url)}" alt="" referrerpolicy="no-referrer" onerror="this.outerHTML='<span class=&quot;${k}&quot;>${esc(initials(d.username))}</span>'">` : `<span class="${k}">${esc(initials(d.username))}</span>`;
+}
+function discCard(d, kws){
+  const m = S.dm[d.username], t = tierOf(m.followers), admin = S.role==='admin';
+  const thumbs = m.posts.filter(p=>p.thumb).sort((a,b)=>(b.views??-1)-(a.views??-1)).slice(0,4);
+  const st = (v, l) => `<span><b class="num">${v}</b><small>${l}</small></span>`;
+  const badges = [
+    d.email ? `<span class="pill" title="${esc(d.email)}">✉ Email</span>` : '',
+    m.egypt ? '<span class="pill">🇪🇬 Egypt</span>' : '',
+    d.sponsored_posts > 0 ? `<span class="pill" title="Recent captions that look like brand partnerships">Brand exp · ${d.sponsored_posts}</span>` : '',
+    isNum(toNum(d.ar_share)) && d.ar_share >= .5 ? '<span class="pill">Arabic</span>' : '',
+    d.is_business === false ? '<span class="pill warn" title="Personal account: Instagram\'s API can\'t track it daily after saving">Personal account</span>' : '',
+    d.verified ? '<span class="pill">Verified</span>' : '',
+    d.category ? `<span class="pill">${esc(d.category)}</span>` : ''
+  ].join('');
+  const act = m.saved ? `<button class="btn btn-sm" data-creator="${m.saved.id}">Saved ✓ Open</button>`
+    : admin ? `<button class="btn btn-sm btn-primary" data-ugc="disc-save" data-u="${esc(d.username)}">Save</button><button class="btn btn-sm" data-ugc="disc-dismiss" data-u="${esc(d.username)}">${d.dismissed?'Restore':'Dismiss'}</button>` : '';
+  return `<div class="ccard" data-dprev="${esc(d.username)}" role="button" tabindex="0" aria-label="Preview @${esc(d.username)}">
+    <div class="cc-l">${discAvatar(d, true)}${scoreRing(m.score)}</div>
+    <div class="cc-m">
+      <div class="cc-h"><b>@${esc(d.username)}</b>${d.full_name?`<span class="muted">${esc(d.full_name)}</span>`:''}${t?`<span class="pill">${t[1]}</span>`:''}</div>
+      <div class="cc-s">${st(fmtK(m.followers),'followers')}${st(fmtPct(m.er,1),'ER')}${st(fmtK(m.mv),'median views')}${st(isNum(m.viewRate)?fmt1(m.viewRate)+'%':'–','views ÷ followers')}${st(isNum(m.daysSince)?Math.round(m.daysSince)+'d':'–','since last post')}</div>
+      ${d.biography?`<p class="cc-bio" dir="auto">${hl(d.biography.slice(0,220), kws)}</p>`:''}
+      ${badges?`<div class="cc-b">${badges}</div>`:''}
+    </div>
+    <div class="cc-r">
+      <div class="cc-act">${act}<a class="btn btn-sm" href="https://instagram.com/${esc(d.username)}" target="_blank" rel="noopener" title="Open on Instagram">${ICON.ext}</a></div>
+      <div class="thumbs">${thumbs.map(p=>`<span class="th"><img src="${esc(p.thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">${isNum(p.views)?`<i class="num">${fmtK(p.views)}</i>`:''}</span>`).join('')}</div>
+    </div></div>`;
+}
+function openDiscPreview(u){
+  const d = S.disc.find(x=>x.username===u); if(!d) return;
+  const m = S.dm[u], admin = S.role==='admin', kws = S.ugcCfg.keywords;
+  const parts = m.parts.map(p=>`<div class="sb"><div class="sb-h"><span>${p.k}</span><span class="num">${Math.round(p.v*p.w)} / ${p.w}</span></div><span class="bar"><i style="width:${p.v*100}%"></i></span><p>${esc(p.why)}</p></div>`).join('');
+  const posts = m.posts.map(p=>`<a class="post" href="${esc(p.url||('https://instagram.com/'+u))}" target="_blank" rel="noopener"><div class="img">${p.thumb?`<img src="${esc(p.thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:''}<span class="ph">Preview expired</span><span class="fmt">${p.video?'Video':'Post'}</span>${isNum(p.views)?`<span class="views num">${ICON.eye}${fmtK(p.views)}</span>`:''}</div>
+    <div class="body"><div class="stats num"><span>${ICON.heart}<b>${isNum(p.likes)?fmtK(p.likes):'hidden'}</b></span><span>${ICON.chat}<b>${fmtK(p.comments)}</b></span>${p.ts?`<span>${shortDate(p.ts)}</span>`:''}</div><div class="cap" dir="auto">${esc((p.caption||'').slice(0,140))}</div></div></a>`).join('');
+  const dlg = $('ugcDlg');
+  dlg.classList.remove('pd-narrow');
+  dlg.innerHTML = `<div class="pd-head">${discAvatar(d)}<div class="t">@${esc(u)}${d.full_name?' · '+esc(d.full_name):''}<small>${fmtK(m.followers)} followers · found by ${esc((d.found_by||[]).join(', '))}</small></div>
+      ${m.saved ? `<button class="btn btn-sm" data-creator="${m.saved.id}" data-dclose>Open saved creator</button>` : admin ? `<button class="btn btn-sm btn-primary" data-ugc="disc-save" data-u="${esc(u)}">Save</button>` : ''}
+      <a class="btn btn-sm" href="https://instagram.com/${esc(u)}" target="_blank" rel="noopener">${ICON.ext}<span class="lbl"> Instagram</span></a><button class="iconbtn" data-dclose aria-label="Close">✕</button></div>
+    <div class="pd-body">
+      <div>${d.biography?`<p class="pd-cap" dir="auto" style="margin-top:0">${hl(d.biography, kws)}</p>`:''}
+        <p class="pd-note">${[d.email?`✉ <a href="mailto:${esc(d.email)}">${esc(d.email)}</a>`:'', d.phone?`☎ ${esc(d.phone)}`:'', d.external_url?`<a href="${esc(d.external_url)}" target="_blank" rel="noopener">${esc(d.external_url.replace(/^https?:\/\//,'').slice(0,40))}</a>`:''].filter(Boolean).join(' · ')}</p>
+        <h3>Muhra match ${isNum(m.score)?m.score+' / 100':''}</h3>${parts}</div>
+      <div><h3>Recent posts</h3><div class="posts">${posts || '<p class="hint">No recent posts found.</p>'}</div>
+        <p class="pd-note">From their latest ${fmtInt(m.posts.length)} posts when found${d.updated_at?' ('+relTime(d.updated_at)+')':''}. Save the creator to track them daily and get the full analysis.</p></div>
+    </div>`;
+  if(!dlg.open) dlg.showModal();
+  dlg.scrollTop = 0;
+  dlg.addEventListener('close', () => dlg.classList.add('pd-narrow'), { once:true });
+}
+
+async function discInvoke(body){
+  const { data, error } = await sb.functions.invoke('ugc-discover', { body });
+  if(error){
+    let msg = error.message, code = null;
+    try{ const j = await error.context.json(); msg = j.error || msg; code = j.code || null; }catch(e){}
+    const err = new Error(msg); err.code = code; throw err;
+  }
+  return data;
+}
+async function discSearch(){
+  const q = ($('dsQ').value || '').trim();
+  S.dsearch.q = q; S.dsearch.limit = Number($('dsLimit').value) || 30;
+  if(q.length < 2){ toast('Type what you are looking for first.'); return; }
+  try{
+    const { id } = await discInvoke({ action:'start', query:q, kind:S.dsearch.kind, limit:S.dsearch.limit });
+    S.discNoToken = false;
+    S.discRun = { id, query: S.dsearch.kind==='hashtag' ? q.replace(/^#/,'').replace(/\s+/g,'') : q, kind:S.dsearch.kind, stage:'search' };
+    render(); pollDisc();
+  }catch(e){
+    if(e.code==='no_token'){ S.discNoToken = true; render(); return; }
+    toast(e.message || 'Search failed.');
+  }
+}
+async function pollDisc(){
+  const run = S.discRun; if(!run || pollDisc._on) return;
+  pollDisc._on = true;
+  try{
+    for(let i=0; i<120 && S.discRun===run; i++){
+      await sleep(5000);
+      let r; try{ r = await discInvoke({ action:'poll', id: run.id }); }catch(e){ if(i > 3) throw e; continue; }
+      if(r.status==='running'){ if(r.stage && r.stage!==run.stage){ run.stage = r.stage; if(S.view==='ugcDiscover') render(); } continue; }
+      S.discRun = null;
+      if(r.status==='failed'){ toast(r.error || 'Search failed.', 6000); render(); return; }
+      await loadDisc();
+      const tag = (run.kind==='hashtag'?'#':'') + run.query;
+      S.df = { ...S.df, found: tag }; saveDF();
+      toast(`Found ${fmtInt(r.found||0)} creator${r.found===1?'':'s'} for ${tag}.`, 5000);
+      render(); return;
+    }
+    if(S.discRun===run){ S.discRun = null; toast('The search is taking long. Results will appear here once it finishes.'); render(); }
+  }catch(e){ S.discRun = null; toast(e.message || 'Search failed.'); render(); }
+  finally{ pollDisc._on = false; }
+}
+async function loadDisc(){
+  const [d, s] = await Promise.all([
+    fetchAll(() => sb.from('ugc_discover').select('*').order('first_seen',{ascending:false}).order('username')).then(data=>({data})).catch(error=>({error})),
+    sb.from('ugc_searches').select('id,query,kind,requested,found,status,stage,error,created_at').order('created_at',{ascending:false}).limit(60)
+  ]);
+  S.discReady = !d.error;
+  S.disc = d.data || []; S.searches = s.data || [];
+  recomputeDisc();
+  // A search still running from earlier (page reload): pick it up again.
+  const live = S.searches.find(x=>x.status==='running' && Date.now()-new Date(x.created_at) < 30*6e4);
+  if(live && !S.discRun){ S.discRun = { id: live.id, query: live.query, kind: live.kind, stage: live.stage }; pollDisc(); }
+}
+async function discSave(u, el){
+  const d = S.disc.find(x=>x.username===u); if(!d) return;
+  if(el) el.disabled = true;
+  const known = S.accounts.find(a=>a.username===u);
+  if(known){ toast(known.kind==='creator' ? `@${u} is already saved.` : `@${u} is tracked as a competitor.`); return; }
+  // Prefill the profile from the search so the card is useful even before (or without) the daily fetch.
+  const { data, error } = await sb.from('ci_competitors').insert({ username:u, kind:'creator', display_name: d.full_name || null, biography: d.biography || null,
+    followers: isNum(toNum(d.followers)) ? toNum(d.followers) : null, profile_picture_url: d.profile_pic_url || null, website: d.external_url || null }).select('id').single();
+  if(error){ toast(error.message); if(el) el.disabled = false; return; }
+  await sb.from('ugc_creators').update({ source:'discover', stage:'shortlisted', email: d.email || null, phone: d.phone || null }).eq('account_id', data.id);
+  const dlg = $('ugcDlg'); if(dlg.open) dlg.close();
+  await loadData(); render(); toast(`Saved @${u} to your creators. Analyzing…`);
+  fetchCreators([data.id]);
+}
+function bindDisc(){
+  const f = S.df;
+  const upd = () => { saveDF(); S.discLimit = 40; const r = $('discResults'); if(r) r.innerHTML = discResultsHtml(); };
+  const map = { dfQ:'q', dfKw:'kw', dfFMin:'fMin', dfFMax:'fMax', dfEr:'erMin', dfV:'vMin', dfScore:'scoreMin' };
+  for(const [id,k] of Object.entries(map)){ const el = $(id); if(el) el.oninput = () => { f[k] = el.value; upd(); }; }
+  const smap = { dfActive:'active', dfLang:'lang', dfSort:'sort', dfKwMode:'kwMode', dfFound:'found' };
+  for(const [id,k] of Object.entries(smap)){ const el = $(id); if(el) el.onchange = () => { f[k] = el.value; upd(); }; }
+  document.querySelectorAll('[data-df]').forEach(b=>b.onclick=()=>{ const k = b.dataset.df; f[k] = !f[k]; b.setAttribute('aria-pressed', f[k]); upd(); });
+  document.querySelectorAll('[data-dtier]').forEach(b=>b.onclick=()=>{ const k = b.dataset.dtier; f.tiers = f.tiers.includes(k) ? f.tiers.filter(x=>x!==k) : [...f.tiers, k]; b.setAttribute('aria-pressed', f.tiers.includes(k)); upd(); });
+  document.querySelectorAll('[data-dkind]').forEach(b=>b.onclick=()=>{ S.dsearch.kind = b.dataset.dkind; const q = $('dsQ'); if(q) S.dsearch.q = q.value; render(); });
+  document.querySelectorAll('[data-dre]').forEach(b=>b.onclick=()=>{ const [k, q] = b.dataset.dre.split('|'); f.found = (k==='hashtag'?'#':'')+q; saveDF(); render(); });
+  const q = $('dsQ'); if(q){ q.oninput = () => { S.dsearch.q = q.value; }; q.onkeydown = (e) => { if(e.key==='Enter') discSearch(); }; }
+  const lim = $('dsLimit'); if(lim) lim.onchange = () => { S.dsearch.limit = Number(lim.value); };
+}
+function exportDiscCsv(){
+  const rows = discFiltered();
+  const q = (v) => { const s = v == null ? '' : String(v); return /[",\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s; };
+  const head = ['handle','name','profile','followers','tier','match_score','er_pct','median_views','views_per_follower_pct','days_since_last_post','email','phone','category','business_account','egypt','arabic_share','brand_posts','found_by','saved'];
+  const lines = rows.map(d=>{ const m = S.dm[d.username], t = tierOf(m.followers);
+    return [d.username, d.full_name, 'https://instagram.com/'+d.username, m.followers, t?t[1]:'', m.score, m.er, m.mv, isNum(m.viewRate)?Math.round(m.viewRate*10)/10:'', isNum(m.daysSince)?Math.round(m.daysSince):'', d.email, d.phone, d.category, d.is_business==null?'':d.is_business?'yes':'no', m.egypt?'yes':'', isNum(toNum(d.ar_share))?Math.round(d.ar_share*100)+'%':'', d.sponsored_posts, (d.found_by||[]).join(' '), m.saved?'yes':''].map(q).join(','); });
+  const blob = new Blob(['﻿'+[head.join(','), ...lines].join('\n')], { type:'text/csv;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `muhra-discovered-creators-${ymd(new Date())}.csv`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+}
 
 /* ---------- boot ---------- */
 async function boot(){
